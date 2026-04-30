@@ -2,33 +2,90 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ninja Man Remake</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#14142b" />
+    <meta
+      name="description"
+      content="Ninjaman - a modern HD remake of the classic Flash beat-em-up platformer, built with Phaser 4 and TypeScript."
+    />
+    <title>Ninjaman - Modern HD Remake</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='28' fill='%2314142b'/><rect x='14' y='28' width='36' height='8' fill='%23e94560'/></svg>" />
     <style>
+      :root {
+        --bg: #0a0a14;
+        --panel: #14142b;
+        --accent: #e94560;
+        --muted: #6b6b8d;
+        --light: #f6f5f5;
+      }
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
       }
+      html,
       body {
-        background: #1a1a2e;
+        height: 100%;
+        background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%);
+        font-family: Georgia, 'Times New Roman', serif;
+        color: var(--light);
+        overflow: hidden;
+        touch-action: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      body {
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
         min-height: 100vh;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        gap: 12px;
+        padding: 16px;
       }
       #game-container {
         position: relative;
-        border: 4px solid #e94560;
-        border-radius: 8px;
+        width: 100%;
+        max-width: 1280px;
+        aspect-ratio: 16 / 9;
+        border: 2px solid rgba(233, 69, 96, 0.5);
+        border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0 0 30px rgba(233, 69, 96, 0.5);
+        box-shadow: 0 0 40px rgba(233, 69, 96, 0.25), 0 8px 30px rgba(0, 0, 0, 0.6);
+        background: var(--panel);
+      }
+      #game-container canvas {
+        display: block;
+        width: 100% !important;
+        height: 100% !important;
+      }
+      #footer {
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        color: var(--muted);
+        letter-spacing: 0.05em;
+        text-align: center;
+      }
+      #footer kbd {
+        background: var(--panel);
+        border: 1px solid var(--muted);
+        border-radius: 3px;
+        padding: 1px 6px;
+        margin: 0 2px;
+        color: var(--light);
+      }
+      @media (max-width: 720px) {
+        #footer {
+          display: none;
+        }
       }
     </style>
   </head>
   <body>
-    <div id="game-container"></div>
+    <main id="game-container" aria-label="Ninjaman game canvas"></main>
+    <p id="footer">
+      Move <kbd>A</kbd><kbd>D</kbd> / arrows &nbsp;·&nbsp; Jump <kbd>W</kbd> / <kbd>Space</kbd> &nbsp;·&nbsp;
+      Slash <kbd>J</kbd> &nbsp;·&nbsp; Guard <kbd>K</kbd> &nbsp;·&nbsp; Pause <kbd>Esc</kbd>
+    </p>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
