@@ -15,6 +15,9 @@ export class Barrel extends Phaser.Physics.Arcade.Sprite {
     scene.add.existing(this);
     scene.physics.add.existing(this, true);
     this.setOrigin(0.5, 1);
+    // Scale HD JPG (~1024px) down to gameplay size.
+    this.setDisplaySize(BARREL_CONFIG.WIDTH, BARREL_CONFIG.HEIGHT);
+
     const body = this.body as Phaser.Physics.Arcade.StaticBody;
     body.setSize(BARREL_CONFIG.WIDTH, BARREL_CONFIG.HEIGHT);
     body.setOffset(0, 0);

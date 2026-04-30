@@ -42,15 +42,19 @@ export class TitleScene extends Phaser.Scene {
 
     // Controls panel
     const controls = [
-      'WASD or Arrows  -  Move and Jump',
-      'J  -  Slash',
-      'K  -  Guard',
+      'WASD / Arrows  -  Move',
+      'W or SPACE  -  Jump (tap twice for double-jump, slide on walls)',
+      'J  -  Slash (chain 3 hits for combo)',
+      'S + J on ground  -  Slide tackle',
+      'S + J in air  -  Slam attack (AOE)',
+      'L  -  Throw shuriken',
+      'K  -  Guard (75% damage reduction)',
       'ESC  -  Pause',
     ];
     controls.forEach((line, i) => {
-      const t = this.add.text(w / 2, h * 0.55 + i * 28, line, {
+      const t = this.add.text(w / 2, h * 0.5 + i * 26, line, {
         fontFamily: '"Courier New", monospace',
-        fontSize: '20px',
+        fontSize: '18px',
         color: COLORS.LIGHT_HEX,
       });
       t.setOrigin(0.5);

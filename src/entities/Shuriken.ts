@@ -15,15 +15,19 @@ export class Shuriken extends Phaser.Physics.Arcade.Sprite {
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
+    // Scale HD JPG (~1024px) down to projectile size before sizing the body.
+    this.setDisplaySize(36, 36);
+
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setAllowGravity(false);
     body.setVelocityX(dir * PLAYER_CONFIG.SHURIKEN_SPEED);
     // Slight gravity arc for feel
     body.setVelocityY(-60);
-    body.setSize(20, 20);
+    // Body in source-texture coords; ~60% of the rendered area is solid blade.
+    body.setSize(this.width * 0.6, this.height * 0.6);
+    body.setOffset(this.width * 0.2, this.height * 0.2);
 
     this.setDepth(15);
-    this.setScale(0.8);
     this.dieAt = scene.time.now + 1500;
 
     // Spin

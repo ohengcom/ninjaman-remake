@@ -27,9 +27,18 @@ export class Pickup extends Phaser.Physics.Arcade.Sprite {
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
+    // HD prop textures are large (~1024px); display them at game scale and
+    // size the physics body to roughly match the visual.
+    const displaySize = kind === 'dango' ? { w: 44, h: 36 } : { w: 36, h: 36 };
+    this.setDisplaySize(displaySize.w, displaySize.h);
+
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setAllowGravity(false);
-    body.setSize(this.width, this.height);
+    // Body sized in the source-texture coordinate system, then offset to centre.
+    const srcW = this.width;
+    const srcH = this.height;
+    body.setSize(srcW * 0.7, srcH * 0.7);
+    body.setOffset(srcW * 0.15, srcH * 0.15);
     body.setImmovable(true);
 
     this.setDepth(8);
