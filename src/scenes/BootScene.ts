@@ -1,8 +1,16 @@
 import Phaser from 'phaser';
+import { CharacterFactory } from '../factories/CharacterFactory.js';
+import {
+  COLORS,
+  GAME_CONFIG,
+  SCENE_KEYS,
+  SOUND_KEYS,
+  TEXTURE_KEYS,
+} from '../utils/constants.js';
 
 export class BootScene extends Phaser.Scene {
   constructor() {
-    super({ key: 'BootScene' });
+    super({ key: SCENE_KEYS.BOOT });
   }
 
   preload(): void {
@@ -11,68 +19,68 @@ export class BootScene extends Phaser.Scene {
   }
 
   create(): void {
-    this.scene.start('GameScene');
+    // Build all procedural character + FX textures once.
+    CharacterFactory.generateAll(this);
+    this.scene.start(SCENE_KEYS.TITLE);
   }
 
   private createLoadingBar(): void {
-    const width = this.cameras.main.width;
-    const height = this.cameras.main.height;
+    const w = GAME_CONFIG.WIDTH;
+    const h = GAME_CONFIG.HEIGHT;
 
-    const progressBar = this.add.graphics();
-    const progressBox = this.add.graphics();
-    progressBox.fillStyle(0x222222, 0.8);
-    progressBox.fillRect(width / 2 - 160, height / 2 - 25, 320, 50);
+    this.cameras.main.setBackgroundColor(COLORS.DARK_HEX);
 
-    const loadingText = this.add.text(width / 2, height / 2 - 50, 'Loading...', {
-      fontFamily: 'Arial',
-      fontSize: '20px',
-      color: '#ffffff',
+    const title = this.add.text(w / 2, h / 2 - 60, 'NINJAMAN', {
+      fontFamily: 'Georgia, "Times New Roman", serif',
+      fontSize: '64px',
+      color: COLORS.LIGHT_HEX,
+      fontStyle: 'bold',
     });
-    loadingText.setOrigin(0.5, 0.5);
+    title.setOrigin(0.5);
+
+    const subtitle = this.add.text(w / 2, h / 2 - 10, 'Loading the path of the shadow...', {
+      fontFamily: 'Georgia, serif',
+      fontSize: '18px',
+      color: COLORS.MUTED_HEX,
+    });
+    subtitle.setOrigin(0.5);
+
+    const barX = w / 2 - 200;
+    const barY = h / 2 + 30;
+
+    const box = this.add.graphics();
+    box.lineStyle(2, COLORS.PRIMARY, 1);
+    box.strokeRect(barX - 2, barY - 2, 404, 18);
+
+    const fill = this.add.graphics();
 
     this.load.on('progress', (value: number) => {
-      progressBar.clear();
-      progressBar.fillStyle(0xe94560, 1);
-      progressBar.fillRect(width / 2 - 150, height / 2 - 15, 300 * value, 30);
+      fill.clear();
+      fill.fillStyle(COLORS.PRIMARY, 1);
+      fill.fillRect(barX, barY, 400 * value, 14);
     });
 
     this.load.on('complete', () => {
-      progressBar.destroy();
-      progressBox.destroy();
-      loadingText.destroy();
+      title.destroy();
+      subtitle.destroy();
+      box.destroy();
+      fill.destroy();
     });
   }
 
   private loadAssets(): void {
-    // Load player frames (only the ones used in animations for now)
-    const ninjaFrames = [
-      ...this.range(0, 3),    // idle
-      ...this.range(30, 38),  // run
-      ...this.range(116, 118),// defend
-      ...this.range(162, 164),// jump
-      ...this.range(725, 730) // attack
-    ];
+    // HD scenery
+    this.load.image(TEXTURE_KEYS.BG_SKY, 'assets/hd/bg-sky.jpg');
+    this.load.image(TEXTURE_KEYS.BG_MID, 'assets/hd/bg-mid.jpg');
+    this.load.image(TEXTURE_KEYS.TILE_GROUND, 'assets/hd/tile-ground.jpg');
+    this.load.image(TEXTURE_KEYS.TILE_PLATFORM, 'assets/hd/tile-platform.jpg');
+    this.load.image(TEXTURE_KEYS.TITLE_BG, 'assets/hd/title-bg.jpg');
 
-    ninjaFrames.forEach(f => {
-      this.load.image(`ninja_${f}`, `assets/sprites/ninja/${f + 1}.png`);
-    });
-
-    // Load enemy frames (using similar logic for tonfa)
-    const tonfaFrames = [...this.range(0, 3), ...this.range(30, 38)];
-    tonfaFrames.forEach(f => {
-      this.load.image(`tonfa_${f}`, `assets/sprites/tonfa/${f + 1}.png`);
-    });
-
-    // Load level data
-    this.load.text('beach_xml', 'assets/maps/beach.xml');
-
-    // Load sounds
-    this.load.audio('attack', 'assets/sounds/237_attack.mp3.mp3');
-    this.load.audio('jump', 'assets/sounds/251_ninjah_jump1.mp3');
-    this.load.audio('hit', 'assets/sounds/242_enemy_thrownimpact.mp3');
-  }
-
-  private range(start: number, end: number): number[] {
-    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+    // SFX (kept from original assets)
+    this.load.audio(SOUND_KEYS.ATTACK, 'assets/sounds/253_ninjah_powerslash2.mp3');
+    this.load.audio(SOUND_KEYS.JUMP, 'assets/sounds/251_ninjah_jump1.mp3');
+    this.load.audio(SOUND_KEYS.HIT, 'assets/sounds/254_ninjah_sword_impact1.mp3');
+    this.load.audio(SOUND_KEYS.ENEMY_HIT, 'assets/sounds/242_enemy_thrownimpact.mp3');
+    this.load.audio(SOUND_KEYS.PLAYER_HURT, 'assets/sounds/244_ninjah_blood1.mp3');
   }
 }

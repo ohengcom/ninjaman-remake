@@ -1,78 +1,146 @@
 import Phaser from 'phaser';
 import { BaseEntity } from './BaseEntity.js';
+import {
+  COLORS,
+  ENEMY_CONFIG,
+  SOUND_KEYS,
+  TEXTURE_KEYS,
+} from '../utils/constants.js';
+
+type EnemyState = 'idle' | 'chase' | 'attack';
 
 export class Enemy extends BaseEntity {
-  private target?: Phaser.GameObjects.Components.Transform;
-  private speed: number = 80;
-  private attackRange: number = 50;
-  private lastAttackTime: number = 0;
-  private attackCooldown: number = 1500;
+  private target?: Phaser.GameObjects.Sprite;
+  private nextAttackAt = 0;
+  private state: EnemyState = 'idle';
+  private animTimer = 0;
+  private runFrameToggle = false;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, type: string) {
-    super(scene, x, y, `${type}_0`);
-    
+  private healthBarBg!: Phaser.GameObjects.Rectangle;
+  private healthBarFill!: Phaser.GameObjects.Rectangle;
+
+  public onAttackHit?: (enemy: Enemy) => void;
+  public onDeath?: (enemy: Enemy) => void;
+
+  constructor(scene: Phaser.Scene, x: number, y: number) {
+    super(scene, x, y, TEXTURE_KEYS.ENEMY_IDLE, ENEMY_CONFIG.MAX_HEALTH);
+
     this.setCollideWorldBounds(true);
-    this.setBounce(0);
-    this.setSize(40, 60);
-    this.setOffset(12, 4);
+    this.setSize(
+      ENEMY_CONFIG.HITBOX.width,
+      ENEMY_CONFIG.HITBOX.height,
+    );
+    this.setOffset(
+      ENEMY_CONFIG.HITBOX.offsetX,
+      ENEMY_CONFIG.HITBOX.offsetY,
+    );
+    this.setOrigin(0.5, 0.5);
+    this.setMaxVelocity(ENEMY_CONFIG.SPEED, 1500);
 
-    this.createAnimations(type);
+    this.healthBarBg = scene.add
+      .rectangle(x, y - 70, 60, 6, COLORS.HEALTH_BG)
+      .setOrigin(0.5)
+      .setDepth(50);
+    this.healthBarFill = scene.add
+      .rectangle(x, y - 70, 60, 6, COLORS.ENEMY_HEALTH_FILL)
+      .setOrigin(0.5)
+      .setDepth(51);
   }
 
-  private createAnimations(type: string): void {
-    const anims = this.scene.anims;
-
-    if (!anims.exists(`${type}_idle`)) {
-      anims.create({
-        key: `${type}_idle`,
-        frames: [0, 1, 2, 3].map(f => ({ key: `${type}_${f}` })),
-        frameRate: 8,
-        repeat: -1,
-      });
-
-      anims.create({
-        key: `${type}_run`,
-        frames: [30, 31, 32, 33, 34, 35, 36, 37, 38].map(f => ({ key: `${type}_${f}` })),
-        frameRate: 10,
-        repeat: -1,
-      });
-    }
-  }
-
-  public setTarget(target: Phaser.GameObjects.Components.Transform): void {
+  public setTarget(target: Phaser.GameObjects.Sprite): void {
     this.target = target;
   }
 
-  public update(): void {
-    if (!this.target || !this.body) return;
+  public update(_time: number, deltaMs: number): void {
+    if (this.isDead) return;
 
-    const distance = Phaser.Math.Distance.Between(this.x, this.y, (this.target as any).x, (this.target as any).y);
+    // Update health bar position above sprite
+    this.healthBarBg.setPosition(this.x, this.y - 70);
+    this.healthBarFill.setPosition(
+      this.x - 30 + (this.getHealthPct() * 60) / 2,
+      this.y - 70,
+    );
+    this.healthBarFill.setSize(this.getHealthPct() * 60, 6);
 
-    if (distance < 300 && distance > this.attackRange) {
-      // Move towards target
-      if ((this.target as any).x < this.x) {
-        this.setVelocityX(-this.speed);
-        this.setFlipX(true);
-      } else {
-        this.setVelocityX(this.speed);
-        this.setFlipX(false);
+    const body = this.body as Phaser.Physics.Arcade.Body | null;
+    if (!body || !this.target) return;
+
+    const dx = this.target.x - this.x;
+    const dy = this.target.y - this.y;
+    const dist = Math.hypot(dx, dy);
+    const now = this.scene.time.now;
+
+    if (dist < ENEMY_CONFIG.ATTACK_RANGE && Math.abs(dy) < 80) {
+      this.state = 'attack';
+      body.setVelocityX(0);
+      this.setFlipX(dx < 0);
+      if (now >= this.nextAttackAt) {
+        this.performAttack();
+        this.nextAttackAt = now + ENEMY_CONFIG.ATTACK_COOLDOWN_MS;
       }
-      this.play(`${this.texture.key.split('_')[0]}_run`, true);
-    } else if (distance <= this.attackRange) {
-      this.setVelocityX(0);
-      this.play(`${this.texture.key.split('_')[0]}_idle`, true);
-      this.tryAttack();
+    } else if (dist < ENEMY_CONFIG.AGGRO_RANGE) {
+      this.state = 'chase';
+      const dir = dx < 0 ? -1 : 1;
+      body.setVelocityX(ENEMY_CONFIG.SPEED * dir);
+      this.setFlipX(dir < 0);
     } else {
-      this.setVelocityX(0);
-      this.play(`${this.texture.key.split('_')[0]}_idle`, true);
+      this.state = 'idle';
+      body.setVelocityX(0);
+    }
+
+    this.animTimer += deltaMs;
+    this.advanceAnimation();
+  }
+
+  private advanceAnimation(): void {
+    switch (this.state) {
+      case 'idle':
+        if (this.texture.key !== TEXTURE_KEYS.ENEMY_IDLE) {
+          this.setTexture(TEXTURE_KEYS.ENEMY_IDLE);
+        }
+        break;
+      case 'chase': {
+        if (this.animTimer > 130) {
+          this.animTimer = 0;
+          this.runFrameToggle = !this.runFrameToggle;
+        }
+        const k = this.runFrameToggle
+          ? TEXTURE_KEYS.ENEMY_RUN_2
+          : TEXTURE_KEYS.ENEMY_RUN_1;
+        if (this.texture.key !== k) this.setTexture(k);
+        break;
+      }
+      case 'attack':
+        if (this.texture.key !== TEXTURE_KEYS.ENEMY_ATTACK) {
+          this.setTexture(TEXTURE_KEYS.ENEMY_ATTACK);
+        }
+        break;
     }
   }
 
-  private tryAttack(): void {
-    const now = this.scene.time.now;
-    if (now - this.lastAttackTime > this.attackCooldown) {
-      this.lastAttackTime = now;
-      // Attack logic could go here (e.g. animation, damage overlap check)
+  private performAttack(): void {
+    if (this.onAttackHit) this.onAttackHit(this);
+  }
+
+  public takeDamage(amount: number, invulnerabilityMs = 200): boolean {
+    const took = super.takeDamage(amount, invulnerabilityMs);
+    if (took) {
+      this.scene.sound.play(SOUND_KEYS.ENEMY_HIT, { volume: 0.4 });
+      // Knockback
+      const body = this.body as Phaser.Physics.Arcade.Body | null;
+      if (body && this.target) {
+        const dir = this.x < this.target.x ? -1 : 1;
+        body.setVelocityX(220 * dir);
+        body.setVelocityY(-200);
+      }
     }
+    return took;
+  }
+
+  protected die(): void {
+    super.die();
+    this.healthBarBg.destroy();
+    this.healthBarFill.destroy();
+    if (this.onDeath) this.onDeath(this);
   }
 }

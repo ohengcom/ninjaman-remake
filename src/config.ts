@@ -1,17 +1,21 @@
 import Phaser from 'phaser';
-import { GAME_CONFIG } from './utils/constants.js';
+import { COLORS, GAME_CONFIG } from './utils/constants.js';
 
-export function createGameConfig(scenes: Phaser.Types.Scenes.SceneType[]): Phaser.Types.Core.GameConfig {
+export function createGameConfig(
+  scenes: Phaser.Types.Scenes.SceneType[],
+): Phaser.Types.Core.GameConfig {
   return {
     type: Phaser.AUTO,
     width: GAME_CONFIG.WIDTH,
     height: GAME_CONFIG.HEIGHT,
     parent: 'game-container',
-    backgroundColor: '#2d2d2d',
+    backgroundColor: COLORS.DARK_HEX,
     pixelArt: false,
     scale: {
       mode: Phaser.Scale.FIT,
       autoCenter: Phaser.Scale.CENTER_BOTH,
+      width: GAME_CONFIG.WIDTH,
+      height: GAME_CONFIG.HEIGHT,
     },
     physics: {
       default: 'arcade',
@@ -25,6 +29,12 @@ export function createGameConfig(scenes: Phaser.Types.Scenes.SceneType[]): Phase
       antialias: true,
       antialiasGL: true,
       powerPreference: 'high-performance',
+      roundPixels: false,
     },
+    fps: {
+      target: 60,
+      forceSetTimeOut: false,
+    },
+    disableContextMenu: true,
   };
 }
