@@ -1,0 +1,26 @@
+{
+  "name": "ninjaman-remake",
+  "version": "1.0.0",
+  "description": "Ninja Man - Modern Remake with Phaser 4",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "game",
+    "phaser",
+    "ninja",
+    "beat-em-up"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "phaser": "^4.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vite": "^8.0.10"
+  }
+}
