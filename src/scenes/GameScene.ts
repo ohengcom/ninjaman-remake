@@ -240,7 +240,7 @@ export class GameScene extends Phaser.Scene {
     const dy = this.player.y - enemy.y;
     if (Math.hypot(dx, dy) <= ENEMY_CONFIG.ATTACK_RANGE + 10) {
       this.player.takeDamage(ENEMY_CONFIG.ATTACK_DAMAGE);
-      this.sound.play(SOUND_KEYS.HIT, { volume: 0.3 });
+      this.playSfx(SOUND_KEYS.HIT, 0.3);
     }
   }
 
@@ -271,7 +271,15 @@ export class GameScene extends Phaser.Scene {
   // ====================== Input / pause ======================
 
   private setupInput(): void {
-    this.input.keyboard?.on('keydown-ESC', () => this.togglePause());
+    const kb = this.input.keyboard;
+    if (!kb) return;
+    // Use a named handler so we can detach on shutdown to avoid stacking
+    // listeners across scene restarts.
+    const escHandler = () => this.togglePause();
+    kb.on('keydown-ESC', escHandler);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      kb.off('keydown-ESC', escHandler);
+    });
   }
 
   private togglePause(): void {
@@ -283,6 +291,19 @@ export class GameScene extends Phaser.Scene {
     } else {
       this.physics.world.resume();
       this.events.emit('hud-resume');
+    }
+  }
+
+  /**
+   * Defensive sound playback: never let a missing or throwing sfx break the
+   * frame loop.
+   */
+  private playSfx(key: string, volume = 0.5): void {
+    try {
+      if (!this.cache.audio.exists(key)) return;
+      this.sound.play(key, { volume });
+    } catch (err) {
+      console.warn('[v0] sfx play failed for', key, err);
     }
   }
 

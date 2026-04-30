@@ -12,7 +12,8 @@ type EnemyState = 'idle' | 'chase' | 'attack';
 export class Enemy extends BaseEntity {
   private target?: Phaser.GameObjects.Sprite;
   private nextAttackAt = 0;
-  private state: EnemyState = 'idle';
+  // NOTE: renamed to avoid shadowing Phaser.GameObjects.GameObject.state.
+  private enemyAiState: EnemyState = 'idle';
   private animTimer = 0;
   private runFrameToggle = false;
 
@@ -71,7 +72,7 @@ export class Enemy extends BaseEntity {
     const now = this.scene.time.now;
 
     if (dist < ENEMY_CONFIG.ATTACK_RANGE && Math.abs(dy) < 80) {
-      this.state = 'attack';
+      this.enemyAiState = 'attack';
       body.setVelocityX(0);
       this.setFlipX(dx < 0);
       if (now >= this.nextAttackAt) {
@@ -79,12 +80,12 @@ export class Enemy extends BaseEntity {
         this.nextAttackAt = now + ENEMY_CONFIG.ATTACK_COOLDOWN_MS;
       }
     } else if (dist < ENEMY_CONFIG.AGGRO_RANGE) {
-      this.state = 'chase';
+      this.enemyAiState = 'chase';
       const dir = dx < 0 ? -1 : 1;
       body.setVelocityX(ENEMY_CONFIG.SPEED * dir);
       this.setFlipX(dir < 0);
     } else {
-      this.state = 'idle';
+      this.enemyAiState = 'idle';
       body.setVelocityX(0);
     }
 
@@ -93,7 +94,7 @@ export class Enemy extends BaseEntity {
   }
 
   private advanceAnimation(): void {
-    switch (this.state) {
+    switch (this.enemyAiState) {
       case 'idle':
         if (this.texture.key !== TEXTURE_KEYS.ENEMY_IDLE) {
           this.setTexture(TEXTURE_KEYS.ENEMY_IDLE);
@@ -125,7 +126,13 @@ export class Enemy extends BaseEntity {
   public takeDamage(amount: number, invulnerabilityMs = 200): boolean {
     const took = super.takeDamage(amount, invulnerabilityMs);
     if (took) {
-      this.scene.sound.play(SOUND_KEYS.ENEMY_HIT, { volume: 0.4 });
+      try {
+        if (this.scene.cache.audio.exists(SOUND_KEYS.ENEMY_HIT)) {
+          this.scene.sound.play(SOUND_KEYS.ENEMY_HIT, { volume: 0.4 });
+        }
+      } catch (err) {
+        console.warn('[v0] enemy hit sfx failed', err);
+      }
       // Knockback
       const body = this.body as Phaser.Physics.Arcade.Body | null;
       if (body && this.target) {

@@ -15,8 +15,10 @@ export class Player extends BaseEntity {
   private keyW!: Phaser.Input.Keyboard.Key;
   private keyJ!: Phaser.Input.Keyboard.Key;
   private keyK!: Phaser.Input.Keyboard.Key;
+  private keySpace!: Phaser.Input.Keyboard.Key;
 
-  private state: PlayerState = 'idle';
+  // NOTE: renamed from `state` to avoid shadowing Phaser.GameObjects.GameObject.state.
+  private playerState: PlayerState = 'idle';
   private isAttacking = false;
   private attackEndTime = 0;
   private nextAttackAvailable = 0;
@@ -59,6 +61,24 @@ export class Player extends BaseEntity {
     this.keyW = kb.addKey(Phaser.Input.Keyboard.KeyCodes.W);
     this.keyJ = kb.addKey(Phaser.Input.Keyboard.KeyCodes.J);
     this.keyK = kb.addKey(Phaser.Input.Keyboard.KeyCodes.K);
+    this.keySpace = kb.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
+    // Prevent default browser behavior (scrolling) for our control keys.
+    kb.addCapture('UP,DOWN,LEFT,RIGHT,SPACE,W,A,S,D,J,K');
+  }
+
+  /**
+   * Defensive sound playback. If the audio context isn't unlocked yet or the
+   * sound key is missing, swallow the error so the game loop can never freeze
+   * on a missing/throwing audio call.
+   */
+  private playSfx(key: string, volume = 0.5): void {
+    try {
+      if (!this.scene.cache.audio.exists(key)) return;
+      this.scene.sound.play(key, { volume });
+    } catch (err) {
+      console.warn('[v0] sfx play failed for', key, err);
+    }
   }
 
   public update(_time: number, deltaMs: number): void {
@@ -75,58 +95,65 @@ export class Player extends BaseEntity {
       this.isAttacking = false;
     }
 
-    // Defend
-    const wantDefend = this.keyK.isDown;
-    if (wantDefend && !this.isAttacking) {
-      this.isDefending = true;
-      body.setVelocityX(0);
-      this.applyState('defend');
-      this.animTimer += deltaMs;
-      return;
-    } else {
-      this.isDefending = false;
-    }
+    // Defend: hold K. Note we DON'T early-return — animation must keep updating.
+    const wantDefend = this.keyK.isDown && !this.isAttacking;
+    this.isDefending = wantDefend;
 
     // Movement input
     const left = this.cursors.left?.isDown || this.keyA.isDown;
     const right = this.cursors.right?.isDown || this.keyD.isDown;
-    const jump = this.cursors.up?.isDown || this.keyW.isDown || this.cursors.space?.isDown;
+    const jumpPressed =
+      Phaser.Input.Keyboard.JustDown(this.cursors.up as Phaser.Input.Keyboard.Key) ||
+      Phaser.Input.Keyboard.JustDown(this.keyW) ||
+      Phaser.Input.Keyboard.JustDown(this.keySpace);
 
-    if (!this.isAttacking) {
-      if (left) {
+    if (this.isDefending) {
+      // Stand ground while defending — kill horizontal motion but keep gravity.
+      body.setVelocityX(0);
+    } else if (this.isAttacking) {
+      // While attacking, freeze horizontal momentum on ground.
+      if (onGround) body.setVelocityX(0);
+    } else {
+      if (left && !right) {
         body.setVelocityX(-PLAYER_CONFIG.SPEED);
         this.setFlipX(true);
-      } else if (right) {
+      } else if (right && !left) {
         body.setVelocityX(PLAYER_CONFIG.SPEED);
         this.setFlipX(false);
       } else {
         body.setVelocityX(0);
       }
 
-      if (jump && onGround) {
+      if (jumpPressed && onGround) {
         body.setVelocityY(PLAYER_CONFIG.JUMP_FORCE);
-        this.scene.sound.play(SOUND_KEYS.JUMP, { volume: 0.4 });
+        this.playSfx(SOUND_KEYS.JUMP, 0.4);
       }
-    } else {
-      // While attacking, kill horizontal momentum on ground
-      if (onGround) body.setVelocityX(0);
     }
 
-    // Attack
-    if (Phaser.Input.Keyboard.JustDown(this.keyJ) && now >= this.nextAttackAvailable && !this.isAttacking) {
+    // Attack on J press (single shot, not repeating)
+    if (
+      Phaser.Input.Keyboard.JustDown(this.keyJ) &&
+      now >= this.nextAttackAvailable &&
+      !this.isAttacking &&
+      !this.isDefending
+    ) {
       this.beginAttack(now);
     }
 
-    // Resolve display state
-    if (this.isAttacking) {
-      this.applyState('attack');
+    // Resolve display state (priority: defend > attack > jump > run > idle)
+    let next: PlayerState;
+    if (this.isDefending) {
+      next = 'defend';
+    } else if (this.isAttacking) {
+      next = 'attack';
     } else if (!onGround) {
-      this.applyState('jump');
+      next = 'jump';
     } else if (Math.abs(body.velocity.x) > 5) {
-      this.applyState('run');
+      next = 'run';
     } else {
-      this.applyState('idle');
+      next = 'idle';
     }
+    this.applyState(next);
 
     this.animTimer += deltaMs;
     this.advanceAnimation();
@@ -138,7 +165,7 @@ export class Player extends BaseEntity {
     this.nextAttackAvailable = now + PLAYER_CONFIG.ATTACK_COOLDOWN_MS + 80;
     this.animTimer = 0;
     this.attackFrameToggle = false;
-    this.scene.sound.play(SOUND_KEYS.ATTACK, { volume: 0.55 });
+    this.playSfx(SOUND_KEYS.ATTACK, 0.55);
 
     // Emit attack hitbox
     if (this.onAttackHitbox) {
@@ -155,18 +182,16 @@ export class Player extends BaseEntity {
   }
 
   private applyState(next: PlayerState): void {
-    if (this.state !== next) {
-      this.state = next;
+    if (this.playerState !== next) {
+      this.playerState = next;
       this.animTimer = 0;
     }
   }
 
   private advanceAnimation(): void {
-    switch (this.state) {
+    switch (this.playerState) {
       case 'idle':
-        if (this.texture.key !== TEXTURE_KEYS.NINJA_IDLE) {
-          this.setTexture(TEXTURE_KEYS.NINJA_IDLE);
-        }
+        this.safeSetTexture(TEXTURE_KEYS.NINJA_IDLE);
         break;
       case 'run': {
         if (this.animTimer > 110) {
@@ -174,13 +199,11 @@ export class Player extends BaseEntity {
           this.runFrameToggle = !this.runFrameToggle;
         }
         const k = this.runFrameToggle ? TEXTURE_KEYS.NINJA_RUN_2 : TEXTURE_KEYS.NINJA_RUN_1;
-        if (this.texture.key !== k) this.setTexture(k);
+        this.safeSetTexture(k);
         break;
       }
       case 'jump':
-        if (this.texture.key !== TEXTURE_KEYS.NINJA_JUMP) {
-          this.setTexture(TEXTURE_KEYS.NINJA_JUMP);
-        }
+        this.safeSetTexture(TEXTURE_KEYS.NINJA_JUMP);
         break;
       case 'attack': {
         if (this.animTimer > 90) {
@@ -190,20 +213,22 @@ export class Player extends BaseEntity {
         const k = this.attackFrameToggle
           ? TEXTURE_KEYS.NINJA_ATTACK_2
           : TEXTURE_KEYS.NINJA_ATTACK_1;
-        if (this.texture.key !== k) this.setTexture(k);
+        this.safeSetTexture(k);
         break;
       }
       case 'defend':
-        if (this.texture.key !== TEXTURE_KEYS.NINJA_DEFEND) {
-          this.setTexture(TEXTURE_KEYS.NINJA_DEFEND);
-        }
+        this.safeSetTexture(TEXTURE_KEYS.NINJA_DEFEND);
         break;
       case 'hurt':
-        if (this.texture.key !== TEXTURE_KEYS.NINJA_IDLE) {
-          this.setTexture(TEXTURE_KEYS.NINJA_IDLE);
-        }
+        this.safeSetTexture(TEXTURE_KEYS.NINJA_IDLE);
         break;
     }
+  }
+
+  private safeSetTexture(key: string): void {
+    if (this.texture.key === key) return;
+    if (!this.scene.textures.exists(key)) return;
+    this.setTexture(key);
   }
 
   public takeDamage(amount: number, invulnerabilityMs?: number): boolean {
@@ -214,7 +239,7 @@ export class Player extends BaseEntity {
       invulnerabilityMs ?? PLAYER_CONFIG.INVULNERABILITY_MS,
     );
     if (took) {
-      this.scene.sound.play(SOUND_KEYS.PLAYER_HURT, { volume: 0.4 });
+      this.playSfx(SOUND_KEYS.PLAYER_HURT, 0.4);
       // Knockback
       const body = this.body as Phaser.Physics.Arcade.Body | null;
       if (body) {
