@@ -8,14 +8,20 @@ import {
 } from '../utils/constants.js';
 
 type EnemyState = 'idle' | 'chase' | 'attack';
+export type EnemyVariant = 'grunt' | 'tough';
 
+/**
+ * Patrol/chase ground enemy. The {@link EnemyVariant} scales HP, speed, and
+ * tint so we can sprinkle slightly stronger versions late in the level
+ * without coding a second class.
+ */
 export class Enemy extends BaseEntity {
   private target?: Phaser.GameObjects.Sprite;
   private nextAttackAt = 0;
-  // NOTE: renamed to avoid shadowing Phaser.GameObjects.GameObject.state.
   private enemyAiState: EnemyState = 'idle';
   private animTimer = 0;
   private runFrameToggle = false;
+  public readonly variant: EnemyVariant;
 
   private healthBarBg!: Phaser.GameObjects.Rectangle;
   private healthBarFill!: Phaser.GameObjects.Rectangle;
@@ -23,20 +29,22 @@ export class Enemy extends BaseEntity {
   public onAttackHit?: (enemy: Enemy) => void;
   public onDeath?: (enemy: Enemy) => void;
 
-  constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, TEXTURE_KEYS.ENEMY_IDLE, ENEMY_CONFIG.MAX_HEALTH);
+  constructor(scene: Phaser.Scene, x: number, y: number, variant: EnemyVariant = 'grunt') {
+    const hp = variant === 'tough' ? ENEMY_CONFIG.MAX_HEALTH * 1.8 : ENEMY_CONFIG.MAX_HEALTH;
+    super(scene, x, y, TEXTURE_KEYS.ENEMY_IDLE, hp);
+    this.variant = variant;
 
     this.setCollideWorldBounds(true);
-    this.setSize(
-      ENEMY_CONFIG.HITBOX.width,
-      ENEMY_CONFIG.HITBOX.height,
-    );
-    this.setOffset(
-      ENEMY_CONFIG.HITBOX.offsetX,
-      ENEMY_CONFIG.HITBOX.offsetY,
-    );
+    this.setSize(ENEMY_CONFIG.HITBOX.width, ENEMY_CONFIG.HITBOX.height);
+    this.setOffset(ENEMY_CONFIG.HITBOX.offsetX, ENEMY_CONFIG.HITBOX.offsetY);
     this.setOrigin(0.5, 0.5);
-    this.setMaxVelocity(ENEMY_CONFIG.SPEED, 1500);
+    const speed = variant === 'tough' ? ENEMY_CONFIG.SPEED * 1.25 : ENEMY_CONFIG.SPEED;
+    this.setMaxVelocity(speed, 1500);
+
+    if (variant === 'tough') {
+      this.setTint(0xffaa70);
+      this.setScale(1.12);
+    }
 
     this.healthBarBg = scene.add
       .rectangle(x, y - 70, 60, 6, COLORS.HEALTH_BG)
@@ -55,7 +63,6 @@ export class Enemy extends BaseEntity {
   public update(_time: number, deltaMs: number): void {
     if (this.isDead) return;
 
-    // Update health bar position above sprite
     this.healthBarBg.setPosition(this.x, this.y - 70);
     this.healthBarFill.setPosition(
       this.x - 30 + (this.getHealthPct() * 60) / 2,
@@ -70,6 +77,7 @@ export class Enemy extends BaseEntity {
     const dy = this.target.y - this.y;
     const dist = Math.hypot(dx, dy);
     const now = this.scene.time.now;
+    const speed = this.variant === 'tough' ? ENEMY_CONFIG.SPEED * 1.25 : ENEMY_CONFIG.SPEED;
 
     if (dist < ENEMY_CONFIG.ATTACK_RANGE && Math.abs(dy) < 80) {
       this.enemyAiState = 'attack';
@@ -82,7 +90,7 @@ export class Enemy extends BaseEntity {
     } else if (dist < ENEMY_CONFIG.AGGRO_RANGE) {
       this.enemyAiState = 'chase';
       const dir = dx < 0 ? -1 : 1;
-      body.setVelocityX(ENEMY_CONFIG.SPEED * dir);
+      body.setVelocityX(speed * dir);
       this.setFlipX(dir < 0);
     } else {
       this.enemyAiState = 'idle';
@@ -133,7 +141,6 @@ export class Enemy extends BaseEntity {
       } catch (err) {
         console.warn('[v0] enemy hit sfx failed', err);
       }
-      // Knockback
       const body = this.body as Phaser.Physics.Arcade.Body | null;
       if (body && this.target) {
         const dir = this.x < this.target.x ? -1 : 1;

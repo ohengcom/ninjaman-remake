@@ -1,5 +1,10 @@
 import Phaser from 'phaser';
 
+/**
+ * Shared base for all damageable sprites. Provides health bookkeeping,
+ * invulnerability frames, and a hit-flash tint pulse so derived classes
+ * (Player, Enemy, Boss) only need to implement gameplay specifics.
+ */
 export abstract class BaseEntity extends Phaser.Physics.Arcade.Sprite {
   protected maxHealth: number;
   protected currentHealth: number;
@@ -52,6 +57,20 @@ export abstract class BaseEntity extends Phaser.Physics.Arcade.Sprite {
       this.die();
     }
     return true;
+  }
+
+  /** Restore HP, clamped to maxHealth. Returns the actual amount restored. */
+  public heal(amount: number): number {
+    if (this.isDead) return 0;
+    const before = this.currentHealth;
+    this.currentHealth = Math.min(this.maxHealth, this.currentHealth + amount);
+    return this.currentHealth - before;
+  }
+
+  /** Used by checkpoints to fully refresh HP without a heal animation. */
+  public restoreFullHealth(): void {
+    this.currentHealth = this.maxHealth;
+    this.isDead = false;
   }
 
   protected die(): void {
