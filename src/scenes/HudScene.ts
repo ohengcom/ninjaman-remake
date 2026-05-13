@@ -1,140 +1,145 @@
 import Phaser from 'phaser';
-import { COLORS, GAME_CONFIG, SCENE_KEYS } from '../utils/constants.js';
 
-export interface HudUpdate {
-  health: number;
-  maxHealth: number;
-  lives: number;
-  score: number;
-  enemiesRemaining: number;
-  timeMs: number;
-  paused?: boolean;
-}
-
-export class HudScene extends Phaser.Scene {
-  private healthBarBg!: Phaser.GameObjects.Rectangle;
-  private healthBarFill!: Phaser.GameObjects.Rectangle;
+export class HUDScene extends Phaser.Scene {
+  private healthBar!: Phaser.GameObjects.Graphics;
   private healthText!: Phaser.GameObjects.Text;
-  private livesText!: Phaser.GameObjects.Text;
   private scoreText!: Phaser.GameObjects.Text;
-  private enemiesText!: Phaser.GameObjects.Text;
-  private timerText!: Phaser.GameObjects.Text;
-  private pausedOverlay?: Phaser.GameObjects.Container;
+  private levelText!: Phaser.GameObjects.Text;
+  private styleText!: Phaser.GameObjects.Text;
+
+  private currentHealth: number = 100;
+  private maxHealth: number = 100;
+  private currentScore: number = 0;
+  private skillPoints: number = 0;
+  
+  private skillMenuContainer!: Phaser.GameObjects.Container;
+  private isSkillMenuOpen: boolean = false;
 
   constructor() {
-    super({ key: SCENE_KEYS.HUD });
+    super({ key: 'HUDScene' });
   }
 
-  create(): void {
-    const w = GAME_CONFIG.WIDTH;
+  create() {
+    const w = this.cameras.main.width;
+    const h = this.cameras.main.height;
 
-    // Top-left panel background
-    const panel = this.add.rectangle(20, 20, 320, 80, 0x000000, 0.45);
-    panel.setOrigin(0, 0);
-    panel.setStrokeStyle(2, COLORS.PRIMARY, 0.6);
+    this.healthBar = this.add.graphics();
+    this.drawHealthBar();
 
-    // Health label
-    this.add.text(36, 30, 'HP', {
-      fontFamily: '"Courier New", monospace',
-      fontSize: '14px',
-      color: COLORS.MUTED_HEX,
+    this.healthText = this.add.text(20, 15, 'INTEGRITY', {
+      fontFamily: 'Arial', fontSize: '16px', color: '#ffffff', fontStyle: 'bold'
     });
 
-    // Health bar
-    this.healthBarBg = this.add
-      .rectangle(36, 50, 240, 14, COLORS.HEALTH_BG)
-      .setOrigin(0, 0)
-      .setStrokeStyle(1, COLORS.MUTED, 1);
-    this.healthBarFill = this.add
-      .rectangle(36, 50, 240, 14, COLORS.HEALTH_FILL)
-      .setOrigin(0, 0);
+    this.scoreText = this.add.text(w - 20, 20, 'SCORE: 0', {
+      fontFamily: 'Impact', fontSize: '32px', color: '#e94560',
+    }).setOrigin(1, 0);
 
-    this.healthText = this.add.text(286, 48, '100/100', {
-      fontFamily: '"Courier New", monospace',
-      fontSize: '14px',
-      color: COLORS.LIGHT_HEX,
+    this.levelText = this.add.text(w / 2, 20, 'SECTOR: 1', {
+      fontFamily: 'Impact', fontSize: '28px', color: '#00ffff',
+      stroke: '#000000', strokeThickness: 4
+    }).setOrigin(0.5, 0);
+
+    this.styleText = this.add.text(w - 20, 80, '', {
+      fontFamily: 'Impact', fontSize: '64px', color: '#f39c12',
+      stroke: '#e94560', strokeThickness: 6, shadow: { blur: 10, color: '#f39c12', fill: true }
+    }).setOrigin(1, 0);
+
+    this.add.text(w / 2, h - 30, '[DOUBLE TAP ARROWS] Dash | [DOWN] Defend | [UP+SPACE] Uppercut | [K] Skills', {
+      fontFamily: 'Arial', fontSize: '16px', color: '#aaa'
+    }).setOrigin(0.5);
+
+    this.createSkillMenu(w, h);
+
+    const gameScene = this.scene.get('GameScene');
+    
+    gameScene.events.on('update_health', (health: number, max: number) => {
+      this.currentHealth = health;
+      this.maxHealth = max || 100;
+      this.drawHealthBar();
     });
 
-    this.livesText = this.add.text(36, 72, 'Lives x 3', {
-      fontFamily: '"Courier New", monospace',
-      fontSize: '14px',
-      color: COLORS.ACCENT_HEX,
+    gameScene.events.on('update_score', (score: number) => {
+      const diff = score - this.currentScore;
+      this.currentScore = score;
+      this.scoreText.setText(`SCORE: ${this.currentScore}`);
+      
+      if (diff > 0 && diff % 500 === 0) {
+          this.skillPoints++; // Give skill points for milestones
+      }
+      
+      this.tweens.add({ targets: this.scoreText, scaleX: 1.2, scaleY: 1.2, duration: 100, yoyo: true });
     });
 
-    // Top-right info
-    this.scoreText = this.add
-      .text(w - 20, 30, 'Score: 0', {
-        fontFamily: '"Courier New", monospace',
-        fontSize: '20px',
-        color: COLORS.LIGHT_HEX,
-        fontStyle: 'bold',
-      })
-      .setOrigin(1, 0);
+    gameScene.events.on('update_level', (level: number) => {
+      let levelName = 'CITY SECTOR';
+      if (level === 2) levelName = 'FOREST SECTOR';
+      if (level === 3) levelName = 'CORE SECTOR';
+      this.levelText.setText(`SECTOR ${level}: ${levelName}`);
+    });
 
-    this.timerText = this.add
-      .text(w - 20, 56, 'Time: 0.0s', {
-        fontFamily: '"Courier New", monospace',
-        fontSize: '14px',
-        color: COLORS.MUTED_HEX,
-      })
-      .setOrigin(1, 0);
+    gameScene.events.on('update_style', (style: string) => {
+      this.styleText.setText(style);
+      if (style) {
+          this.styleText.setScale(2);
+          this.tweens.add({ targets: this.styleText, scaleX: 1, scaleY: 1, duration: 200, ease: 'Bounce.out' });
+      }
+    });
 
-    this.enemiesText = this.add
-      .text(w - 20, 76, 'Enemies: 0', {
-        fontFamily: '"Courier New", monospace',
-        fontSize: '14px',
-        color: COLORS.MUTED_HEX,
-      })
-      .setOrigin(1, 0);
-
-    // Listen for updates
-    this.scene.get(SCENE_KEYS.GAME).events.on('hud-update', this.handleUpdate, this);
-    this.scene.get(SCENE_KEYS.GAME).events.on('hud-pause', this.showPaused, this);
-    this.scene.get(SCENE_KEYS.GAME).events.on('hud-resume', this.hidePaused, this);
-
-    // Cleanup if game scene shuts down
-    this.events.once('shutdown', () => {
-      this.scene.get(SCENE_KEYS.GAME)?.events.off('hud-update', this.handleUpdate, this);
-      this.scene.get(SCENE_KEYS.GAME)?.events.off('hud-pause', this.showPaused, this);
-      this.scene.get(SCENE_KEYS.GAME)?.events.off('hud-resume', this.hidePaused, this);
+    this.input.keyboard!.on('keydown-K', () => {
+       this.isSkillMenuOpen = !this.isSkillMenuOpen;
+       this.skillMenuContainer.setVisible(this.isSkillMenuOpen);
+       if (this.isSkillMenuOpen) {
+           (this.skillMenuContainer.getByName('sp_text') as Phaser.GameObjects.Text).setText(`SKILL POINTS: ${this.skillPoints}`);
+           gameScene.scene.pause();
+       } else {
+           gameScene.scene.resume();
+       }
     });
   }
 
-  private handleUpdate(data: HudUpdate): void {
-    const pct = Phaser.Math.Clamp(data.health / data.maxHealth, 0, 1);
-    this.healthBarFill.setSize(240 * pct, 14);
-    // Color shift on low health
-    if (pct < 0.3) {
-      this.healthBarFill.setFillStyle(COLORS.PRIMARY);
-    } else {
-      this.healthBarFill.setFillStyle(COLORS.HEALTH_FILL);
-    }
-    this.healthText.setText(`${data.health}/${data.maxHealth}`);
-    this.livesText.setText(`Lives x ${data.lives}`);
-    this.scoreText.setText(`Score: ${data.score}`);
-    this.enemiesText.setText(`Enemies: ${data.enemiesRemaining}`);
-    this.timerText.setText(`Time: ${(data.timeMs / 1000).toFixed(1)}s`);
+  private drawHealthBar() {
+    this.healthBar.clear();
+    this.healthBar.fillStyle(0x000000, 0.8);
+    this.healthBar.fillRect(20, 40, 200, 20);
+
+    const healthPercent = Math.max(0, this.currentHealth / this.maxHealth);
+    const healthWidth = healthPercent * 200;
+    const color = healthPercent > 0.5 ? 0x00ff00 : (healthPercent > 0.25 ? 0xffff00 : 0xff0000);
+    
+    this.healthBar.fillStyle(color, 1);
+    this.healthBar.fillRect(20, 40, healthWidth, 20);
+    this.healthBar.lineStyle(2, 0xffffff, 1);
+    this.healthBar.strokeRect(20, 40, 200, 20);
   }
 
-  private showPaused(): void {
-    if (this.pausedOverlay) return;
-    const w = GAME_CONFIG.WIDTH;
-    const h = GAME_CONFIG.HEIGHT;
-    this.pausedOverlay = this.add.container(0, 0);
-    const bg = this.add.rectangle(w / 2, h / 2, w, h, 0x000000, 0.6);
-    const txt = this.add
-      .text(w / 2, h / 2, 'PAUSED\nESC to resume', {
-        fontFamily: 'Georgia, serif',
-        fontSize: '48px',
-        color: COLORS.LIGHT_HEX,
-        align: 'center',
-      })
-      .setOrigin(0.5);
-    this.pausedOverlay.add([bg, txt]);
-  }
+  private createSkillMenu(w: number, h: number) {
+    this.skillMenuContainer = this.add.container(w/2, h/2);
+    this.skillMenuContainer.setVisible(false);
 
-  private hidePaused(): void {
-    this.pausedOverlay?.destroy(true);
-    this.pausedOverlay = undefined;
+    const bg = this.add.rectangle(0, 0, 400, 300, 0x1a1a2e, 0.95);
+    bg.setStrokeStyle(4, 0x00ffff);
+    
+    const title = this.add.text(0, -120, 'CYBER ENHANCEMENTS', { fontFamily: 'Impact', fontSize: '32px', color: '#00ffff' }).setOrigin(0.5);
+    const spText = this.add.text(0, -80, 'SKILL POINTS: 0', { fontFamily: 'Arial', fontSize: '20px', color: '#e94560' }).setOrigin(0.5);
+    spText.setName('sp_text');
+
+    const upgradeHealthBtn = this.add.text(0, 0, '[1] MAX INTEGRITY +20 (Cost: 1 SP)', { fontFamily: 'Arial', fontSize: '18px', color: '#fff' }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    
+    upgradeHealthBtn.on('pointerdown', () => {
+        if (this.skillPoints > 0) {
+            this.skillPoints--;
+            this.maxHealth += 20;
+            this.currentHealth = this.maxHealth;
+            spText.setText(`SKILL POINTS: ${this.skillPoints}`);
+            this.drawHealthBar();
+            const gameScene = this.scene.get('GameScene');
+            (gameScene as any).player.maxHealth = this.maxHealth;
+            (gameScene as any).player.health = this.currentHealth;
+        }
+    });
+
+    const closeText = this.add.text(0, 100, 'PRESS [K] TO CLOSE', { fontFamily: 'Arial', fontSize: '16px', color: '#aaa' }).setOrigin(0.5);
+
+    this.skillMenuContainer.add([bg, title, spText, upgradeHealthBtn, closeText]);
   }
 }
