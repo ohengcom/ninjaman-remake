@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
+    <defs>
+      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+      <filter id="heavyGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="5" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+      <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#2a2a35"/>
+        <stop offset="50%" stop-color="#1a1a2e"/>
+        <stop offset="100%" stop-color="#0f0f1a"/>
+      </linearGradient>
+      <linearGradient id="blade" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="100%" stop-color="#00ffff"/>
+      </linearGradient>
+    </defs>
+    
+  <g transform="translate(0, -5)">
+    <!-- Scarf trailing down -->
+    <path d="M 35 25 Q 30 50 40 65 Q 45 45 45 25" fill="#e94560" opacity="0.8"/>
+    <!-- Body Armor -->
+    <rect x="25" y="20" width="30" height="30" rx="6" fill="url(#metal)" stroke="#3a3a50" stroke-width="2"/>
+    <!-- Legs tucked up -->
+    <path d="M 30 50 L 25 60 M 50 50 L 45 60" stroke="#0f3460" stroke-width="6" stroke-linecap="round"/>
+    <path d="M 30 50 L 25 60 M 50 50 L 45 60" stroke="#e94560" stroke-width="2" stroke-linecap="round"/>
+    <!-- Head/Helmet -->
+    <path d="M 28 12 Q 40 -3 52 12 Q 40 22 28 12" fill="#1a1a2e" stroke="#3a3a50" stroke-width="2"/>
+    <path d="M 36 7 L 48 7 L 46 13 L 38 13 Z" fill="#00ffff" filter="url(#glow)"/>
+    <!-- Scarf Front -->
+    <path d="M 25 17 Q 40 22 55 17 L 50 25 Q 40 29 30 25 Z" fill="#e94560"/>
+  </g>
+
+  </svg>

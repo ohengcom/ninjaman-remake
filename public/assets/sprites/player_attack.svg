@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80" width="120" height="80">
+    <defs>
+      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+      <filter id="heavyGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="5" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+      <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#2a2a35"/>
+        <stop offset="50%" stop-color="#1a1a2e"/>
+        <stop offset="100%" stop-color="#0f0f1a"/>
+      </linearGradient>
+      <linearGradient id="blade" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="100%" stop-color="#00ffff"/>
+      </linearGradient>
+    </defs>
+    
+  <!-- Motion blur trail -->
+  <path d="M 30 20 A 60 60 0 0 1 110 50 L 100 55 A 50 50 0 0 0 30 30 Z" fill="#00ffff" filter="url(#glow)" opacity="0.6"/>
+  <!-- Body -->
+  <rect x="25" y="22" width="30" height="36" rx="6" fill="url(#metal)" stroke="#3a3a50" stroke-width="2"/>
+  <!-- Head -->
+  <path d="M 28 15 Q 40 0 52 15 Q 40 25 28 15" fill="#1a1a2e" stroke="#3a3a50" stroke-width="2"/>
+  <path d="M 38 10 L 50 10 L 48 16 L 40 16 Z" fill="#00ffff" filter="url(#heavyGlow)"/>
+  <!-- Arm holding sword -->
+  <rect x="40" y="26" width="35" height="8" rx="4" fill="url(#metal)" transform="rotate(20 40 26)"/>
+  <!-- The glowing Katana -->
+  <path d="M 70 36 L 115 52 L 113 55 L 68 39 Z" fill="url(#blade)" filter="url(#heavyGlow)"/>
+  <rect x="65" y="32" width="6" height="12" fill="#111" transform="rotate(20 68 38)"/>
+
+  </svg>

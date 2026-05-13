@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
+    
+  <defs>
+    <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+      <stop offset="40%" stop-color="#e94560" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#0f0c29" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0a0510"/>
+      <stop offset="50%" stop-color="#1b1130"/>
+      <stop offset="100%" stop-color="#2a1b40"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#skyGrad)"/>
+  
+  <!-- Stars -->
+  <g fill="#fff" opacity="0.6">
+    <circle cx="100" cy="50" r="1.5"/><circle cx="250" cy="120" r="1"/>
+    <circle cx="500" cy="80" r="2"/><circle cx="800" cy="40" r="1.5"/>
+    <circle cx="1100" cy="150" r="2"/><circle cx="1200" cy="60" r="1"/>
+    <circle cx="350" cy="200" r="1"/><circle cx="650" cy="180" r="1.5"/>
+  </g>
+
+  <!-- Cyber Moon -->
+  <circle cx="900" cy="150" r="100" fill="url(#moonGlow)"/>
+  
+  <!-- Distant Silhouette -->
+  <path d="M 0 500 L 80 420 L 100 420 L 150 480 L 250 380 L 280 380 L 320 450 L 450 350 L 500 350 L 550 420 L 700 320 L 750 320 L 850 450 L 1000 380 L 1050 380 L 1150 480 L 1280 400 L 1280 720 L 0 720 Z" fill="#0f111a" opacity="0.8"/>
+
+  </svg>
