@@ -1,8 +1,20 @@
 import Phaser from 'phaser';
+import { COLORS, GAME_CONFIG, SCENE_KEYS } from '../utils/constants.js';
+
+export interface GameOverData {
+  score: number;
+  enemiesDefeated: number;
+}
 
 export class GameOverScene extends Phaser.Scene {
+  private data!: GameOverData;
+
   constructor() {
-    super({ key: 'GameOverScene' });
+    super({ key: SCENE_KEYS.GAME_OVER });
+  }
+
+  init(data: GameOverData): void {
+    this.data = data ?? { score: 0, enemiesDefeated: 0 };
   }
 
   init(data: { score: number, win?: boolean }) {

@@ -1,18 +1,24 @@
 {
   "name": "ninjaman-remake",
-  "version": "1.0.0",
-  "description": "Ninja Man - Modern Remake with Phaser 4",
+  "version": "2.0.0",
+  "description": "Ninjaman - a modern HD remake of the classic Flash beat-em-up, built with Phaser 4 + TypeScript + Vite.",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "keywords": [
     "game",
     "phaser",
     "ninja",
-    "beat-em-up"
+    "platformer",
+    "beat-em-up",
+    "typescript",
+    "vite"
   ],
   "author": "",
   "license": "ISC",
@@ -21,6 +27,7 @@
   },
   "devDependencies": {
     "typescript": "^5.9.3",
-    "vite": "^8.0.10"
+    "vite": "^8.0.10",
+    "vitest": "^3.2.4"
   }
 }
