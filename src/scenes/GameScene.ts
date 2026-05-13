@@ -21,7 +21,7 @@ export class GameScene extends Phaser.Scene {
   private mapWidth: number = 0;
 
   constructor() {
-    super({ key: SCENE_KEYS.GAME });
+    super({ key: 'GameScene' });
   }
 
   init(data: { level?: number; score?: number }) {
