@@ -254,7 +254,7 @@ export class GameScene extends Phaser.Scene {
         this.cameras.main.shake(150, 0.015);
         this.events.emit('update_score', this.score);
         if (this.comboCount > 1) {
-            const popup = this.add.text(attacker.x + (50 * dir), attacker.y - 40, \`\${this.comboCount} HITS!\`, {
+            const popup = this.add.text(attacker.x + (50 * dir), attacker.y - 40, `${this.comboCount} HITS!`, {
                 fontFamily: 'Impact', fontSize: '20px', color: '#e94560'
             }).setOrigin(0.5);
             this.tweens.add({ targets: popup, y: attacker.y - 80, alpha: 0, duration: 600, onComplete: () => popup.destroy() });
