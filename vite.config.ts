@@ -2,9 +2,6 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   base: './',
-  // Only `static/` is served and copied to `dist/` — keeps the 3000+ legacy
-  // Flash sprite frames in `public/` out of the production build.
-  publicDir: 'static',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
