@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
+    
+  <g fill="#113320" stroke="#00ff55" stroke-width="1" opacity="0.9">
+    <!-- Trunks -->
+    <rect x="200" y="100" width="80" height="620" />
+    <rect x="550" y="50" width="100" height="670" />
+    <rect x="850" y="150" width="60" height="570" />
+    <!-- Tech Leaves / Branches -->
+    <polygon points="150,200 240,100 330,200" fill="#0f4a25"/>
+    <polygon points="450,150 600,50 750,150" fill="#0f4a25"/>
+    <polygon points="780,250 880,150 980,250" fill="#0f4a25"/>
+  </g>
+  <g fill="#00ff55" opacity="0.6">
+    <rect x="230" y="300" width="10" height="50" />
+    <rect x="590" y="250" width="20" height="80" />
+    <circle cx="880" cy="400" r="10" filter="url(#glow)"/>
+  </g>
+
+  </svg>

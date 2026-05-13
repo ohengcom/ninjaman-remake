@@ -1,13 +1,16 @@
 import Phaser from 'phaser';
-import { createGameConfig } from './config.js';
+import { gameConfig } from './config.js';
 import { BootScene } from './scenes/BootScene.js';
+import { MainMenuScene } from './scenes/MainMenuScene.js';
 import { GameScene } from './scenes/GameScene.js';
+import { HUDScene } from './scenes/HUDScene.js';
 import { GameOverScene } from './scenes/GameOverScene.js';
 
-const config = createGameConfig([BootScene, GameScene, GameOverScene]);
-const game = new Phaser.Game(config);
+const config = {
+  ...gameConfig,
+  scene: [BootScene, MainMenuScene, GameScene, HUDScene, GameOverScene],
+};
 
-// Handle window resize
-window.addEventListener('resize', () => {
-  game.scale.resize(window.innerWidth, window.innerHeight);
+window.addEventListener('load', () => {
+  new Phaser.Game(config);
 });

@@ -6,73 +6,56 @@ export class BootScene extends Phaser.Scene {
   }
 
   preload(): void {
-    this.createLoadingBar();
-    this.loadAssets();
-  }
+    // Load Modern Vector SVGs
+    this.load.svg('player_idle', 'assets/sprites/player_idle.svg');
+    this.load.svg('player_run', 'assets/sprites/player_run.svg');
+    this.load.svg('player_jump', 'assets/sprites/player_jump.svg');
+    this.load.svg('player_attack', 'assets/sprites/player_attack.svg');
+    this.load.svg('player_dash', 'assets/sprites/player_dash.svg');
+    this.load.svg('player_defend', 'assets/sprites/player_defend.svg');
+    this.load.svg('player_uppercut', 'assets/sprites/player_uppercut.svg');
+    this.load.svg('player_dive', 'assets/sprites/player_dive.svg');
+    
+    this.load.svg('enemy_guard', 'assets/sprites/enemy_guard.svg');
+    this.load.svg('enemy_axe', 'assets/sprites/enemy_axe.svg');
+    this.load.svg('enemy_ninja', 'assets/sprites/enemy_ninja.svg');
+    this.load.svg('boss_idle', 'assets/sprites/boss_idle.svg');
+    this.load.svg('boss_attack', 'assets/sprites/boss_attack.svg');
+    
+    this.load.svg('bg_city_far', 'assets/backgrounds/bg_city_far.svg');
+    this.load.svg('bg_city_mid', 'assets/backgrounds/bg_city_mid.svg');
+    this.load.svg('bg_forest_far', 'assets/backgrounds/bg_forest_far.svg');
+    this.load.svg('bg_forest_mid', 'assets/backgrounds/bg_forest_mid.svg');
+    this.load.svg('bg_core_far', 'assets/backgrounds/bg_core_far.svg');
+    this.load.svg('bg_core_mid', 'assets/backgrounds/bg_core_mid.svg');
+    this.load.svg('platform', 'assets/backgrounds/platform.svg');
 
-  create(): void {
-    this.scene.start('GameScene');
-  }
+    const w = this.cameras.main.width;
+    const h = this.cameras.main.height;
+    
+    const bar = this.add.graphics();
+    const box = this.add.graphics();
+    box.fillStyle(0x222222, 0.8);
+    box.fillRect(w / 2 - 160, h / 2 - 25, 320, 50);
+    
+    const txt = this.add.text(w / 2, h / 2 - 50, 'Loading Cyberspace...', {
+      fontFamily: 'Arial', fontSize: '20px', color: '#e94560',
+    }).setOrigin(0.5);
 
-  private createLoadingBar(): void {
-    const width = this.cameras.main.width;
-    const height = this.cameras.main.height;
-
-    const progressBar = this.add.graphics();
-    const progressBox = this.add.graphics();
-    progressBox.fillStyle(0x222222, 0.8);
-    progressBox.fillRect(width / 2 - 160, height / 2 - 25, 320, 50);
-
-    const loadingText = this.add.text(width / 2, height / 2 - 50, 'Loading...', {
-      fontFamily: 'Arial',
-      fontSize: '20px',
-      color: '#ffffff',
-    });
-    loadingText.setOrigin(0.5, 0.5);
-
-    this.load.on('progress', (value: number) => {
-      progressBar.clear();
-      progressBar.fillStyle(0xe94560, 1);
-      progressBar.fillRect(width / 2 - 150, height / 2 - 15, 300 * value, 30);
+    this.load.on('progress', (v: number) => {
+      bar.clear();
+      bar.fillStyle(0xe94560, 1);
+      bar.fillRect(w / 2 - 150, h / 2 - 15, 300 * v, 30);
     });
 
     this.load.on('complete', () => {
-      progressBar.destroy();
-      progressBox.destroy();
-      loadingText.destroy();
+      bar.destroy();
+      box.destroy();
+      txt.destroy();
     });
   }
 
-  private loadAssets(): void {
-    // Load player frames (only the ones used in animations for now)
-    const ninjaFrames = [
-      ...this.range(0, 3),    // idle
-      ...this.range(30, 38),  // run
-      ...this.range(116, 118),// defend
-      ...this.range(162, 164),// jump
-      ...this.range(725, 730) // attack
-    ];
-
-    ninjaFrames.forEach(f => {
-      this.load.image(`ninja_${f}`, `assets/sprites/ninja/${f + 1}.png`);
-    });
-
-    // Load enemy frames (using similar logic for tonfa)
-    const tonfaFrames = [...this.range(0, 3), ...this.range(30, 38)];
-    tonfaFrames.forEach(f => {
-      this.load.image(`tonfa_${f}`, `assets/sprites/tonfa/${f + 1}.png`);
-    });
-
-    // Load level data
-    this.load.text('beach_xml', 'assets/maps/beach.xml');
-
-    // Load sounds
-    this.load.audio('attack', 'assets/sounds/237_attack.mp3.mp3');
-    this.load.audio('jump', 'assets/sounds/251_ninjah_jump1.mp3');
-    this.load.audio('hit', 'assets/sounds/242_enemy_thrownimpact.mp3');
-  }
-
-  private range(start: number, end: number): number[] {
-    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  create(): void {
+    this.scene.start('MainMenuScene');
   }
 }

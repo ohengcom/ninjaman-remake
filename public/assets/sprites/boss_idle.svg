@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+    <defs>
+      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+      <filter id="heavyGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="5" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+      <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#2a2a35"/>
+        <stop offset="50%" stop-color="#1a1a2e"/>
+        <stop offset="100%" stop-color="#0f0f1a"/>
+      </linearGradient>
+      <linearGradient id="blade" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="100%" stop-color="#00ffff"/>
+      </linearGradient>
+    </defs>
+    
+  <rect x="10" y="10" width="100" height="90" rx="10" fill="#0b0c10" stroke="#ff0055" stroke-width="4"/>
+  <!-- Horns -->
+  <polygon points="60,10 40,-10 50,10" fill="#ff0055"/>
+  <polygon points="60,10 80,-10 70,10" fill="#ff0055"/>
+  <!-- Face -->
+  <path d="M 40 20 L 80 20 L 70 40 L 50 40 Z" fill="#1a1a2e" stroke="#ff0055" stroke-width="2"/>
+  <circle cx="50" cy="30" r="5" fill="#ff0055" filter="url(#glow)"/>
+  <circle cx="70" cy="30" r="5" fill="#ff0055" filter="url(#glow)"/>
+  <!-- Heavy Armor Core -->
+  <circle cx="60" cy="60" r="15" fill="#1a1a2e" stroke="#ff0055" stroke-width="3"/>
+  <circle cx="60" cy="60" r="8" fill="#ff0055" filter="url(#heavyGlow)"/>
+  <!-- Arms -->
+  <rect x="0" y="30" width="30" height="60" rx="5" fill="#151520" stroke="#ff0055" stroke-width="2"/>
+  <rect x="90" y="30" width="30" height="60" rx="5" fill="#151520" stroke="#ff0055" stroke-width="2"/>
+
+  </svg>

@@ -5,29 +5,41 @@ export class GameOverScene extends Phaser.Scene {
     super({ key: 'GameOverScene' });
   }
 
-  create(): void {
-    const width = this.cameras.main.width;
-    const height = this.cameras.main.height;
+  init(data: { score: number, win?: boolean }) {
+    this.registry.set('score', data.score || 0);
+    this.registry.set('win', data.win || false);
+  }
 
-    this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.8);
+  create() {
+    const w = this.cameras.main.width;
+    const h = this.cameras.main.height;
+    const isWin = this.registry.get('win');
 
-    const gameOverText = this.add.text(width / 2, height / 2 - 50, 'GAME OVER', {
+    this.cameras.main.fadeIn(500, 0, 0, 0);
+
+    this.add.text(w / 2, h / 2 - 100, isWin ? 'MISSION ACCOMPLISHED' : 'SYSTEM FAILURE', {
+      fontFamily: 'Impact, sans-serif',
+      fontSize: '80px',
+      color: isWin ? '#00ffff' : '#ff0000',
+      stroke: '#000000',
+      strokeThickness: 8
+    }).setOrigin(0.5);
+
+    const score = this.registry.get('score');
+    this.add.text(w / 2, h / 2 + 20, `FINAL SCORE: ${score}`, {
       fontFamily: 'Arial',
-      fontSize: '48px',
-      color: '#e94560',
-      fontStyle: 'bold',
-    });
-    gameOverText.setOrigin(0.5, 0.5);
+      fontSize: '40px',
+      color: '#ffffff'
+    }).setOrigin(0.5);
 
-    const restartText = this.add.text(width / 2, height / 2 + 50, 'Press SPACE to restart', {
+    this.add.text(w / 2, h / 2 + 120, 'PRESS SPACE TO REBOOT', {
       fontFamily: 'Arial',
-      fontSize: '24px',
-      color: '#ffffff',
-    });
-    restartText.setOrigin(0.5, 0.5);
+      fontSize: '28px',
+      color: '#aaaaaa'
+    }).setOrigin(0.5);
 
     this.input.keyboard!.once('keydown-SPACE', () => {
-      this.scene.start('GameScene');
+      this.scene.start('GameScene', { level: 1, score: 0 });
     });
   }
 }

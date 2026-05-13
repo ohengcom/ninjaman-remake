@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
+    
+  <linearGradient id="forestSky" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#0a1a10"/>
+    <stop offset="100%" stop-color="#113320"/>
+  </linearGradient>
+  <rect width="1280" height="720" fill="url(#forestSky)"/>
+  <!-- Tech Trees Far -->
+  <g fill="#0a2215" opacity="0.8">
+    <rect x="100" y="200" width="40" height="520" />
+    <rect x="350" y="150" width="60" height="570" />
+    <rect x="700" y="250" width="30" height="470" />
+    <rect x="1000" y="100" width="80" height="620" />
+  </g>
+
+  </svg>

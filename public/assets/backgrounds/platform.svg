@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+    
+  <defs>
+    <linearGradient id="platGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2a2a3a"/>
+      <stop offset="100%" stop-color="#151520"/>
+    </linearGradient>
+    <filter id="platGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <!-- Main block -->
+  <rect width="64" height="64" fill="url(#platGrad)" stroke="#0f3460" stroke-width="2"/>
+  <!-- Industrial grating pattern -->
+  <line x1="0" y1="16" x2="64" y2="16" stroke="#111" stroke-width="2"/>
+  <line x1="0" y1="32" x2="64" y2="32" stroke="#111" stroke-width="2"/>
+  <line x1="0" y1="48" x2="64" y2="48" stroke="#111" stroke-width="2"/>
+  <!-- Neon Edge -->
+  <rect x="0" y="0" width="64" height="6" fill="#00ffff" filter="url(#platGlow)" opacity="0.9"/>
+  <!-- Rivets -->
+  <circle cx="8" cy="12" r="2" fill="#555"/>
+  <circle cx="56" cy="12" r="2" fill="#555"/>
+
+  </svg>

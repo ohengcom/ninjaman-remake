@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120" width="200" height="120">
+    <defs>
+      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+      <filter id="heavyGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="5" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+      <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#2a2a35"/>
+        <stop offset="50%" stop-color="#1a1a2e"/>
+        <stop offset="100%" stop-color="#0f0f1a"/>
+      </linearGradient>
+      <linearGradient id="blade" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="100%" stop-color="#00ffff"/>
+      </linearGradient>
+    </defs>
+    
+  <rect x="10" y="10" width="100" height="90" rx="10" fill="#2a0010" stroke="#ff0055" stroke-width="4"/>
+  <!-- Eye Flare -->
+  <path d="M 30 30 L 120 30 L 120 35 L 30 35 Z" fill="#ff0055" filter="url(#heavyGlow)"/>
+  <circle cx="60" cy="60" r="15" fill="#1a1a2e" stroke="#ff0055" stroke-width="3"/>
+  <circle cx="60" cy="60" r="8" fill="#ffffff" filter="url(#heavyGlow)"/>
+  <!-- Giant energy blade slash -->
+  <path d="M 0 50 A 100 100 0 0 1 180 50" fill="none" stroke="#ff0055" stroke-width="12" filter="url(#heavyGlow)" stroke-linecap="round"/>
+  <path d="M 0 50 A 100 100 0 0 1 180 50" fill="none" stroke="#ffffff" stroke-width="4" filter="url(#glow)" stroke-linecap="round"/>
+
+  </svg>

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
+    <defs>
+      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+      <filter id="heavyGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="5" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+      <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#2a2a35"/>
+        <stop offset="50%" stop-color="#1a1a2e"/>
+        <stop offset="100%" stop-color="#0f0f1a"/>
+      </linearGradient>
+      <linearGradient id="blade" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="100%" stop-color="#00ffff"/>
+      </linearGradient>
+    </defs>
+    
+  <!-- Heavy cybernetic body -->
+  <rect x="20" y="25" width="40" height="35" rx="4" fill="#15202b" stroke="#f39c12" stroke-width="2"/>
+  <path d="M 25 35 L 55 35 M 25 45 L 55 45" stroke="#333" stroke-width="2"/>
+  <!-- Robotic Head -->
+  <rect x="30" y="10" width="20" height="15" rx="3" fill="#15202b" stroke="#f39c12" stroke-width="1"/>
+  <!-- Red glowing eye -->
+  <circle cx="45" cy="17" r="3" fill="#ff0000" filter="url(#glow)"/>
+  <line x1="30" y1="17" x2="40" y2="17" stroke="#ff0000" stroke-width="1" filter="url(#glow)"/>
+  <!-- Energy Shield or baton -->
+  <rect x="55" y="25" width="6" height="30" rx="3" fill="#f39c12" filter="url(#glow)"/>
+
+  </svg>
