@@ -4,6 +4,7 @@ import { Enemy, EnemyType } from '../entities/Enemy.js';
 import { Boss } from '../entities/Boss.js';
 
 export class GameScene extends Phaser.Scene {
+  private level!: LevelData;
   private player!: Player;
   private enemies!: Phaser.Physics.Arcade.Group;
   private boss: Boss | null = null;
@@ -20,7 +21,7 @@ export class GameScene extends Phaser.Scene {
   private mapWidth: number = 0;
 
   constructor() {
-    super({ key: 'GameScene' });
+    super({ key: SCENE_KEYS.GAME });
   }
 
   init(data: { level?: number; score?: number }) {

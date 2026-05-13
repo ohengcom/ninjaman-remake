@@ -1,8 +1,16 @@
 import Phaser from 'phaser';
+import { CharacterFactory } from '../factories/CharacterFactory.js';
+import {
+  COLORS,
+  GAME_CONFIG,
+  SCENE_KEYS,
+  SOUND_KEYS,
+  TEXTURE_KEYS,
+} from '../utils/constants.js';
 
 export class BootScene extends Phaser.Scene {
   constructor() {
-    super({ key: 'BootScene' });
+    super({ key: SCENE_KEYS.BOOT });
   }
 
   preload(): void {
