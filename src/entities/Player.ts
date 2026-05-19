@@ -138,17 +138,17 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   public applySquash(sx: number, sy: number, dur: number) {
-      // Kill existing scale tweens to prevent them from breaking the base scale
-      this.scene.tweens.killTweensOf(this);
-      this.setScale(1); // Reset to base scale before applying new squash
-      this.scene.tweens.add({
-          targets: this,
-          scaleX: sx,
-          scaleY: sy,
-          duration: dur,
-          yoyo: true,
-          onComplete: () => this.setScale(1) // Guarantee it returns to normal
-      });
+      // Disabled due to Arcade Physics body scaling bug causing floor clipping
+      // this.scene.tweens.killTweensOf(this);
+      // this.setScale(1); // Reset to base scale before applying new squash
+      // this.scene.tweens.add({
+      //     targets: this,
+      //     scaleX: sx,
+      //     scaleY: sy,
+      //     duration: dur,
+      //     yoyo: true,
+      //     onComplete: () => this.setScale(1) // Guarantee it returns to normal
+      // });
   }
 
   private setPlayerTexture(texture: string) {
