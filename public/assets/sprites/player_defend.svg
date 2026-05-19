@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
     <defs>
       <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="3" result="blur" />
+        <feGaussianBlur stdDeviation="2.5" result="blur" />
         <feComposite in="SourceGraphic" in2="blur" operator="over" />
       </filter>
       <filter id="heavyGlow" x="-50%" y="-50%" width="200%" height="200%">
@@ -9,25 +9,30 @@
         <feComposite in="SourceGraphic" in2="blur" operator="over" />
       </filter>
       <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#2a2a35"/>
-        <stop offset="50%" stop-color="#1a1a2e"/>
-        <stop offset="100%" stop-color="#0f0f1a"/>
+        <stop offset="0%" stop-color="#3a3a4f"/>
+        <stop offset="50%" stop-color="#1e1e2f"/>
+        <stop offset="100%" stop-color="#0a0a14"/>
       </linearGradient>
       <linearGradient id="blade" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%" stop-color="#ffffff"/>
         <stop offset="100%" stop-color="#00ffff"/>
       </linearGradient>
+      <linearGradient id="energy" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ff0055"/>
+        <stop offset="100%" stop-color="#ff9900"/>
+      </linearGradient>
     </defs>
     
   <!-- Scarf Back -->
-  <path d="M 35 25 Q 20 40 10 55 Q 20 45 30 30" fill="#e94560" opacity="0.7"/>
-  <!-- Body Armor -->
-  <rect x="25" y="22" width="30" height="36" rx="6" fill="url(#metal)" stroke="#3a3a50" stroke-width="2"/>
-  <!-- Head/Helmet tucked -->
-  <path d="M 30 18 Q 40 3 50 18 Q 40 28 30 18" fill="#1a1a2e" stroke="#3a3a50" stroke-width="2"/>
-  <!-- Sword blocking -->
+  <path d="M 35 25 Q 15 45 5 65" fill="none" stroke="url(#energy)" stroke-width="6" opacity="0.7"/>
+  <!-- Body Tucked -->
+  <path d="M 25 22 L 55 22 L 50 50 L 30 50 Z" fill="url(#metal)"/>
+  <!-- Head Tucked -->
+  <path d="M 30 18 Q 40 -2 50 18 L 46 28 L 34 28 Z" fill="#0f0f15"/>
+  <path d="M 34 14 L 46 14 L 40 20 Z" fill="#00ffff" filter="url(#glow)"/>
+  <!-- Katana Block -->
   <rect x="45" y="10" width="6" height="50" fill="url(#blade)" filter="url(#heavyGlow)"/>
-  <!-- Shield Energy Flare -->
-  <circle cx="50" cy="35" r="25" fill="none" stroke="#00ffff" stroke-width="4" filter="url(#glow)" opacity="0.8"/>
+  <!-- Hexagon Energy Shield -->
+  <polygon points="50,5 70,20 70,50 50,65 30,50 30,20" fill="none" stroke="#00ffff" stroke-width="3" filter="url(#glow)" opacity="0.9"/>
 
   </svg>

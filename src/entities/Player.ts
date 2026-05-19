@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import { StateMachine } from '../utils/StateMachine.js';
+import { SoundManager } from '../managers/SoundManager.js';
+import { SaveManager } from '../managers/SaveManager.js';
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
   public stateMachine: StateMachine<Player>;
@@ -57,8 +59,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     
     // Combo logic
     const time = this.scene.time.now;
+    const maxComboHits = SaveManager.load().comboLevel + 1; // Level 1 = 2 hits, Level 2 = 3 hits, Level 3 = 4 hits
+
     if (time - this.lastAttackTime < 800) {
-      this.comboStep = (this.comboStep + 1) % 4; // 0 to 3 for 4-hit combo
+      this.comboStep = (this.comboStep + 1) % maxComboHits;
     } else {
       this.comboStep = 0;
     }
@@ -128,9 +132,23 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'dash',
         onEnter: (p) => {
+          SoundManager.playDash();
           p.setTexture('player_dash');
           p.setVelocityX(p.dashDir * 800);
-          p.isInvulnerable = true;
+          
+          if (SaveManager.load().dashInvincible) {
+             p.isInvulnerable = true;
+          }
+          
+          // Extreme horizontal stretch for dash
+          p.scene.tweens.add({
+             targets: p,
+             scaleX: 1.5,
+             scaleY: 0.5,
+             duration: 150,
+             yoyo: true
+          });
+
           p.scene.time.delayedCall(300, () => {
              if (p.health > 0) p.stateMachine.setState('idle');
           });
@@ -152,9 +170,19 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'jump',
         onEnter: (p) => {
+          SoundManager.playJump();
           p.setTexture('player_jump');
           p.setVelocityY(p.jumpCount === 0 ? -600 : -550);
           p.jumpCount++;
+          
+          // Squash and stretch for jump
+          p.scene.tweens.add({
+            targets: p,
+            scaleY: 1.3,
+            scaleX: 0.7,
+            duration: 150,
+            yoyo: true,
+          });
         },
         onUpdate: (p) => {
           if (p.handleCommonTransitions(p)) return;
@@ -167,7 +195,17 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         onUpdate: (p) => {
           if (p.handleCommonTransitions(p)) return;
           p.handleAirMovement();
-          if (p.body!.touching.down) p.stateMachine.setState('idle');
+          if (p.body!.touching.down) {
+            // Landing squash
+            p.scene.tweens.add({
+              targets: p,
+              scaleY: 0.6,
+              scaleX: 1.4,
+              duration: 100,
+              yoyo: true,
+            });
+            p.stateMachine.setState('idle');
+          }
         }
       })
       .addState({
@@ -178,8 +216,38 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           p.scene.cameras.main.shake(100, 0.005);
           p.scene.events.emit('player_attack', p, 'combo');
           
+          // Lunge stretch
+          p.scene.tweens.add({
+             targets: p,
+             scaleX: 1.2,
+             scaleY: 0.9,
+             duration: 100,
+             yoyo: true,
+          });
+          
           p.scene.time.delayedCall(200, () => {
             if (p.health > 0) p.stateMachine.setState(p.body!.touching.down ? 'idle' : 'fall');
+          });
+        }
+      })
+      .addState({
+        name: 'attack_wave',
+        onEnter: (p) => {
+          p.setTexture('player_cast');
+          p.setVelocityX(0);
+          p.scene.cameras.main.shake(100, 0.005);
+          p.scene.events.emit('player_cast_wave', p);
+          
+          p.scene.tweens.add({
+             targets: p,
+             scaleX: 1.2,
+             scaleY: 0.9,
+             duration: 150,
+             yoyo: true,
+          });
+
+          p.scene.time.delayedCall(300, () => {
+             if (p.health > 0) p.stateMachine.setState(p.body!.touching.down ? 'idle' : 'fall');
           });
         }
       })
@@ -191,6 +259,16 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           p.setVelocityX(0);
           p.scene.cameras.main.shake(150, 0.01);
           p.scene.events.emit('player_attack', p, 'uppercut');
+          
+          // Upward stretch
+          p.scene.tweens.add({
+            targets: p,
+            scaleY: 1.4,
+            scaleX: 0.6,
+            duration: 150,
+            yoyo: true
+          });
+
           p.scene.time.delayedCall(300, () => {
             if (p.health > 0) p.stateMachine.setState('fall');
           });
@@ -203,11 +281,30 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           p.setVelocityY(800); // Fast downward
           p.setVelocityX(p.flipX ? -300 : 300);
           p.scene.events.emit('player_attack', p, 'dive');
+          
+          // Downward stretch
+          p.scene.tweens.add({
+            targets: p,
+            scaleY: 1.4,
+            scaleX: 0.6,
+            duration: 150,
+            yoyo: true
+          });
         },
         onUpdate: (p) => {
            if (p.body!.touching.down) {
               p.scene.cameras.main.shake(200, 0.02);
               p.scene.events.emit('player_attack', p, 'dive_land');
+              
+              // Heavy landing squash
+              p.scene.tweens.add({
+                targets: p,
+                scaleY: 0.5,
+                scaleX: 1.5,
+                duration: 100,
+                yoyo: true,
+              });
+
               p.stateMachine.setState('idle');
            }
         }
@@ -277,6 +374,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     super.preUpdate(time, delta);
     this.stateMachine.update(delta);
     
+    if (Phaser.Input.Keyboard.JustDown(this.cursors.down)) this.recordInput('down');
+    if (Phaser.Input.Keyboard.JustDown(this.cursors.left)) this.recordInput('left');
+    if (Phaser.Input.Keyboard.JustDown(this.cursors.right)) this.recordInput('right');
+    if (Phaser.Input.Keyboard.JustDown(this.cursors.up)) this.recordInput('up');
+
     if (this.isInvulnerable && this.stateMachine.getCurrentStateName() !== 'hurt') {
       this.setAlpha(time % 200 < 100 ? 0.5 : 1);
     }

@@ -15,10 +15,14 @@ export class BootScene extends Phaser.Scene {
     this.load.svg('player_defend', 'assets/sprites/player_defend.svg');
     this.load.svg('player_uppercut', 'assets/sprites/player_uppercut.svg');
     this.load.svg('player_dive', 'assets/sprites/player_dive.svg');
+    this.load.svg('player_cast', 'assets/sprites/player_cast.svg');
+    this.load.svg('player_wave', 'assets/sprites/player_wave.svg');
     
     this.load.svg('enemy_guard', 'assets/sprites/enemy_guard.svg');
     this.load.svg('enemy_axe', 'assets/sprites/enemy_axe.svg');
     this.load.svg('enemy_ninja', 'assets/sprites/enemy_ninja.svg');
+    this.load.svg('enemy_sniper', 'assets/sprites/enemy_sniper.svg');
+    this.load.svg('projectile', 'assets/sprites/projectile.svg');
     this.load.svg('boss_idle', 'assets/sprites/boss_idle.svg');
     this.load.svg('boss_attack', 'assets/sprites/boss_attack.svg');
     

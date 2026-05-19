@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
     <defs>
       <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="3" result="blur" />
+        <feGaussianBlur stdDeviation="2.5" result="blur" />
         <feComposite in="SourceGraphic" in2="blur" operator="over" />
       </filter>
       <filter id="heavyGlow" x="-50%" y="-50%" width="200%" height="200%">
@@ -9,22 +9,26 @@
         <feComposite in="SourceGraphic" in2="blur" operator="over" />
       </filter>
       <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#2a2a35"/>
-        <stop offset="50%" stop-color="#1a1a2e"/>
-        <stop offset="100%" stop-color="#0f0f1a"/>
+        <stop offset="0%" stop-color="#3a3a4f"/>
+        <stop offset="50%" stop-color="#1e1e2f"/>
+        <stop offset="100%" stop-color="#0a0a14"/>
       </linearGradient>
       <linearGradient id="blade" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%" stop-color="#ffffff"/>
         <stop offset="100%" stop-color="#00ffff"/>
       </linearGradient>
+      <linearGradient id="energy" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ff0055"/>
+        <stop offset="100%" stop-color="#ff9900"/>
+      </linearGradient>
     </defs>
     
   <g transform="translate(0, 10) rotate(45 50 50)">
-    <!-- Downward blur -->
-    <path d="M 80 50 L 120 50" stroke="#ff0055" stroke-width="20" opacity="0.5" filter="url(#heavyGlow)"/>
-    <rect x="25" y="22" width="30" height="36" rx="6" fill="url(#metal)"/>
-    <path d="M 28 15 Q 40 0 52 15 Q 40 25 28 15" fill="#1a1a2e"/>
-    <path d="M 50 40 L 100 40 L 100 45 L 50 45 Z" fill="url(#blade)" filter="url(#heavyGlow)"/>
+    <!-- Impact lines -->
+    <polygon points="80,50 140,40 140,60" fill="#ff0055" filter="url(#heavyGlow)" opacity="0.6"/>
+    <path d="M 25 22 L 55 22 L 50 55 L 30 55 Z" fill="url(#metal)"/>
+    <path d="M 28 15 Q 40 -5 52 15 L 48 25 L 32 25 Z" fill="#0f0f15"/>
+    <path d="M 50 45 L 110 45 L 110 50 L 50 50 Z" fill="url(#blade)" filter="url(#heavyGlow)"/>
   </g>
 
   </svg>

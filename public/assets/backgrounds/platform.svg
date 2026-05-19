@@ -1,25 +1,34 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+    <defs>
+      <filter id="bgGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="4" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+      <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00ffff" stroke-width="0.5" opacity="0.15"/>
+      </pattern>
+      <linearGradient id="bgFade" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#05050a"/>
+        <stop offset="50%" stop-color="#151025"/>
+        <stop offset="100%" stop-color="#2a1b40"/>
+      </linearGradient>
+    </defs>
     
   <defs>
-    <linearGradient id="platGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#2a2a3a"/>
-      <stop offset="100%" stop-color="#151520"/>
+    <linearGradient id="pGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1f1f2e"/>
+      <stop offset="100%" stop-color="#0d0d16"/>
     </linearGradient>
-    <filter id="platGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="2" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
-    </filter>
   </defs>
-  <!-- Main block -->
-  <rect width="64" height="64" fill="url(#platGrad)" stroke="#0f3460" stroke-width="2"/>
-  <!-- Industrial grating pattern -->
-  <line x1="0" y1="16" x2="64" y2="16" stroke="#111" stroke-width="2"/>
-  <line x1="0" y1="32" x2="64" y2="32" stroke="#111" stroke-width="2"/>
-  <line x1="0" y1="48" x2="64" y2="48" stroke="#111" stroke-width="2"/>
-  <!-- Neon Edge -->
-  <rect x="0" y="0" width="64" height="6" fill="#00ffff" filter="url(#platGlow)" opacity="0.9"/>
+  <rect width="64" height="64" fill="url(#pGrad)" stroke="#0f3460" stroke-width="2"/>
+  <!-- Hexagon grid inside platform -->
+  <path d="M 0 16 L 64 16 M 0 32 L 64 32 M 0 48 L 64 48" stroke="#111" stroke-width="2"/>
+  <path d="M 16 0 L 16 64 M 32 0 L 32 64 M 48 0 L 48 64" stroke="#111" stroke-width="2"/>
+  <!-- Neon Edge Glow -->
+  <rect x="0" y="0" width="64" height="5" fill="#00ffff" filter="url(#bgGlow)"/>
+  <rect x="0" y="0" width="64" height="2" fill="#ffffff"/>
   <!-- Rivets -->
-  <circle cx="8" cy="12" r="2" fill="#555"/>
-  <circle cx="56" cy="12" r="2" fill="#555"/>
+  <circle cx="8" cy="10" r="2" fill="#00ffff" filter="url(#bgGlow)"/>
+  <circle cx="56" cy="10" r="2" fill="#00ffff" filter="url(#bgGlow)"/>
 
   </svg>
