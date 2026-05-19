@@ -43,6 +43,7 @@ export class GameScene extends Phaser.Scene {
     this.currentStyle = '';
     const w = this.cameras.main.width;
     const h = this.cameras.main.height;
+    this.lastSafeX = 200;
     this.lastSafeY = h - 250;
     this.boss = null;
 
