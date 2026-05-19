@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 120" width="140" height="120">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 80" width="90" height="80">
     <defs>
       <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
         <feGaussianBlur stdDeviation="2.5" result="blur" />
@@ -23,17 +23,19 @@
       </linearGradient>
     </defs>
     
-  <path d="M 10 30 L 60 10 L 110 30 L 100 100 L 20 100 Z" fill="#1a0b12" stroke="#ff0055" stroke-width="4"/>
-  <polygon points="60,10 40,-15 50,10" fill="#ff0055"/>
-  <polygon points="60,10 80,-15 70,10" fill="#ff0055"/>
-  <!-- Eyes -->
-  <line x1="45" y1="35" x2="55" y2="40" stroke="#ff0055" stroke-width="4" filter="url(#glow)"/>
-  <line x1="75" y1="35" x2="65" y2="40" stroke="#ff0055" stroke-width="4" filter="url(#glow)"/>
-  <!-- Chest Core -->
-  <circle cx="60" cy="70" r="15" fill="#ff0055" filter="url(#heavyGlow)"/>
-  <circle cx="60" cy="70" r="5" fill="#fff"/>
-  <!-- Huge Shoulders -->
-  <rect x="-10" y="30" width="30" height="50" rx="10" fill="#111" stroke="#ff0055" stroke-width="3"/>
-  <rect x="100" y="30" width="30" height="50" rx="10" fill="#111" stroke="#ff0055" stroke-width="3"/>
+  <!-- Scarf Back -->
+  <path d="M 35 25 Q 10 40 0 50" fill="none" stroke="url(#energy)" stroke-width="4" filter="url(#glow)"/>
+  <!-- Body leaning forward -->
+  <g transform="rotate(10 40 40)">
+      <path d="M 25 22 L 55 22 L 50 55 L 30 55 Z" fill="url(#metal)" stroke="#00ffff" stroke-width="1.5"/>
+      <!-- Head -->
+      <path d="M 28 15 Q 40 -5 52 15 L 48 25 L 32 25 Z" fill="#0f0f15"/>
+      <path d="M 36 10 L 52 10 L 44 18 Z" fill="#00ffff" filter="url(#glow)"/>
+      <!-- Arms thrust forward -->
+      <path d="M 30 30 L 70 25 L 70 35 Z" fill="url(#metal)"/>
+      <!-- Energy gathering in hands -->
+      <circle cx="75" cy="30" r="10" fill="#00ffff" filter="url(#heavyGlow)"/>
+      <circle cx="75" cy="30" r="4" fill="#ffffff"/>
+  </g>
 
   </svg>

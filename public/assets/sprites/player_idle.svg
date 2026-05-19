@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
     <defs>
       <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="3" result="blur" />
+        <feGaussianBlur stdDeviation="2.5" result="blur" />
         <feComposite in="SourceGraphic" in2="blur" operator="over" />
       </filter>
       <filter id="heavyGlow" x="-50%" y="-50%" width="200%" height="200%">
@@ -9,33 +9,37 @@
         <feComposite in="SourceGraphic" in2="blur" operator="over" />
       </filter>
       <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#2a2a35"/>
-        <stop offset="50%" stop-color="#1a1a2e"/>
-        <stop offset="100%" stop-color="#0f0f1a"/>
+        <stop offset="0%" stop-color="#3a3a4f"/>
+        <stop offset="50%" stop-color="#1e1e2f"/>
+        <stop offset="100%" stop-color="#0a0a14"/>
       </linearGradient>
       <linearGradient id="blade" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%" stop-color="#ffffff"/>
         <stop offset="100%" stop-color="#00ffff"/>
       </linearGradient>
+      <linearGradient id="energy" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ff0055"/>
+        <stop offset="100%" stop-color="#ff9900"/>
+      </linearGradient>
     </defs>
     
-  <!-- Scarf Back -->
-  <path d="M 35 25 Q 20 40 10 55 Q 20 45 30 30" fill="#e94560" opacity="0.7"/>
-  <!-- Body Armor -->
-  <rect x="25" y="22" width="30" height="36" rx="6" fill="url(#metal)" stroke="#3a3a50" stroke-width="2"/>
-  <path d="M 25 35 L 55 35 M 25 45 L 55 45" stroke="#0f3460" stroke-width="2"/>
-  <polygon points="35,22 45,22 40,30" fill="#e94560"/>
+  <!-- Flowing Energy Scarf -->
+  <path d="M 35 25 Q 15 45 5 65 Q 15 50 30 30" fill="url(#energy)" opacity="0.8" filter="url(#glow)"/>
+  <path d="M 35 25 Q 20 50 15 70 Q 25 55 35 30" fill="#ff0055" opacity="0.6"/>
+  <!-- Cyber Armor Core -->
+  <path d="M 25 22 L 55 22 L 50 55 L 30 55 Z" fill="url(#metal)" stroke="#00ffff" stroke-width="1.5"/>
+  <circle cx="40" cy="38" r="6" fill="#00ffff" filter="url(#glow)"/>
   <!-- Arms/Shoulders -->
-  <circle cx="25" cy="26" r="6" fill="#0f3460" stroke="#e94560" stroke-width="1"/>
-  <rect x="20" y="26" width="10" height="20" rx="3" fill="url(#metal)"/>
-  <circle cx="55" cy="26" r="6" fill="#0f3460" stroke="#e94560" stroke-width="1"/>
+  <path d="M 20 22 L 28 22 L 25 45 L 17 45 Z" fill="url(#metal)"/>
+  <path d="M 52 22 L 60 22 L 63 45 L 55 45 Z" fill="url(#metal)"/>
+  <circle cx="24" cy="26" r="5" fill="#ff0055"/>
+  <circle cx="56" cy="26" r="5" fill="#ff0055"/>
   <!-- Head/Helmet -->
-  <path d="M 28 15 Q 40 0 52 15 Q 40 25 28 15" fill="#1a1a2e" stroke="#3a3a50" stroke-width="2"/>
-  <!-- Cyber Visor -->
-  <path d="M 36 10 L 48 10 L 46 16 L 38 16 Z" fill="#00ffff" filter="url(#glow)"/>
-  <!-- Scarf Front -->
-  <path d="M 25 20 Q 40 25 55 20 L 50 28 Q 40 32 30 28 Z" fill="#e94560"/>
-  <!-- Katana Sheathed -->
-  <rect x="15" y="20" width="4" height="40" rx="2" fill="#111" transform="rotate(-30 15 20)"/>
+  <path d="M 28 15 Q 40 -5 52 15 L 48 25 L 32 25 Z" fill="#0f0f15" stroke="#3a3a50" stroke-width="2"/>
+  <!-- V-Shaped Visor -->
+  <path d="M 32 10 L 48 10 L 40 18 Z" fill="#00ffff" filter="url(#glow)"/>
+  <!-- Katana Hilt -->
+  <rect x="12" y="15" width="4" height="45" rx="2" fill="#111" transform="rotate(-25 12 15)"/>
+  <rect x="8" y="25" width="12" height="4" fill="#00ffff" transform="rotate(-25 12 15)"/>
 
   </svg>

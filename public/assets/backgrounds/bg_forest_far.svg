@@ -1,16 +1,26 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
+    <defs>
+      <filter id="bgGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="4" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+      <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00ffff" stroke-width="0.5" opacity="0.15"/>
+      </pattern>
+      <linearGradient id="bgFade" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#05050a"/>
+        <stop offset="50%" stop-color="#151025"/>
+        <stop offset="100%" stop-color="#2a1b40"/>
+      </linearGradient>
+    </defs>
     
-  <linearGradient id="forestSky" x1="0%" y1="0%" x2="0%" y2="100%">
-    <stop offset="0%" stop-color="#0a1a10"/>
-    <stop offset="100%" stop-color="#113320"/>
-  </linearGradient>
-  <rect width="1280" height="720" fill="url(#forestSky)"/>
-  <!-- Tech Trees Far -->
-  <g fill="#0a2215" opacity="0.8">
-    <rect x="100" y="200" width="40" height="520" />
-    <rect x="350" y="150" width="60" height="570" />
-    <rect x="700" y="250" width="30" height="470" />
-    <rect x="1000" y="100" width="80" height="620" />
+  <rect width="1280" height="720" fill="#05150a"/>
+  <rect width="1280" height="720" fill="url(#grid)"/>
+  <g fill="#0a2a15" stroke="#0f4a25" stroke-width="2">
+    <rect x="150" y="200" width="50" height="520" />
+    <rect x="400" y="120" width="70" height="600" />
+    <rect x="750" y="250" width="40" height="470" />
+    <rect x="1050" y="100" width="90" height="620" />
   </g>
 
   </svg>

@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
     <defs>
       <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="3" result="blur" />
+        <feGaussianBlur stdDeviation="2.5" result="blur" />
         <feComposite in="SourceGraphic" in2="blur" operator="over" />
       </filter>
       <filter id="heavyGlow" x="-50%" y="-50%" width="200%" height="200%">
@@ -9,21 +9,26 @@
         <feComposite in="SourceGraphic" in2="blur" operator="over" />
       </filter>
       <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#2a2a35"/>
-        <stop offset="50%" stop-color="#1a1a2e"/>
-        <stop offset="100%" stop-color="#0f0f1a"/>
+        <stop offset="0%" stop-color="#3a3a4f"/>
+        <stop offset="50%" stop-color="#1e1e2f"/>
+        <stop offset="100%" stop-color="#0a0a14"/>
       </linearGradient>
       <linearGradient id="blade" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%" stop-color="#ffffff"/>
         <stop offset="100%" stop-color="#00ffff"/>
       </linearGradient>
+      <linearGradient id="energy" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ff0055"/>
+        <stop offset="100%" stop-color="#ff9900"/>
+      </linearGradient>
     </defs>
     
-  <rect x="30" y="25" width="20" height="30" rx="4" fill="#102030" stroke="#00ffcc" stroke-width="1"/>
-  <circle cx="40" cy="15" r="8" fill="#102030" stroke="#00ffcc" stroke-width="1"/>
-  <line x1="35" y1="15" x2="45" y2="15" stroke="#00ffcc" stroke-width="2" filter="url(#glow)"/>
-  <!-- Twin Daggers -->
-  <path d="M 20 40 L 0 50 L 5 45 Z" fill="#00ffcc" filter="url(#glow)"/>
-  <path d="M 60 40 L 80 50 L 75 45 Z" fill="#00ffcc" filter="url(#glow)"/>
+  <!-- Sleek Stealth Bot -->
+  <polygon points="40,20 50,55 30,55" fill="#0f1f2f" stroke="#00ffcc" stroke-width="1.5"/>
+  <circle cx="40" cy="15" r="8" fill="#0f1f2f" stroke="#00ffcc"/>
+  <circle cx="40" cy="15" r="3" fill="#00ffcc" filter="url(#glow)"/>
+  <!-- Energy Blades -->
+  <path d="M 25 40 L 0 60 L 10 50 Z" fill="#00ffcc" filter="url(#glow)"/>
+  <path d="M 55 40 L 80 60 L 70 50 Z" fill="#00ffcc" filter="url(#glow)"/>
 
   </svg>

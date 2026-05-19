@@ -2,11 +2,15 @@ import Phaser from 'phaser';
 import { Player } from '../entities/Player.js';
 import { Enemy, EnemyType } from '../entities/Enemy.js';
 import { Boss } from '../entities/Boss.js';
+import { Projectile } from '../entities/Projectile.js';
+import { CombatManager } from '../managers/CombatManager.js';
+import { SaveManager } from '../managers/SaveManager.js';
+import { SoundManager } from '../managers/SoundManager.js';
 
 export class GameScene extends Phaser.Scene {
-  private level!: LevelData;
   private player!: Player;
   private enemies!: Phaser.Physics.Arcade.Group;
+  private projectiles!: Phaser.Physics.Arcade.Group;
   private boss: Boss | null = null;
   private score: number = 0;
   
@@ -20,16 +24,21 @@ export class GameScene extends Phaser.Scene {
   private currentLevel: number = 1;
   private mapWidth: number = 0;
 
+  private combatManager!: CombatManager;
+
   constructor() {
     super({ key: 'GameScene' });
   }
 
-  init(data: { level?: number; score?: number }) {
-    this.currentLevel = data.level || 1;
-    this.score = data.score || 0;
+  init(data: { level?: number }) {
+    const saveData = SaveManager.load();
+    this.currentLevel = data.level || saveData.unlockedLevel;
+    this.score = saveData.score || 0;
   }
 
   create(): void {
+    SoundManager.startBGM(this.currentLevel);
+    this.combatManager = new CombatManager(this);
     this.comboCount = 0;
     this.currentStyle = '';
     const w = this.cameras.main.width;
@@ -77,19 +86,27 @@ export class GameScene extends Phaser.Scene {
     const leftWall = this.add.rectangle(-32, h/2, 64, h * 2).setOrigin(0.5);
     this.physics.add.existing(leftWall, true);
 
+    const saveData = SaveManager.load();
     this.player = new Player(this, this.lastSafeX, this.lastSafeY);
+    this.player.maxHealth = saveData.maxHealth;
+    this.player.health = saveData.maxHealth;
+    
     this.physics.add.collider(this.player, platforms);
     this.physics.add.collider(this.player, leftWall);
 
-    this.enemies = this.physics.add.group({ classType: Enemy, runChildUpdate: true });
+    this.enemies = this.physics.add.group({ classType: Enemy, maxSize: 30, runChildUpdate: true });
+    this.projectiles = this.physics.add.group({ classType: Projectile, maxSize: 20, runChildUpdate: true });
     
     if (this.currentLevel < 3) {
-      const types: EnemyType[] = ['guard', 'axe', 'ninja'];
+      const types: EnemyType[] = ['guard', 'axe', 'ninja', 'sniper'];
       for (let x = 1200; x < this.mapWidth - 800; x += 600 + Math.random() * 600) {
         const type = types[Math.floor(Math.random() * types.length)];
-        const enemy = new Enemy(this, x, h - 250, type);
-        enemy.setTarget(this.player);
-        this.enemies.add(enemy);
+        const yOffset = type === 'sniper' ? 350 : 250; // Snipers spawn higher up sometimes
+        const enemy = this.enemies.get(x, h - yOffset, type) as Enemy;
+        if (enemy) {
+            enemy.spawn(x, h - yOffset, type);
+            enemy.setTarget(this.player);
+        }
       }
       
       const portal = this.add.text(this.mapWidth - 300, h - 150, '=> NEXT SECTOR =>', {
@@ -124,11 +141,85 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, this.mapWidth, h);
     this.physics.world.setBounds(0, 0, this.mapWidth, h * 2);
 
-    this.events.on('player_attack', (attacker: Player, type: string) => this.resolvePlayerAttack(attacker, type));
+    this.events.on('player_attack', (attacker: Player, type: string) => this.combatManager.resolvePlayerAttack(attacker, type, this.enemies, this.boss));
     this.events.on('player_parry', (defender: Player) => this.handleParry(defender));
-    this.events.on('enemy_attack', (attacker: Enemy, dmg: number, reach: number) => this.resolveEnemyAttack(attacker, dmg, reach));
-    this.events.on('boss_attack', (attacker: Boss) => this.resolveBossAttack(attacker));
+    this.events.on('enemy_attack', (attacker: Enemy, dmg: number, reach: number) => this.combatManager.resolveEnemyAttack(attacker, dmg, reach, this.player));
+    this.events.on('boss_attack', (attacker: Boss) => this.combatManager.resolveBossAttack(attacker, this.player));
     this.events.on('player_dead', () => this.handlePlayerDeath());
+    
+    this.events.on('enemy_shoot', (attacker: Enemy, damage: number) => {
+        const p = this.projectiles.get(attacker.x, attacker.y) as Projectile;
+        if (p) {
+            const dir = attacker.flipX ? -1 : 1;
+            p.fire(attacker.x + (20 * dir), attacker.y, dir, 600, damage, 'projectile');
+            SoundManager.playSwing(); // Reuse swing sound for shoot
+        }
+    });
+
+    // Player Hadouken
+    this.events.on('player_cast_wave', (player: Player) => {
+        SoundManager.playHadouken();
+        const wave = this.projectiles.get(player.x, player.y) as Projectile;
+        if (wave) {
+            const dir = player.flipX ? -1 : 1;
+            // High speed, medium damage projectile
+            wave.fire(player.x + (30 * dir), player.y, dir, 800, 20, 'player_wave');
+        }
+    });
+
+    this.physics.add.overlap(this.projectiles, this.player, (playerObj, projObj) => {
+        const proj = projObj as Projectile;
+        const player = playerObj as Player;
+        if (proj.active && player.health > 0 && proj.texture.key === 'projectile') {
+            const dir = proj.body!.velocity.x > 0 ? 1 : -1;
+            
+            if (player.isBlocking && Math.sign(dir) !== (player.flipX ? -1 : 1)) {
+                 player.health -= Math.floor(proj.damage * 0.2);
+                 this.events.emit('player_parry', player);
+                 player.setVelocityX(dir * 50);
+            } else {
+                 player.takeDamage(proj.damage, dir);
+                 SoundManager.playDamage();
+                 this.emitHitParticle(player.x, player.y, 5);
+                 this.cameras.main.shake(200, 0.02);
+            }
+            this.events.emit('update_health', player.health, player.maxHealth);
+            proj.hit();
+        }
+    });
+
+    // Player wave hitting enemies
+    this.physics.add.overlap(this.projectiles, this.enemies, (projObj, enemyObj) => {
+        const proj = projObj as Projectile;
+        const enemy = enemyObj as Enemy;
+        if (proj.active && enemy.active && enemy.health > 0 && proj.texture.key === 'player_wave') {
+            const dir = proj.body!.velocity.x > 0 ? 1 : -1;
+            enemy.takeDamage(proj.damage, dir);
+            SoundManager.playHit();
+            this.emitHitParticle(enemy.x, enemy.y, 10);
+            proj.hit(); // Consume wave
+            if (enemy.health <= 0) {
+               this.addScore(150);
+               this.incrementCombo();
+            }
+        }
+    });
+
+    // Player wave hitting Boss
+    if (this.boss) {
+        this.physics.add.overlap(this.projectiles, this.boss, (projObj, bossObj) => {
+            const proj = projObj as Projectile;
+            const boss = bossObj as Boss;
+            if (proj.active && boss.active && boss.health > 0 && proj.texture.key === 'player_wave') {
+                const dir = proj.body!.velocity.x > 0 ? 1 : -1;
+                boss.takeDamage(proj.damage * 0.5, dir);
+                SoundManager.playHit();
+                this.emitHitParticle(boss.x, boss.y, 15);
+                proj.hit();
+                this.incrementCombo();
+            }
+        });
+    }
 
     this.time.delayedCall(10, () => {
       this.events.emit('update_health', this.player.health, this.player.maxHealth);
@@ -157,13 +248,15 @@ export class GameScene extends Phaser.Scene {
 
     if (this.currentLevel < 3 && this.player.x > this.mapWidth - 100) {
        this.player.setVelocityX(0);
-       this.scene.restart({ level: this.currentLevel + 1, score: this.score });
+       SaveManager.updateLevel(this.currentLevel + 1);
+       SaveManager.updateScoreAndSp(this.score - SaveManager.load().score, 10); // Reward 10 SP per level
+       this.scene.restart({ level: this.currentLevel + 1 });
     }
 
     if (this.currentLevel === 3 && this.boss && !this.boss.active) {
        this.boss = null;
-       this.score += 5000;
-       this.events.emit('update_score', this.score);
+       this.addScore(5000);
+       SaveManager.updateScoreAndSp(this.score - SaveManager.load().score, 50); // Boss reward
        this.cameras.main.shake(1000, 0.05);
        
        this.time.delayedCall(2000, () => {
@@ -173,7 +266,7 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  private incrementCombo() {
+  public incrementCombo() {
       this.comboCount++;
       
       let style = 'C';
@@ -195,13 +288,34 @@ export class GameScene extends Phaser.Scene {
       return multiplier;
   }
 
-  private resetCombo() {
+  public resetCombo() {
       this.comboCount = 0;
       this.currentStyle = '';
       this.events.emit('update_style', '');
   }
 
+  public getComboCount() {
+      return this.comboCount;
+  }
+
+  public addScore(amount: number) {
+      this.score += amount;
+      this.events.emit('update_score', this.score);
+  }
+
+  public showComboPopup(x: number, y: number) {
+      const popup = this.add.text(x, y, `${this.comboCount} HITS!`, {
+          fontFamily: 'Impact', fontSize: '20px', color: '#e94560'
+      }).setOrigin(0.5);
+      this.tweens.add({ targets: popup, y: y - 40, alpha: 0, duration: 600, onComplete: () => popup.destroy() });
+  }
+
+  public emitHitParticle(x: number, y: number, count: number) {
+      this.hitParticles.emitParticleAt(x, y, count);
+  }
+
   private handleParry(defender: Player) {
+      SoundManager.playParry();
       this.cameras.main.shake(100, 0.01);
       const parryText = this.add.text(defender.x, defender.y - 40, 'PARRY!', {
           fontFamily: 'Impact', fontSize: '24px', color: '#00ffff'
@@ -209,97 +323,16 @@ export class GameScene extends Phaser.Scene {
       this.tweens.add({ targets: parryText, y: defender.y - 80, alpha: 0, duration: 600, onComplete: () => parryText.destroy() });
       
       // Bonus points for parry
-      this.score += 50;
-      this.events.emit('update_score', this.score);
+      this.addScore(50);
       this.events.emit('update_health', this.player.health, this.player.maxHealth);
-  }
-
-  private resolvePlayerAttack(attacker: Player, type: string) {
-    let reach = 80;
-    let baseDamage = 15;
-    
-    if (type === 'uppercut') { reach = 60; baseDamage = 20; }
-    if (type === 'dive') { reach = 70; baseDamage = 25; }
-    if (type === 'combo') { baseDamage = 10 + (attacker.comboStep * 5); } // scales up to 25
-
-    const dir = attacker.flipX ? -1 : 1;
-    const attackRect = new Phaser.Geom.Rectangle(dir > 0 ? attacker.x : attacker.x - reach, attacker.y - attacker.height / 2, reach, attacker.height);
-
-    let hitAnything = false;
-
-    this.enemies.getChildren().forEach((obj) => {
-      const enemy = obj as Enemy;
-      if (enemy.health <= 0) return;
-      const enemyRect = new Phaser.Geom.Rectangle(enemy.body!.x, enemy.body!.y, enemy.body!.width, enemy.body!.height);
-
-      if (Phaser.Geom.Rectangle.Overlaps(attackRect, enemyRect)) {
-        enemy.takeDamage(baseDamage, dir);
-        hitAnything = true;
-        this.hitParticles.emitParticleAt(enemy.x, enemy.y, 15);
-        if (enemy.health <= 0) this.score += Math.floor(100 * this.incrementCombo());
-      }
-    });
-
-    if (this.boss && this.boss.active && this.boss.health > 0) {
-       const bossRect = new Phaser.Geom.Rectangle(this.boss.body!.x, this.boss.body!.y, this.boss.body!.width, this.boss.body!.height);
-       if (Phaser.Geom.Rectangle.Overlaps(attackRect, bossRect)) {
-          this.boss.takeDamage(baseDamage * 0.5, dir); 
-          hitAnything = true;
-          this.hitParticles.emitParticleAt(this.boss.x, this.boss.y, 25);
-          this.incrementCombo();
-       }
-    }
-
-    if (hitAnything) {
-        this.cameras.main.shake(150, 0.015);
-        this.events.emit('update_score', this.score);
-        if (this.comboCount > 1) {
-            const popup = this.add.text(attacker.x + (50 * dir), attacker.y - 40, `${this.comboCount} HITS!`, {
-                fontFamily: 'Impact', fontSize: '20px', color: '#e94560'
-            }).setOrigin(0.5);
-            this.tweens.add({ targets: popup, y: attacker.y - 80, alpha: 0, duration: 600, onComplete: () => popup.destroy() });
-        }
-    }
-  }
-
-  private resolveEnemyAttack(attacker: Enemy, damage: number, reach: number) {
-    if (attacker.health <= 0) return;
-    const dir = attacker.flipX ? -1 : 1;
-    const attackRect = new Phaser.Geom.Rectangle(dir > 0 ? attacker.x : attacker.x - reach, attacker.y - attacker.height / 2, reach, attacker.height);
-    const playerRect = new Phaser.Geom.Rectangle(this.player.body!.x, this.player.body!.y, this.player.body!.width, this.player.body!.height);
-
-    if (Phaser.Geom.Rectangle.Overlaps(attackRect, playerRect)) {
-      this.resetCombo(); 
-      this.player.takeDamage(damage, dir); 
-      this.events.emit('update_health', this.player.health, this.player.maxHealth);
-      if (!this.player.isBlocking) {
-          this.hitParticles.emitParticleAt(this.player.x, this.player.y, 5);
-          this.cameras.main.shake(200, 0.02);
-      }
-    }
-  }
-
-  private resolveBossAttack(attacker: Boss) {
-    if (attacker.health <= 0) return;
-    const reach = 200; 
-    const dir = attacker.flipX ? -1 : 1;
-    const attackRect = new Phaser.Geom.Rectangle(dir > 0 ? attacker.x : attacker.x - reach, attacker.y - attacker.height / 2, reach, attacker.height);
-    const playerRect = new Phaser.Geom.Rectangle(this.player.body!.x, this.player.body!.y, this.player.body!.width, this.player.body!.height);
-
-    if (Phaser.Geom.Rectangle.Overlaps(attackRect, playerRect)) {
-      this.resetCombo();
-      this.player.takeDamage(30, dir); 
-      this.events.emit('update_health', this.player.health, this.player.maxHealth);
-      if (!this.player.isBlocking) {
-          this.hitParticles.emitParticleAt(this.player.x, this.player.y, 20);
-          this.cameras.main.shake(300, 0.04);
-      }
-    }
   }
 
   private handlePlayerDeath() {
     this.player.setVelocityX(0);
     this.cameras.main.shake(500, 0.03);
+    
+    // Save current score up to death
+    SaveManager.updateScoreAndSp(this.score - SaveManager.load().score, 5); 
     
     this.time.delayedCall(2000, () => {
         this.scene.stop('HUDScene');

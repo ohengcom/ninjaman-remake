@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
     <defs>
       <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="3" result="blur" />
+        <feGaussianBlur stdDeviation="2.5" result="blur" />
         <feComposite in="SourceGraphic" in2="blur" operator="over" />
       </filter>
       <filter id="heavyGlow" x="-50%" y="-50%" width="200%" height="200%">
@@ -9,29 +9,30 @@
         <feComposite in="SourceGraphic" in2="blur" operator="over" />
       </filter>
       <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#2a2a35"/>
-        <stop offset="50%" stop-color="#1a1a2e"/>
-        <stop offset="100%" stop-color="#0f0f1a"/>
+        <stop offset="0%" stop-color="#3a3a4f"/>
+        <stop offset="50%" stop-color="#1e1e2f"/>
+        <stop offset="100%" stop-color="#0a0a14"/>
       </linearGradient>
       <linearGradient id="blade" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%" stop-color="#ffffff"/>
         <stop offset="100%" stop-color="#00ffff"/>
       </linearGradient>
+      <linearGradient id="energy" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ff0055"/>
+        <stop offset="100%" stop-color="#ff9900"/>
+      </linearGradient>
     </defs>
     
   <g transform="translate(0, -5)">
-    <!-- Scarf trailing down -->
-    <path d="M 35 25 Q 30 50 40 65 Q 45 45 45 25" fill="#e94560" opacity="0.8"/>
-    <!-- Body Armor -->
-    <rect x="25" y="20" width="30" height="30" rx="6" fill="url(#metal)" stroke="#3a3a50" stroke-width="2"/>
-    <!-- Legs tucked up -->
-    <path d="M 30 50 L 25 60 M 50 50 L 45 60" stroke="#0f3460" stroke-width="6" stroke-linecap="round"/>
-    <path d="M 30 50 L 25 60 M 50 50 L 45 60" stroke="#e94560" stroke-width="2" stroke-linecap="round"/>
-    <!-- Head/Helmet -->
-    <path d="M 28 12 Q 40 -3 52 12 Q 40 22 28 12" fill="#1a1a2e" stroke="#3a3a50" stroke-width="2"/>
-    <path d="M 36 7 L 48 7 L 46 13 L 38 13 Z" fill="#00ffff" filter="url(#glow)"/>
-    <!-- Scarf Front -->
-    <path d="M 25 17 Q 40 22 55 17 L 50 25 Q 40 29 30 25 Z" fill="#e94560"/>
+    <!-- Scarf trailing straight down -->
+    <path d="M 35 25 Q 30 60 35 80 Q 45 55 45 25" fill="url(#energy)" filter="url(#glow)" opacity="0.8"/>
+    <!-- Tucked Body -->
+    <path d="M 25 20 L 55 20 L 45 45 L 35 45 Z" fill="url(#metal)" stroke="#00ffff" stroke-width="1.5"/>
+    <!-- Legs tucked -->
+    <path d="M 30 45 L 20 65 M 50 45 L 60 65" stroke="#ff0055" stroke-width="4" stroke-linecap="round"/>
+    <!-- Head -->
+    <path d="M 28 12 Q 40 -8 52 12 L 48 22 L 32 22 Z" fill="#0f0f15"/>
+    <path d="M 32 7 L 48 7 L 40 15 Z" fill="#00ffff" filter="url(#glow)"/>
   </g>
 
   </svg>
