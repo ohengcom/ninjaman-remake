@@ -151,12 +151,18 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       });
   }
 
+  private setPlayerTexture(texture: string) {
+    this.setTexture(texture);
+    this.body!.setSize(30, 40);
+    this.body!.setOffset(this.width / 2 - 15, this.height / 2 - 20);
+  }
+
   private setupStates() {
     this.stateMachine
       .addState({
         name: 'idle',
         onEnter: (p) => {
-          p.setTexture('player_idle');
+          p.setPlayerTexture('player_idle');
           p.setVelocityX(0);
           p.jumpCount = 0;
           p.isBlocking = false;
@@ -195,8 +201,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           if (SaveManager.load().dashInvincible) {
              p.isInvulnerable = true;
           }
-          
-          p.applySquash(1.5, 0.5, 150);
 
           p.scene.time.delayedCall(300, () => {
              if (p.health > 0) p.stateMachine.setState('idle');
