@@ -23,6 +23,7 @@ export class GameScene extends Phaser.Scene {
   private lastSafeY: number = 0;
   private currentLevel: number = 1;
   private mapWidth: number = 0;
+  private isTransitioning: boolean = false;
 
   private combatManager!: CombatManager;
 
@@ -34,6 +35,7 @@ export class GameScene extends Phaser.Scene {
     const saveData = SaveManager.load();
     this.currentLevel = data.level || saveData.unlockedLevel;
     this.score = saveData.score || 0;
+    this.isTransitioning = false;
   }
 
   create(): void {
@@ -46,6 +48,7 @@ export class GameScene extends Phaser.Scene {
     this.lastSafeX = 200;
     this.lastSafeY = h - 250;
     this.boss = null;
+    this.isTransitioning = false;
 
     // Level configs
     let farBg = 'bg_city_far';
@@ -63,9 +66,9 @@ export class GameScene extends Phaser.Scene {
     this.add.image(w/2, h/2, farBg).setScrollFactor(0);
     this.add.image(w/2, h/2, midBg).setScrollFactor(0.2);
 
-    if (this.currentLevel === 1) {
-       this.scene.launch('HUDScene');
-    }
+    // Refresh HUD properly by stopping and re-launching it so events connect to the new GameScene instance
+    this.scene.stop('HUDScene');
+    this.scene.launch('HUDScene');
 
     // Platforms
     const platforms = this.physics.add.staticGroup();
@@ -247,7 +250,8 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
-    if (this.currentLevel < 3 && this.player.x > this.mapWidth - 100) {
+    if (this.currentLevel < 3 && this.player.x > this.mapWidth - 100 && !this.isTransitioning) {
+       this.isTransitioning = true;
        this.player.setVelocityX(0);
        SaveManager.updateLevel(this.currentLevel + 1);
        SaveManager.updateScoreAndSp(this.score - SaveManager.load().score, 10); // Reward 10 SP per level

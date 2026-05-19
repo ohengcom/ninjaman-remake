@@ -120,7 +120,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         name: 'chase',
         onUpdate: (e) => {
           if (!e.active) return;
-          if (!e.target || e.target.getData('isDead') || !e.target.active) {
+          if (!e.target || !e.target.active || (e.target as any).health <= 0) {
             e.stateMachine.setState('patrol');
             return;
           }

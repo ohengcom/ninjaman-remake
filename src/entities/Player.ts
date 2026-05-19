@@ -16,10 +16,14 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   public comboStep: number = 0;
   public lastAttackTime: number = 0;
+  public lastWaveTime: number = 0;
   
   private lastTapLeftTime: number = 0;
   private lastTapRightTime: number = 0;
   private dashDir: number = 1;
+
+  private inputBuffer: { key: string, time: number }[] = [];
+  private static readonly BUFFER_TIMEOUT = 500; // ms to complete motion
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'player_idle');
@@ -38,6 +42,36 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.stateMachine.setState('idle');
   }
 
+  private recordInput(key: string) {
+    const time = this.scene.time.now;
+    this.inputBuffer.push({ key, time });
+    // Keep buffer small
+    if (this.inputBuffer.length > 10) {
+       this.inputBuffer.shift();
+    }
+  }
+
+  private checkMotionInput(sequence: string[]): boolean {
+     if (this.inputBuffer.length < sequence.length) return false;
+     
+     const time = this.scene.time.now;
+     // Filter out old inputs
+     const recentInputs = this.inputBuffer.filter(i => time - i.time < Player.BUFFER_TIMEOUT);
+     if (recentInputs.length < sequence.length) return false;
+
+     let seqIndex = sequence.length - 1;
+     for (let i = recentInputs.length - 1; i >= 0; i--) {
+        if (recentInputs[i].key === sequence[seqIndex]) {
+           seqIndex--;
+           if (seqIndex < 0) {
+              this.inputBuffer = []; // Consume buffer
+              return true;
+           }
+        }
+     }
+     return false;
+  }
+
   private checkDashInput(): boolean {
     const time = this.scene.time.now;
     if (Phaser.Input.Keyboard.JustDown(this.cursors.left)) {
@@ -52,13 +86,21 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   private checkAttackInput(): string | null {
+    const time = this.scene.time.now;
+
     if (!Phaser.Input.Keyboard.JustDown(this.attackKey)) return null;
+
+    // Check for Hadouken motion: Down -> Forward -> Attack
+    const forwardKey = this.flipX ? 'left' : 'right';
+    if (time - this.lastWaveTime > 1000 && this.checkMotionInput(['down', forwardKey])) {
+       this.lastWaveTime = time;
+       return 'attack_wave';
+    }
     
     if (this.cursors.up.isDown) return 'attack_uppercut';
     if (!this.body!.touching.down && this.cursors.down.isDown) return 'attack_dive';
     
     // Combo logic
-    const time = this.scene.time.now;
     const maxComboHits = SaveManager.load().comboLevel + 1; // Level 1 = 2 hits, Level 2 = 3 hits, Level 3 = 4 hits
 
     if (time - this.lastAttackTime < 800) {
@@ -93,6 +135,20 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       return true;
     }
     return false;
+  }
+
+  public applySquash(sx: number, sy: number, dur: number) {
+      // Kill existing scale tweens to prevent them from breaking the base scale
+      this.scene.tweens.killTweensOf(this);
+      this.setScale(1); // Reset to base scale before applying new squash
+      this.scene.tweens.add({
+          targets: this,
+          scaleX: sx,
+          scaleY: sy,
+          duration: dur,
+          yoyo: true,
+          onComplete: () => this.setScale(1) // Guarantee it returns to normal
+      });
   }
 
   private setupStates() {
@@ -140,14 +196,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
              p.isInvulnerable = true;
           }
           
-          // Extreme horizontal stretch for dash
-          p.scene.tweens.add({
-             targets: p,
-             scaleX: 1.5,
-             scaleY: 0.5,
-             duration: 150,
-             yoyo: true
-          });
+          p.applySquash(1.5, 0.5, 150);
 
           p.scene.time.delayedCall(300, () => {
              if (p.health > 0) p.stateMachine.setState('idle');
@@ -175,14 +224,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           p.setVelocityY(p.jumpCount === 0 ? -600 : -550);
           p.jumpCount++;
           
-          // Squash and stretch for jump
-          p.scene.tweens.add({
-            targets: p,
-            scaleY: 1.3,
-            scaleX: 0.7,
-            duration: 150,
-            yoyo: true,
-          });
+          p.applySquash(0.7, 1.3, 150);
         },
         onUpdate: (p) => {
           if (p.handleCommonTransitions(p)) return;
@@ -196,14 +238,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           if (p.handleCommonTransitions(p)) return;
           p.handleAirMovement();
           if (p.body!.touching.down) {
-            // Landing squash
-            p.scene.tweens.add({
-              targets: p,
-              scaleY: 0.6,
-              scaleX: 1.4,
-              duration: 100,
-              yoyo: true,
-            });
+            p.applySquash(1.4, 0.6, 100);
             p.stateMachine.setState('idle');
           }
         }
@@ -216,14 +251,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           p.scene.cameras.main.shake(100, 0.005);
           p.scene.events.emit('player_attack', p, 'combo');
           
-          // Lunge stretch
-          p.scene.tweens.add({
-             targets: p,
-             scaleX: 1.2,
-             scaleY: 0.9,
-             duration: 100,
-             yoyo: true,
-          });
+          p.applySquash(1.2, 0.9, 100);
           
           p.scene.time.delayedCall(200, () => {
             if (p.health > 0) p.stateMachine.setState(p.body!.touching.down ? 'idle' : 'fall');
@@ -238,13 +266,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           p.scene.cameras.main.shake(100, 0.005);
           p.scene.events.emit('player_cast_wave', p);
           
-          p.scene.tweens.add({
-             targets: p,
-             scaleX: 1.2,
-             scaleY: 0.9,
-             duration: 150,
-             yoyo: true,
-          });
+          p.applySquash(1.2, 0.9, 150);
 
           p.scene.time.delayedCall(300, () => {
              if (p.health > 0) p.stateMachine.setState(p.body!.touching.down ? 'idle' : 'fall');
@@ -260,14 +282,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           p.scene.cameras.main.shake(150, 0.01);
           p.scene.events.emit('player_attack', p, 'uppercut');
           
-          // Upward stretch
-          p.scene.tweens.add({
-            targets: p,
-            scaleY: 1.4,
-            scaleX: 0.6,
-            duration: 150,
-            yoyo: true
-          });
+          p.applySquash(0.6, 1.4, 150);
 
           p.scene.time.delayedCall(300, () => {
             if (p.health > 0) p.stateMachine.setState('fall');
@@ -282,28 +297,14 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           p.setVelocityX(p.flipX ? -300 : 300);
           p.scene.events.emit('player_attack', p, 'dive');
           
-          // Downward stretch
-          p.scene.tweens.add({
-            targets: p,
-            scaleY: 1.4,
-            scaleX: 0.6,
-            duration: 150,
-            yoyo: true
-          });
+          p.applySquash(0.6, 1.4, 150);
         },
         onUpdate: (p) => {
            if (p.body!.touching.down) {
               p.scene.cameras.main.shake(200, 0.02);
               p.scene.events.emit('player_attack', p, 'dive_land');
               
-              // Heavy landing squash
-              p.scene.tweens.add({
-                targets: p,
-                scaleY: 0.5,
-                scaleX: 1.5,
-                duration: 100,
-                yoyo: true,
-              });
+              p.applySquash(1.5, 0.5, 100);
 
               p.stateMachine.setState('idle');
            }
@@ -374,6 +375,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     super.preUpdate(time, delta);
     this.stateMachine.update(delta);
     
+    // Record inputs for motion detection
     if (Phaser.Input.Keyboard.JustDown(this.cursors.down)) this.recordInput('down');
     if (Phaser.Input.Keyboard.JustDown(this.cursors.left)) this.recordInput('left');
     if (Phaser.Input.Keyboard.JustDown(this.cursors.right)) this.recordInput('right');
