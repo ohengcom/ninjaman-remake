@@ -75,11 +75,7 @@ export class GameScene extends Phaser.Scene {
     const tiles = Math.floor(this.mapWidth / 64);
     
     for (let i = 0; i < tiles; i++) {
-      if (this.currentLevel !== 3) {
-         if (i > 15 && i < 17) continue;
-         if (i > 30 && i < 32) continue;
-         if (i > 50 && i < 53) continue;
-      }
+      // Create a continuous, solid floor
       platforms.create(i * 64 + 32, h - 32, 'platform');
       
       if (this.currentLevel !== 3 && i > 15 && i % 6 === 0) {
