@@ -1,99 +1,91 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130 80" width="130" height="80">
     <defs>
-      <!-- High-Fidelity Filters -->
-      <filter id="cyanGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="3" result="blur" />
-        <feMerge>
-          <feMergeNode in="blur" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <filter id="heavyCyanGlow" x="-80%" y="-80%" width="260%" height="260%">
-        <feGaussianBlur stdDeviation="6" result="blur1" />
-        <feGaussianBlur stdDeviation="2" result="blur2" />
-        <feMerge>
-          <feMergeNode in="blur1" />
-          <feMergeNode in="blur2" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <filter id="pinkGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="3.5" result="blur" />
-        <feMerge>
-          <feMergeNode in="blur" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <filter id="greenGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="3" result="blur" />
-        <feMerge>
-          <feMergeNode in="blur" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <filter id="orangeGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <!-- Premium Oriental Cyber-Zen Filters -->
+      <filter id="goldGlow" x="-50%" y="-50%" width="200%" height="200%">
         <feGaussianBlur stdDeviation="4.5" result="blur" />
         <feMerge>
           <feMergeNode in="blur" />
           <feMergeNode in="SourceGraphic" />
         </feMerge>
       </filter>
+      <filter id="heavyGoldGlow" x="-80%" y="-80%" width="260%" height="260%">
+        <feGaussianBlur stdDeviation="7" result="blur1" />
+        <feGaussianBlur stdDeviation="2.5" result="blur2" />
+        <feMerge>
+          <feMergeNode in="blur1" />
+          <feMergeNode in="blur2" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <filter id="sakuraGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="4" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <filter id="inkMisty" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="1.8" />
+      </filter>
+      <filter id="redGlow" x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur stdDeviation="3.5" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
 
-      <!-- Advanced Cyber Gradients -->
-      <linearGradient id="cyberMetal" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#2a2a3e"/>
-        <stop offset="35%" stop-color="#1b1b26"/>
-        <stop offset="70%" stop-color="#0e0e16"/>
-        <stop offset="100%" stop-color="#050508"/>
+      <!-- Advanced Cyber-Zen Gradients -->
+      <linearGradient id="inkWashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#2a2a2a"/>
+        <stop offset="60%" stop-color="#121212"/>
+        <stop offset="100%" stop-color="#050505"/>
       </linearGradient>
-      <linearGradient id="cyberMetalLight" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#4e4e6a"/>
-        <stop offset="50%" stop-color="#2a2a3c"/>
-        <stop offset="100%" stop-color="#14141e"/>
+      <linearGradient id="inkWashLight" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#6e6e6e"/>
+        <stop offset="50%" stop-color="#3c3c3c"/>
+        <stop offset="100%" stop-color="#1c1c1c"/>
       </linearGradient>
-      <linearGradient id="ninjaBlade" x1="0%" y1="0%" x2="100%" y2="0%">
+      <linearGradient id="spiritGold" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%" stop-color="#ffffff"/>
-        <stop offset="30%" stop-color="#dffffc"/>
-        <stop offset="75%" stop-color="#00ffff"/>
-        <stop offset="100%" stop-color="#0088cc"/>
+        <stop offset="35%" stop-color="#ffe680"/>
+        <stop offset="75%" stop-color="#e5c158"/>
+        <stop offset="100%" stop-color="#b8860b"/>
       </linearGradient>
-      <linearGradient id="cyberScarf" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#ff0055"/>
-        <stop offset="45%" stop-color="#ff3300"/>
-        <stop offset="90%" stop-color="#ffcc00"/>
+      <linearGradient id="sacredMaple" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ff2200"/>
+        <stop offset="50%" stop-color="#d43f00"/>
+        <stop offset="100%" stop-color="#800000"/>
       </linearGradient>
-      <linearGradient id="plasmaBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <linearGradient id="sakuraBlade" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="#ffffff"/>
-        <stop offset="50%" stop-color="#00ffff"/>
-        <stop offset="100%" stop-color="#0033aa"/>
+        <stop offset="40%" stop-color="#ffb3d9"/>
+        <stop offset="85%" stop-color="#ff3399"/>
+        <stop offset="100%" stop-color="#cc0066"/>
       </linearGradient>
-      <linearGradient id="heavyAxe" x1="0%" y1="0%" x2="100%" y2="100%">
+      <linearGradient id="crimsonGaze" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="#ff3333"/>
-        <stop offset="50%" stop-color="#ff7700"/>
+        <stop offset="60%" stop-color="#aa0000"/>
         <stop offset="100%" stop-color="#550000"/>
-      </linearGradient>
-      <linearGradient id="ninjaGreen" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#00ffcc"/>
-        <stop offset="60%" stop-color="#00ff55"/>
-        <stop offset="100%" stop-color="#003311"/>
       </linearGradient>
     </defs>
     
-  <!-- Spectacular massive neon cyan sweep arc -->
-  <path d="M 12 10 A 75 75 0 0 1 122 45 L 105 58 A 52 52 0 0 0 25 32 Z" fill="url(#ninjaBlade)" filter="url(#heavyCyanGlow)" opacity="0.8"/>
-  <path d="M 18 14 A 72 72 0 0 1 116 43 L 108 49 A 58 58 0 0 0 28 28 Z" fill="#ffffff" opacity="0.9"/>
+  <!-- Spectacular massive calligraphy ink-black crescent sweep with pink glowing wing -->
+  <path d="M 12 10 A 75 75 0 0 1 122 45 L 105 58 A 52 52 0 0 0 25 32 Z" fill="url(#inkWashGrad)" filter="url(#inkMisty)" opacity="0.95"/>
+  <path d="M 18 14 A 72 72 0 0 1 116 43 L 108 49 A 58 58 0 0 0 28 28 Z" fill="url(#sakuraBlade)" filter="url(#sakuraGlow)" opacity="0.85"/>
+  <path d="M 24 18 A 66 66 0 0 1 110 41 L 105 45 A 61 61 0 0 0 32 30 Z" fill="#ffffff" opacity="0.95"/>
 
   <g transform="translate(10, 0)">
-    <!-- Attacking Body -->
-    <path d="M 18 24 L 46 24 L 40 54 L 22 54 Z" fill="url(#cyberMetal)" stroke="#00ffff" stroke-width="1.5"/>
-    <circle cx="32" cy="38" r="6" fill="#00ffff" filter="url(#cyanGlow)"/>
-    <path d="M 20 16 Q 32 -4 44 16 L 40 26 L 24 26 Z" fill="#0f0f18"/>
-    <path d="M 26 12 L 32 17 L 38 12 Z" fill="#00ffff" filter="url(#cyanGlow)"/>
+    <!-- Ronin Attacking Body -->
+    <path d="M 18 24 L 46 24 L 40 54 L 22 54 Z" fill="url(#inkWashGrad)" stroke="#e5c158" stroke-width="1.5"/>
+    <ellipse cx="32" cy="16" rx="20" ry="5" fill="url(#inkWashLight)" stroke="#e5c158" stroke-width="1.2"/>
+    <path d="M 12 16 Q 32 -2 52 16 Z" fill="url(#inkWashGrad)"/>
+    <circle cx="32" cy="36" r="6.5" fill="#e5c158" filter="url(#goldGlow)"/>
 
     <!-- Extending sword arm -->
-    <path d="M 36 28 L 72 38 L 68 45 L 32 36 Z" fill="url(#cyberMetalLight)"/>
-    <!-- Intricate Katana Sword Base and Core -->
-    <path d="M 68 38 L 122 62 L 118 66 L 64 42 Z" fill="url(#ninjaBlade)" filter="url(#heavyCyanGlow)"/>
+    <path d="M 36 28 L 72 38 L 68 45 L 32 36 Z" fill="url(#inkWashLight)"/>
+    <!-- Intricate Katana Sword with pink glowing edge -->
+    <path d="M 68 38 L 122 62 L 118 66 L 64 42 Z" fill="url(#sakuraBlade)" filter="url(#sakuraGlow)"/>
   </g>
 
   </svg>

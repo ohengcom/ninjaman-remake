@@ -1,98 +1,93 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
     <defs>
-      <!-- High-Fidelity Filters -->
-      <filter id="cyanGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="3" result="blur" />
-        <feMerge>
-          <feMergeNode in="blur" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <filter id="heavyCyanGlow" x="-80%" y="-80%" width="260%" height="260%">
-        <feGaussianBlur stdDeviation="6" result="blur1" />
-        <feGaussianBlur stdDeviation="2" result="blur2" />
-        <feMerge>
-          <feMergeNode in="blur1" />
-          <feMergeNode in="blur2" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <filter id="pinkGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="3.5" result="blur" />
-        <feMerge>
-          <feMergeNode in="blur" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <filter id="greenGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="3" result="blur" />
-        <feMerge>
-          <feMergeNode in="blur" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <filter id="orangeGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <!-- Premium Oriental Cyber-Zen Filters -->
+      <filter id="goldGlow" x="-50%" y="-50%" width="200%" height="200%">
         <feGaussianBlur stdDeviation="4.5" result="blur" />
         <feMerge>
           <feMergeNode in="blur" />
           <feMergeNode in="SourceGraphic" />
         </feMerge>
       </filter>
+      <filter id="heavyGoldGlow" x="-80%" y="-80%" width="260%" height="260%">
+        <feGaussianBlur stdDeviation="7" result="blur1" />
+        <feGaussianBlur stdDeviation="2.5" result="blur2" />
+        <feMerge>
+          <feMergeNode in="blur1" />
+          <feMergeNode in="blur2" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <filter id="sakuraGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="4" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <filter id="inkMisty" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="1.8" />
+      </filter>
+      <filter id="redGlow" x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur stdDeviation="3.5" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
 
-      <!-- Advanced Cyber Gradients -->
-      <linearGradient id="cyberMetal" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#2a2a3e"/>
-        <stop offset="35%" stop-color="#1b1b26"/>
-        <stop offset="70%" stop-color="#0e0e16"/>
-        <stop offset="100%" stop-color="#050508"/>
+      <!-- Advanced Cyber-Zen Gradients -->
+      <linearGradient id="inkWashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#2a2a2a"/>
+        <stop offset="60%" stop-color="#121212"/>
+        <stop offset="100%" stop-color="#050505"/>
       </linearGradient>
-      <linearGradient id="cyberMetalLight" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#4e4e6a"/>
-        <stop offset="50%" stop-color="#2a2a3c"/>
-        <stop offset="100%" stop-color="#14141e"/>
+      <linearGradient id="inkWashLight" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#6e6e6e"/>
+        <stop offset="50%" stop-color="#3c3c3c"/>
+        <stop offset="100%" stop-color="#1c1c1c"/>
       </linearGradient>
-      <linearGradient id="ninjaBlade" x1="0%" y1="0%" x2="100%" y2="0%">
+      <linearGradient id="spiritGold" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%" stop-color="#ffffff"/>
-        <stop offset="30%" stop-color="#dffffc"/>
-        <stop offset="75%" stop-color="#00ffff"/>
-        <stop offset="100%" stop-color="#0088cc"/>
+        <stop offset="35%" stop-color="#ffe680"/>
+        <stop offset="75%" stop-color="#e5c158"/>
+        <stop offset="100%" stop-color="#b8860b"/>
       </linearGradient>
-      <linearGradient id="cyberScarf" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#ff0055"/>
-        <stop offset="45%" stop-color="#ff3300"/>
-        <stop offset="90%" stop-color="#ffcc00"/>
+      <linearGradient id="sacredMaple" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ff2200"/>
+        <stop offset="50%" stop-color="#d43f00"/>
+        <stop offset="100%" stop-color="#800000"/>
       </linearGradient>
-      <linearGradient id="plasmaBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <linearGradient id="sakuraBlade" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="#ffffff"/>
-        <stop offset="50%" stop-color="#00ffff"/>
-        <stop offset="100%" stop-color="#0033aa"/>
+        <stop offset="40%" stop-color="#ffb3d9"/>
+        <stop offset="85%" stop-color="#ff3399"/>
+        <stop offset="100%" stop-color="#cc0066"/>
       </linearGradient>
-      <linearGradient id="heavyAxe" x1="0%" y1="0%" x2="100%" y2="100%">
+      <linearGradient id="crimsonGaze" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="#ff3333"/>
-        <stop offset="50%" stop-color="#ff7700"/>
+        <stop offset="60%" stop-color="#aa0000"/>
         <stop offset="100%" stop-color="#550000"/>
-      </linearGradient>
-      <linearGradient id="ninjaGreen" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#00ffcc"/>
-        <stop offset="60%" stop-color="#00ff55"/>
-        <stop offset="100%" stop-color="#003311"/>
       </linearGradient>
     </defs>
     
-  <!-- Heavy carbon block armor -->
-  <path d="M 18 24 L 58 24 L 62 55 L 14 55 Z" fill="#181822" stroke="#f39c12" stroke-width="2.5"/>
-  <!-- Glowing orange panel lines -->
-  <path d="M 22 34 L 54 34 M 24 42 L 52 42 M 26 50 L 50 50" stroke="#f39c12" stroke-width="1.5" filter="url(#orangeGlow)"/>
-  <circle cx="38" cy="38" r="6.5" fill="#f39c12" filter="url(#orangeGlow)"/>
+  <!-- Heavy carbon block armor in samurai design -->
+  <path d="M 16 24 L 56 24 L 60 55 L 12 55 Z" fill="url(#inkWashGrad)" stroke="#cc1100" stroke-width="2.5"/>
+  <path d="M 12 55 L 60 55 L 56 68 L 16 68 Z" fill="#cc1100" stroke="#151515" stroke-width="1"/>
   
-  <!-- Robot Helm with glowing visor sensor -->
-  <rect x="26" y="8" width="24" height="16" rx="4" fill="#0f0f15" stroke="#f39c12" stroke-width="1.2"/>
-  <rect x="28" y="13" width="20" height="4" fill="#ff3300" filter="url(#orangeGlow)"/>
+  <!-- Glowing orange panel lines -->
+  <path d="M 22 34 L 50 34 M 24 42 L 48 42 M 26 50 L 46 50" stroke="#cc1100" stroke-width="1.8"/>
+  <circle cx="36" cy="38" r="6" fill="#e5c158" filter="url(#goldGlow)"/>
+  
+  <!-- Cyber samurai helm with glowing optic sensor -->
+  <rect x="24" y="8" width="24" height="16" rx="2" fill="#1c1c1c" stroke="#cc1100" stroke-width="1.5"/>
+  <path d="M 20 6 L 24 10 L 28 8" fill="#cc1100"/>
+  <path d="M 52 6 L 48 10 L 44 8" fill="#cc1100"/>
+  <rect x="28" y="13" width="16" height="4" fill="#e5c158" filter="url(#goldGlow)"/>
 
-  <!-- High-voltage electric stun baton -->
-  <rect x="58" y="16" width="6" height="44" rx="3" fill="#333" stroke="#f39c12" stroke-width="1"/>
-  <!-- Crackling electric plasma arcs around baton -->
-  <path d="M 58 10 C 66 18 68 28 60 38" fill="none" stroke="#00ffff" stroke-width="2.5" filter="url(#cyanGlow)"/>
-  <path d="M 64 22 C 54 32 62 42 66 52" fill="none" stroke="#00ffff" stroke-width="1.5" filter="url(#cyanGlow)"/>
+  <!-- High-voltage electric stun naginata spear -->
+  <rect x="56" y="16" width="4" height="48" fill="#333" stroke="#cc1100" stroke-width="0.8"/>
+  <path d="M 55 16 C 55 0 65 -8 72 -14 L 75 -10 C 65 0 58 10 58 16" fill="url(#spiritGold)" filter="url(#goldGlow)"/>
+  <!-- Gold sparks around Naginata blade -->
+  <path d="M 56 4 C 64 12 66 22 58 32" fill="none" stroke="#e5c158" stroke-width="2" filter="url(#goldGlow)"/>
 
   </svg>

@@ -1,44 +1,69 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
     <defs>
       <filter id="bgGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="5" result="blur" />
+        <feGaussianBlur stdDeviation="5.5" result="blur" />
         <feMerge>
           <feMergeNode in="blur" />
           <feMergeNode in="SourceGraphic" />
         </feMerge>
       </filter>
-      <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00ffff" stroke-width="0.75" opacity="0.12"/>
-      </pattern>
-      <linearGradient id="bgFade" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#04030a"/>
-        <stop offset="40%" stop-color="#0f0c21"/>
-        <stop offset="85%" stop-color="#180e32"/>
-        <stop offset="100%" stop-color="#241245"/>
+      <filter id="inkMistyBg" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="8" />
+      </filter>
+      <!-- Traditional parchment rice-paper background pattern -->
+      <linearGradient id="parchmentFade" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#fdfbf7"/>
+        <stop offset="40%" stop-color="#f5efe0"/>
+        <stop offset="85%" stop-color="#ede3cd"/>
+        <stop offset="100%" stop-color="#dfd2b5"/>
+      </linearGradient>
+      <linearGradient id="inkMistyFade" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#ede3cd"/>
+        <stop offset="50%" stop-color="#ccc1aa"/>
+        <stop offset="100%" stop-color="#a69b85"/>
       </linearGradient>
     </defs>
     
-  <!-- Digital trees -->
-  <g fill="#072b12" stroke="#00ff55" stroke-width="2">
-    <rect x="180" y="80" width="85" height="640" />
-    <rect x="580" y="40" width="105" height="680" />
-    <rect x="880" y="120" width="75" height="600" />
+  <!-- Digital Zen bamboo stalks in ink-black with golden rings -->
+  <g fill="#221e16" stroke="#e5c158" stroke-width="2">
+    <!-- Bamboo 1 -->
+    <rect x="180" y="80" width="70" height="640" rx="3" />
+    <!-- Bamboo 2 -->
+    <rect x="580" y="40" width="90" height="680" rx="4" />
+    <!-- Bamboo 3 -->
+    <rect x="880" y="120" width="65" height="600" rx="3" />
     
-    <!-- Segmented angular high tech leaves -->
-    <polygon points="120,180 220,70 320,180 220,130" fill="#083d19" stroke="#00ff55" stroke-width="1"/>
-    <polygon points="480,130 630,20 780,130 630,80" fill="#083d19" stroke="#00ff55" stroke-width="1"/>
-    <polygon points="780,220 915,110 1050,220 915,170" fill="#083d19" stroke="#00ff55" stroke-width="1"/>
+    <!-- Golden segments connections -->
+    <rect x="178" y="240" width="74" height="6" fill="#e5c158"/>
+    <rect x="178" y="420" width="74" height="6" fill="#e5c158"/>
+    <rect x="578" y="200" width="94" height="8" fill="#e5c158"/>
+    <rect x="578" y="440" width="94" height="8" fill="#e5c158"/>
+    <rect x="878" y="300" width="69" height="6" fill="#e5c158"/>
+    <rect x="878" y="480" width="69" height="6" fill="#e5c158"/>
+
+    <!-- High-fidelity segmented bamboo leaves (gold/crimson water-color brush paths) -->
+    <!-- Leaf clusters -->
+    <polygon points="120,180 200,90 280,180 200,140" fill="#cc1100" stroke="#e5c158" stroke-width="1.2"/>
+    <polygon points="480,130 625,30 770,130 625,90" fill="#2d281e" stroke="#e5c158" stroke-width="1.2"/>
+    <polygon points="780,220 910,120 1040,220 910,180" fill="#cc1100" stroke="#e5c158" stroke-width="1.2"/>
   </g>
 
-  <!-- Glowing cybernetic data spores -->
-  <g fill="#00ff55" filter="url(#bgGlow)">
-    <rect x="215" y="260" width="15" height="90" rx="7" fill="#00ffcc"/>
-    <rect x="620" y="200" width="25" height="140" rx="12" fill="#00ff55"/>
-    <circle cx="915" cy="350" r="18" fill="#00ffcc"/>
+  <!-- Glowing spiritual calligraphic lanterns suspended from stalks -->
+  <g fill="#e5c158" filter="url(#bgGlow)">
+    <rect x="207" y="270" width="16" height="50" rx="4" fill="#e5c158"/>
+    <rect x="612" y="220" width="26" height="80" rx="6" fill="#ffffff"/>
+    <rect x="898" y="320" width="28" height="60" rx="5" fill="#e5c158"/>
+    
+    <!-- Calligraphic red ink tassels on lanterns -->
+    <line x1="215" y1="320" x2="215" y2="335" stroke="#cc1100" stroke-width="1.5"/>
+    <line x1="625" y1="300" x2="625" y2="320" stroke="#cc1100" stroke-width="2"/>
+    <line x1="912" y1="380" x2="912" y2="400" stroke="#cc1100" stroke-width="1.8"/>
 
-    <!-- Code spores floating in forest -->
-    <circle cx="280" cy="360" r="5"/><circle cx="480" cy="460" r="4"/>
-    <circle cx="780" cy="260" r="6"/><circle cx="1080" cy="400" r="5"/>
+    <!-- Floating spirit cherry blossom flower seeds -->
+    <circle cx="280" cy="360" r="5" fill="#ff5599" filter="url(#bgGlow)"/>
+    <circle cx="480" cy="460" r="4.5" fill="#ff5599" filter="url(#bgGlow)"/>
+    <circle cx="780" cy="260" r="6" fill="#e5c158"/>
+    <circle cx="1080" cy="400" r="5" fill="#e5c158"/>
   </g>
 
   </svg>

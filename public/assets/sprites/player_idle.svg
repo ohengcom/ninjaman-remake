@@ -1,119 +1,108 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
     <defs>
-      <!-- High-Fidelity Filters -->
-      <filter id="cyanGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="3" result="blur" />
-        <feMerge>
-          <feMergeNode in="blur" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <filter id="heavyCyanGlow" x="-80%" y="-80%" width="260%" height="260%">
-        <feGaussianBlur stdDeviation="6" result="blur1" />
-        <feGaussianBlur stdDeviation="2" result="blur2" />
-        <feMerge>
-          <feMergeNode in="blur1" />
-          <feMergeNode in="blur2" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <filter id="pinkGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="3.5" result="blur" />
-        <feMerge>
-          <feMergeNode in="blur" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <filter id="greenGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="3" result="blur" />
-        <feMerge>
-          <feMergeNode in="blur" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <filter id="orangeGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <!-- Premium Oriental Cyber-Zen Filters -->
+      <filter id="goldGlow" x="-50%" y="-50%" width="200%" height="200%">
         <feGaussianBlur stdDeviation="4.5" result="blur" />
         <feMerge>
           <feMergeNode in="blur" />
           <feMergeNode in="SourceGraphic" />
         </feMerge>
       </filter>
+      <filter id="heavyGoldGlow" x="-80%" y="-80%" width="260%" height="260%">
+        <feGaussianBlur stdDeviation="7" result="blur1" />
+        <feGaussianBlur stdDeviation="2.5" result="blur2" />
+        <feMerge>
+          <feMergeNode in="blur1" />
+          <feMergeNode in="blur2" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <filter id="sakuraGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="4" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <filter id="inkMisty" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="1.8" />
+      </filter>
+      <filter id="redGlow" x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur stdDeviation="3.5" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
 
-      <!-- Advanced Cyber Gradients -->
-      <linearGradient id="cyberMetal" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#2a2a3e"/>
-        <stop offset="35%" stop-color="#1b1b26"/>
-        <stop offset="70%" stop-color="#0e0e16"/>
-        <stop offset="100%" stop-color="#050508"/>
+      <!-- Advanced Cyber-Zen Gradients -->
+      <linearGradient id="inkWashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#2a2a2a"/>
+        <stop offset="60%" stop-color="#121212"/>
+        <stop offset="100%" stop-color="#050505"/>
       </linearGradient>
-      <linearGradient id="cyberMetalLight" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#4e4e6a"/>
-        <stop offset="50%" stop-color="#2a2a3c"/>
-        <stop offset="100%" stop-color="#14141e"/>
+      <linearGradient id="inkWashLight" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#6e6e6e"/>
+        <stop offset="50%" stop-color="#3c3c3c"/>
+        <stop offset="100%" stop-color="#1c1c1c"/>
       </linearGradient>
-      <linearGradient id="ninjaBlade" x1="0%" y1="0%" x2="100%" y2="0%">
+      <linearGradient id="spiritGold" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%" stop-color="#ffffff"/>
-        <stop offset="30%" stop-color="#dffffc"/>
-        <stop offset="75%" stop-color="#00ffff"/>
-        <stop offset="100%" stop-color="#0088cc"/>
+        <stop offset="35%" stop-color="#ffe680"/>
+        <stop offset="75%" stop-color="#e5c158"/>
+        <stop offset="100%" stop-color="#b8860b"/>
       </linearGradient>
-      <linearGradient id="cyberScarf" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#ff0055"/>
-        <stop offset="45%" stop-color="#ff3300"/>
-        <stop offset="90%" stop-color="#ffcc00"/>
+      <linearGradient id="sacredMaple" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ff2200"/>
+        <stop offset="50%" stop-color="#d43f00"/>
+        <stop offset="100%" stop-color="#800000"/>
       </linearGradient>
-      <linearGradient id="plasmaBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <linearGradient id="sakuraBlade" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="#ffffff"/>
-        <stop offset="50%" stop-color="#00ffff"/>
-        <stop offset="100%" stop-color="#0033aa"/>
+        <stop offset="40%" stop-color="#ffb3d9"/>
+        <stop offset="85%" stop-color="#ff3399"/>
+        <stop offset="100%" stop-color="#cc0066"/>
       </linearGradient>
-      <linearGradient id="heavyAxe" x1="0%" y1="0%" x2="100%" y2="100%">
+      <linearGradient id="crimsonGaze" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="#ff3333"/>
-        <stop offset="50%" stop-color="#ff7700"/>
+        <stop offset="60%" stop-color="#aa0000"/>
         <stop offset="100%" stop-color="#550000"/>
-      </linearGradient>
-      <linearGradient id="ninjaGreen" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#00ffcc"/>
-        <stop offset="60%" stop-color="#00ff55"/>
-        <stop offset="100%" stop-color="#003311"/>
       </linearGradient>
     </defs>
     
-  <!-- Flowing energy scarf (dynamic layered ribbons) -->
-  <path d="M 36 28 C 22 42 12 55 2 64 C 10 52 24 38 34 32" fill="url(#cyberScarf)" opacity="0.8" filter="url(#pinkGlow)"/>
-  <path d="M 36 28 C 26 48 16 63 6 74 C 18 56 28 42 34 32" fill="url(#cyberScarf)" opacity="0.9"/>
-  <path d="M 36 28 C 18 36 8 50 0 58 C 8 46 22 34 34 32" fill="#ff0055" opacity="0.6"/>
+  <!-- Flowing Crimson Haori/Cape (Traditional calligraphic brush stroke lines) -->
+  <path d="M 36 28 C 22 42 8 62 -2 74 C 10 58 24 42 34 32" fill="url(#sacredMaple)" opacity="0.85" filter="url(#sakuraGlow)"/>
+  <path d="M 36 28 C 26 48 12 70 2 82 C 18 64 28 46 34 32" fill="url(#sacredMaple)" opacity="0.95"/>
+  <path d="M 36 28 C 18 36 6 52 -4 64 C 8 50 22 36 34 32" fill="#cc1100" opacity="0.7"/>
 
-  <!-- Back Scabbard / Katana Hilt on back -->
-  <path d="M 28 32 L 10 12 L 14 8 L 32 28 Z" fill="#0b0b10" stroke="#00ffff" stroke-width="1.5"/>
-  <rect x="5" y="5" width="5" height="15" fill="#ff0055" transform="rotate(45 5 5)" filter="url(#pinkGlow)"/>
-  <circle cx="10" cy="10" r="3" fill="#ffffff"/>
+  <!-- Back Sheathed Sacred Katana with golden tassels -->
+  <path d="M 28 32 L 8 10 L 12 6 L 32 28 Z" fill="#1c1c1c" stroke="#e5c158" stroke-width="1.8"/>
+  <path d="M 5 3 L 8 6 L 3 11" fill="none" stroke="#e5c158" stroke-width="1.5" filter="url(#goldGlow)"/>
+  <circle cx="8" cy="6" r="3" fill="#ffffff"/>
 
-  <!-- Left/Right Mechanical Shoulder Pauldrons -->
-  <path d="M 22 24 L 14 30 L 16 42 L 26 36 Z" fill="url(#cyberMetalLight)" stroke="#00ffff" stroke-width="1.2"/>
-  <path d="M 58 24 L 66 30 L 64 42 L 54 36 Z" fill="url(#cyberMetalLight)" stroke="#00ffff" stroke-width="1.2"/>
-  
-  <!-- Cyber Armor Core Body with segmented panels -->
-  <path d="M 26 24 L 54 24 L 48 54 L 32 54 Z" fill="url(#cyberMetal)" stroke="#00ffff" stroke-width="1.5"/>
-  <!-- Abdominal grid lines -->
-  <path d="M 32 38 L 48 38 M 33 44 L 47 44 M 34 50 L 46 50" stroke="#0088cc" stroke-width="1" opacity="0.7"/>
-  <!-- Central Glowing Fusion Core (Arc Reactor) -->
-  <polygon points="40,28 46,34 44,42 36,42 34,34" fill="#00ffff" filter="url(#heavyCyanGlow)"/>
-  <polygon points="40,31 43,35 42,40 38,40 37,35" fill="#ffffff"/>
+  <!-- Segmented Cyber-Samurai Chestpiece & Underlayer -->
+  <path d="M 26 24 L 54 24 L 46 54 L 34 54 Z" fill="url(#inkWashGrad)" stroke="#e5c158" stroke-width="1.5"/>
+  <!-- Calligraphy golden rib-stripes -->
+  <path d="M 32 38 L 48 38 M 33 44 L 47 44" stroke="#e5c158" stroke-width="1.5" opacity="0.8"/>
+  <!-- Central Glowing Spiritual Core (Circular golden Zen Enso) -->
+  <circle cx="40" cy="35" r="7.5" fill="none" stroke="#e5c158" stroke-width="2.5" filter="url(#heavyGoldGlow)"/>
+  <circle cx="40" cy="35" r="3.5" fill="#ffffff"/>
 
-  <!-- Cyber Legs (Segmented plates) -->
-  <path d="M 32 54 L 28 66 L 22 66 L 26 54 Z" fill="url(#cyberMetalLight)"/>
-  <path d="M 48 54 L 52 66 L 58 66 L 54 54 Z" fill="url(#cyberMetalLight)"/>
-  <circle cx="28" cy="60" r="2.5" fill="#00ffff"/>
-  <circle cx="52" cy="60" r="2.5" fill="#00ffff"/>
+  <!-- Dark wood-sandals legs -->
+  <path d="M 32 54 L 28 68 L 22 68 L 26 54 Z" fill="url(#inkWashLight)"/>
+  <path d="M 48 54 L 52 68 L 58 68 L 54 54 Z" fill="url(#inkWashLight)"/>
+  <circle cx="28" cy="62" r="3" fill="#e5c158" filter="url(#goldGlow)"/>
+  <circle cx="52" cy="62" r="3" fill="#e5c158" filter="url(#goldGlow)"/>
 
-  <!-- Cyber Ninja Helmet & Visor -->
-  <path d="M 28 16 C 28 4 52 4 52 16 L 49 26 L 31 26 Z" fill="#0f0f18" stroke="#33334d" stroke-width="2"/>
-  <!-- Sleek angular segmented V-Visor -->
-  <path d="M 31 12 L 40 21 L 49 12 L 44 11 L 40 15 L 36 11 Z" fill="#00ffff" filter="url(#heavyCyanGlow)"/>
-  <path d="M 33 13 L 40 19 L 47 13 Z" fill="#ffffff"/>
-  <!-- Side Horns/Sensors -->
-  <polygon points="28,12 20,8 28,6" fill="#ff0055" filter="url(#pinkGlow)"/>
-  <polygon points="52,12 60,8 52,6" fill="#ff0055" filter="url(#pinkGlow)"/>
+  <!-- Cyber-Zen Ronin Head with Circular Woven Straw Hat (斗笠) -->
+  <!-- Straw hat structure (angled calligraphic curves) -->
+  <ellipse cx="40" cy="18" rx="26" ry="7" fill="url(#inkWashLight)" stroke="#e5c158" stroke-width="2"/>
+  <path d="M 14 18 C 14 6 66 6 66 18 Z" fill="url(#inkWashGrad)" stroke="#e5c158" stroke-width="1.5"/>
+  <line x1="40" y1="6" x2="40" y2="24" stroke="#e5c158" stroke-width="1"/>
+  <line x1="20" y1="14" x2="60" y2="14" stroke="#e5c158" stroke-width="0.8"/>
+
+  <!-- V-shaped Glowing Golden Eyepiece beneath the hat shadow -->
+  <path d="M 32 20 L 40 25 L 48 20" fill="none" stroke="#e5c158" stroke-width="2.5" filter="url(#heavyGoldGlow)"/>
+  <polygon points="38,20 40,23 42,20" fill="#ffffff"/>
 
   </svg>

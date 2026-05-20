@@ -171,7 +171,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         return true;
       }
     }
-    if (!p.body!.touching.down && p.body!.velocity.y > 0 && p.stateMachine.getCurrentStateName() !== 'jump') {
+    if (!p.body!.touching.down && p.body!.velocity.y > 0) {
       p.stateMachine.setState('fall');
       return true;
     }
@@ -192,7 +192,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       // });
   }
 
-  private setPlayerTexture(texture: string) {
+  public setPlayerTexture(texture: string) {
     this.setTexture(texture);
     this.body!.setSize(30, 40);
     this.body!.setOffset(this.width / 2 - 15, this.height / 2 - 20);
@@ -218,7 +218,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'run',
         onEnter: (p) => {
-          p.setTexture('player_run');
+          p.setPlayerTexture('player_run');
           p.jumpCount = 0;
         },
         onUpdate: (p) => {
@@ -236,7 +236,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         name: 'dash',
         onEnter: (p) => {
           SoundManager.playDash((p.scene as any).getPan?.(p.x) ?? 0);
-          p.setTexture('player_dash');
+          p.setPlayerTexture('player_dash');
           p.setVelocityX(p.dashDir * PLAYER_MOVEMENT.dashSpeed);
           
           // Dash grants invincibility frames by default now that upgrade menu is removed
@@ -251,7 +251,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'defend',
         onEnter: (p) => {
-          p.setTexture('player_defend');
+          p.setPlayerTexture('player_defend');
           p.setVelocityX(0);
           p.isBlocking = true;
         },
@@ -264,7 +264,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         name: 'jump',
         onEnter: (p) => {
           SoundManager.playJump((p.scene as any).getPan?.(p.x) ?? 0);
-          p.setTexture('player_jump');
+          p.setPlayerTexture('player_jump');
           p.setVelocityY(p.jumpCount === 0 ? PLAYER_MOVEMENT.jumpVelocity : PLAYER_MOVEMENT.doubleJumpVelocity);
           p.jumpCount++;
           
@@ -273,11 +273,15 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         onUpdate: (p) => {
           if (p.handleCommonTransitions(p)) return;
           p.handleAirMovement();
+          if (p.body!.touching.down) {
+            p.applySquash(1.4, 0.6, 100);
+            p.stateMachine.setState('idle');
+          }
         }
       })
       .addState({
         name: 'fall',
-        onEnter: (p) => { p.setTexture('player_jump'); },
+        onEnter: (p) => { p.setPlayerTexture('player_jump'); },
         onUpdate: (p) => {
           if (p.handleCommonTransitions(p)) return;
           p.handleAirMovement();
@@ -317,7 +321,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           const recovery = comboRecovery[step] ?? PLAYER_ATTACKS.combo.recovery;
           const [shakeDur, shakeIntensity] = comboShake[step] ?? [100, 0.005];
 
-          p.setTexture(texture);
+          p.setPlayerTexture(texture);
           p.setVelocityX(p.flipX ? -momentum : momentum);
 
           // Step 3 (heavy slam) also pushes down slightly for impact feel
@@ -331,12 +335,22 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           p.scene.time.delayedCall(recovery, () => {
             if (p.health > 0) p.stateMachine.setState(p.body!.touching.down ? 'idle' : 'fall');
           });
+        },
+        onUpdate: (p) => {
+          // Special Cancel: Allow canceling active combo hits into wave attack instantly
+          if (Phaser.Input.Keyboard.JustDown(p.waveKey) || (p.pad && p.pad.X)) {
+            const time = p.scene.time.now;
+            if (time - p.lastWaveTime > PLAYER_ATTACKS.wave.cooldown) {
+              p.lastWaveTime = time;
+              p.stateMachine.setState('attack_wave');
+            }
+          }
         }
       })
       .addState({
         name: 'attack_wave',
         onEnter: (p) => {
-          p.setTexture('player_cast');
+          p.setPlayerTexture('player_cast');
           p.setVelocityX(0);
           p.scene.cameras.main.shake(100, 0.005);
           p.scene.events.emit('player_cast_wave', p);
@@ -351,7 +365,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'attack_uppercut',
         onEnter: (p) => {
-          p.setTexture('player_uppercut');
+          p.setPlayerTexture('player_uppercut');
           p.setVelocityY(PLAYER_ATTACKS.uppercut.launchVelocity); // Launcher
           p.setVelocityX(0);
           p.scene.cameras.main.shake(150, 0.01);
@@ -367,7 +381,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'attack_dive',
         onEnter: (p) => {
-          p.setTexture('player_dive');
+          p.setPlayerTexture('player_dive');
           p.setVelocityY(PLAYER_ATTACKS.dive.downVelocity); // Fast downward
           p.setVelocityX(p.flipX ? -PLAYER_ATTACKS.dive.forwardVelocity : PLAYER_ATTACKS.dive.forwardVelocity);
           p.scene.events.emit('player_attack', p, 'dive');
@@ -388,7 +402,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'hurt',
         onEnter: (p) => {
-          p.setTexture('player_idle');
+          p.setPlayerTexture('player_idle');
           p.setTint(0xff0000);
           p.isInvulnerable = true;
           p.isBlocking = false;

@@ -22,7 +22,7 @@ export const PLAYER_ATTACKS = {
   wave: {
     speed: 800,
     damage: 20,
-    cooldown: 1000,
+    cooldown: 350,
   },
 } as const;
 

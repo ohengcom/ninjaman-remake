@@ -1,101 +1,93 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 120" width="140" height="120">
     <defs>
-      <!-- High-Fidelity Filters -->
-      <filter id="cyanGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="3" result="blur" />
-        <feMerge>
-          <feMergeNode in="blur" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <filter id="heavyCyanGlow" x="-80%" y="-80%" width="260%" height="260%">
-        <feGaussianBlur stdDeviation="6" result="blur1" />
-        <feGaussianBlur stdDeviation="2" result="blur2" />
-        <feMerge>
-          <feMergeNode in="blur1" />
-          <feMergeNode in="blur2" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <filter id="pinkGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="3.5" result="blur" />
-        <feMerge>
-          <feMergeNode in="blur" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <filter id="greenGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="3" result="blur" />
-        <feMerge>
-          <feMergeNode in="blur" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <filter id="orangeGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <!-- Premium Oriental Cyber-Zen Filters -->
+      <filter id="goldGlow" x="-50%" y="-50%" width="200%" height="200%">
         <feGaussianBlur stdDeviation="4.5" result="blur" />
         <feMerge>
           <feMergeNode in="blur" />
           <feMergeNode in="SourceGraphic" />
         </feMerge>
       </filter>
+      <filter id="heavyGoldGlow" x="-80%" y="-80%" width="260%" height="260%">
+        <feGaussianBlur stdDeviation="7" result="blur1" />
+        <feGaussianBlur stdDeviation="2.5" result="blur2" />
+        <feMerge>
+          <feMergeNode in="blur1" />
+          <feMergeNode in="blur2" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <filter id="sakuraGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="4" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <filter id="inkMisty" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="1.8" />
+      </filter>
+      <filter id="redGlow" x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur stdDeviation="3.5" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
 
-      <!-- Advanced Cyber Gradients -->
-      <linearGradient id="cyberMetal" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#2a2a3e"/>
-        <stop offset="35%" stop-color="#1b1b26"/>
-        <stop offset="70%" stop-color="#0e0e16"/>
-        <stop offset="100%" stop-color="#050508"/>
+      <!-- Advanced Cyber-Zen Gradients -->
+      <linearGradient id="inkWashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#2a2a2a"/>
+        <stop offset="60%" stop-color="#121212"/>
+        <stop offset="100%" stop-color="#050505"/>
       </linearGradient>
-      <linearGradient id="cyberMetalLight" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#4e4e6a"/>
-        <stop offset="50%" stop-color="#2a2a3c"/>
-        <stop offset="100%" stop-color="#14141e"/>
+      <linearGradient id="inkWashLight" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#6e6e6e"/>
+        <stop offset="50%" stop-color="#3c3c3c"/>
+        <stop offset="100%" stop-color="#1c1c1c"/>
       </linearGradient>
-      <linearGradient id="ninjaBlade" x1="0%" y1="0%" x2="100%" y2="0%">
+      <linearGradient id="spiritGold" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%" stop-color="#ffffff"/>
-        <stop offset="30%" stop-color="#dffffc"/>
-        <stop offset="75%" stop-color="#00ffff"/>
-        <stop offset="100%" stop-color="#0088cc"/>
+        <stop offset="35%" stop-color="#ffe680"/>
+        <stop offset="75%" stop-color="#e5c158"/>
+        <stop offset="100%" stop-color="#b8860b"/>
       </linearGradient>
-      <linearGradient id="cyberScarf" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#ff0055"/>
-        <stop offset="45%" stop-color="#ff3300"/>
-        <stop offset="90%" stop-color="#ffcc00"/>
+      <linearGradient id="sacredMaple" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ff2200"/>
+        <stop offset="50%" stop-color="#d43f00"/>
+        <stop offset="100%" stop-color="#800000"/>
       </linearGradient>
-      <linearGradient id="plasmaBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <linearGradient id="sakuraBlade" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="#ffffff"/>
-        <stop offset="50%" stop-color="#00ffff"/>
-        <stop offset="100%" stop-color="#0033aa"/>
+        <stop offset="40%" stop-color="#ffb3d9"/>
+        <stop offset="85%" stop-color="#ff3399"/>
+        <stop offset="100%" stop-color="#cc0066"/>
       </linearGradient>
-      <linearGradient id="heavyAxe" x1="0%" y1="0%" x2="100%" y2="100%">
+      <linearGradient id="crimsonGaze" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="#ff3333"/>
-        <stop offset="50%" stop-color="#ff7700"/>
+        <stop offset="60%" stop-color="#aa0000"/>
         <stop offset="100%" stop-color="#550000"/>
-      </linearGradient>
-      <linearGradient id="ninjaGreen" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#00ffcc"/>
-        <stop offset="60%" stop-color="#00ff55"/>
-        <stop offset="100%" stop-color="#003311"/>
       </linearGradient>
     </defs>
     
-  <path d="M 8 26 L 60 6 L 112 26 L 102 98 L 18 98 Z" fill="#1c1206" stroke="#ffaa00" stroke-width="5"/>
-  
-  <!-- Visor overloaded warning yellow -->
-  <polygon points="42,32 54,36 50,42" fill="#ffaa00" filter="url(#orangeGlow)"/>
-  <polygon points="78,32 66,36 70,42" fill="#ffaa00" filter="url(#orangeGlow)"/>
+  <path d="M 8 26 L 60 6 L 112 26 L 102 98 L 18 98 Z" fill="url(#inkWashGrad)" stroke="#e5c158" stroke-width="5.5"/>
+  <path d="M 0 28 Q 60 0 120 28" fill="none" stroke="#cc1100" stroke-width="6"/>
 
   <!-- Core charging yellow-hot -->
-  <circle cx="60" cy="66" r="28" fill="none" stroke="#ffaa00" stroke-width="4" stroke-dasharray="8 4" filter="url(#orangeGlow)"/>
-  <circle cx="60" cy="66" r="22" fill="url(#heavyAxe)" filter="url(#orangeGlow)"/>
-  <circle cx="60" cy="66" r="8" fill="#ffffff"/>
+  <circle cx="60" cy="66" r="34" fill="none" stroke="#e5c158" stroke-width="4" stroke-dasharray="8 6" filter="url(#goldGlow)"/>
+  
+  <!-- Yin-Yang spinning actively -->
+  <circle cx="60" cy="66" r="22" fill="#1c1c1c" stroke="#ffffff" stroke-width="2.5" filter="url(#heavyGoldGlow)"/>
+  <path d="M 60 44 A 11 11 0 0 0 60 66 A 11 11 0 0 1 60 88 A 22 22 0 0 0 60 44 Z" fill="#e5c158"/>
 
-  <!-- Power gathering grids -->
-  <path d="M 32 40 L 40 66 L 32 90" fill="none" stroke="#ffaa00" stroke-width="2" opacity="0.8"/>
-  <path d="M 88 40 L 80 66 L 88 90" fill="none" stroke="#ffaa00" stroke-width="2" opacity="0.8"/>
+  <!-- Massive glowing calligraphy signs erupting (Sanskrit/Kanji "神" / "力") -->
+  <text x="32" y="42" font-family="serif" font-weight="bold" font-size="15" fill="#cc1100" filter="url(#redGlow)">神</text>
+  <text x="76" y="42" font-family="serif" font-weight="bold" font-size="15" fill="#cc1100" filter="url(#redGlow)">机</text>
+  <text x="32" y="96" font-family="serif" font-weight="bold" font-size="15" fill="#e5c158" filter="url(#goldGlow)">乾</text>
+  <text x="76" y="96" font-family="serif" font-weight="bold" font-size="15" fill="#e5c158" filter="url(#goldGlow)">坤</text>
 
-  <!-- Hydraulic arms raised -->
-  <rect x="-20" y="8" width="30" height="52" rx="10" fill="#111" stroke="#ffaa00" stroke-width="3" transform="rotate(-26 0 32)"/>
-  <rect x="110" y="8" width="30" height="52" rx="10" fill="#111" stroke="#ffaa00" stroke-width="3" transform="rotate(26 120 32)"/>
+  <!-- Claws raised in charging pose -->
+  <rect x="-20" y="8" width="30" height="52" rx="5" fill="#111" stroke="#e5c158" stroke-width="3" transform="rotate(-26 0 32)"/>
+  <rect x="110" y="8" width="30" height="52" rx="5" fill="#111" stroke="#e5c158" stroke-width="3" transform="rotate(26 120 32)"/>
 
   </svg>

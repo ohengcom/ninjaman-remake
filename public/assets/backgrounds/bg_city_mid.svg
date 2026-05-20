@@ -1,66 +1,84 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
     <defs>
       <filter id="bgGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="5" result="blur" />
+        <feGaussianBlur stdDeviation="5.5" result="blur" />
         <feMerge>
           <feMergeNode in="blur" />
           <feMergeNode in="SourceGraphic" />
         </feMerge>
       </filter>
-      <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00ffff" stroke-width="0.75" opacity="0.12"/>
-      </pattern>
-      <linearGradient id="bgFade" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#04030a"/>
-        <stop offset="40%" stop-color="#0f0c21"/>
-        <stop offset="85%" stop-color="#180e32"/>
-        <stop offset="100%" stop-color="#241245"/>
+      <filter id="inkMistyBg" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="8" />
+      </filter>
+      <!-- Traditional parchment rice-paper background pattern -->
+      <linearGradient id="parchmentFade" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#fdfbf7"/>
+        <stop offset="40%" stop-color="#f5efe0"/>
+        <stop offset="85%" stop-color="#ede3cd"/>
+        <stop offset="100%" stop-color="#dfd2b5"/>
+      </linearGradient>
+      <linearGradient id="inkMistyFade" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#ede3cd"/>
+        <stop offset="50%" stop-color="#ccc1aa"/>
+        <stop offset="100%" stop-color="#a69b85"/>
       </linearGradient>
     </defs>
     
   <defs>
-    <linearGradient id="bldgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#120e24"/>
-      <stop offset="100%" stop-color="#05030d"/>
+    <linearGradient id="pagodaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3d3527"/>
+      <stop offset="100%" stop-color="#15120d"/>
     </linearGradient>
   </defs>
   
-  <!-- Detailed Buildings -->
-  <g fill="url(#bldgGrad)" stroke="#00ffff" stroke-width="1.8">
-    <rect x="40" y="260" width="150" height="460" />
-    <polygon points="40,260 115,190 190,260" fill="url(#bldgGrad)"/>
+  <!-- Beautiful multi-tiered Silhouette Pagodas and Shrines -->
+  <g fill="url(#pagodaGrad)" stroke="#e5c158" stroke-width="2">
+    <!-- Pagoda 1 -->
+    <rect x="50" y="280" width="130" height="440" />
+    <path d="M 30 280 Q 115 220 200 280" fill="url(#pagodaGrad)" stroke="#cc1100" stroke-width="2.5"/>
+    <path d="M 40 360 Q 115 310 190 360" fill="url(#pagodaGrad)" stroke="#cc1100" stroke-width="2"/>
     
+    <!-- Pagoda 2 -->
     <rect x="290" y="160" width="170" height="560" />
+    <path d="M 270 160 Q 375 100 480 160" fill="url(#pagodaGrad)" stroke="#cc1100" stroke-width="2.5"/>
+    <path d="M 280 280 Q 375 220 470 280" fill="url(#pagodaGrad)" stroke="#cc1100" stroke-width="2"/>
+    <path d="M 285 400 Q 375 340 465 400" fill="url(#pagodaGrad)" stroke="#cc1100" stroke-width="2"/>
     
-    <rect x="540" y="300" width="190" height="420" />
+    <!-- Pagoda 3 -->
+    <rect x="560" y="320" width="160" height="400" />
+    <path d="M 540 320 Q 640 260 740 320" fill="url(#pagodaGrad)" stroke="#cc1100" stroke-width="2.5"/>
     
-    <rect x="800" y="100" width="160" height="620" />
-    <polygon points="800,100 880,30 960,100" fill="url(#bldgGrad)"/>
+    <!-- Pagoda 4 -->
+    <rect x="800" y="110" width="160" height="610" />
+    <path d="M 780 110 Q 880 50 980 110" fill="url(#pagodaGrad)" stroke="#cc1100" stroke-width="2.5"/>
+    <path d="M 790 230 Q 880 170 970 230" fill="url(#pagodaGrad)" stroke="#cc1100" stroke-width="2"/>
+    <path d="M 795 350 Q 880 290 965 350" fill="url(#pagodaGrad)" stroke="#cc1100" stroke-width="2"/>
     
-    <rect x="1050" y="230" width="170" height="490" />
+    <!-- Pagoda 5 -->
+    <rect x="1060" y="240" width="150" height="480" />
+    <path d="M 1040 240 Q 1135 180 1230 240" fill="url(#pagodaGrad)" stroke="#cc1100" stroke-width="2.5"/>
   </g>
 
-  <!-- High-Fidelity Hologram Ads & Neon Signage -->
+  <!-- Glowing spiritual paper lanterns and calligraphic typography signs -->
   <g filter="url(#bgGlow)">
-    <!-- Bldg 1 Windows -->
-    <rect x="65" y="300" width="22" height="44" fill="#00ffff" opacity="0.85"/>
-    <rect x="105" y="300" width="22" height="44" fill="#00ffff" opacity="0.85"/>
-    <rect x="145" y="300" width="22" height="44" fill="#00ffff" opacity="0.85"/>
-    <rect x="65" y="370" width="22" height="44" fill="#ff0055" opacity="0.8"/>
-    <rect x="105" y="370" width="22" height="44" fill="#ff0055" opacity="0.8"/>
+    <!-- Pagoda 1 hanging lantern lights -->
+    <rect x="105" y="300" width="20" height="30" rx="3" fill="#e5c158" opacity="0.9"/>
+    <line x1="115" y1="300" x2="115" y2="330" stroke="#cc1100" stroke-width="1.8"/>
 
-    <!-- Bldg 2 Cyber Circuit Core -->
-    <line x1="290" y1="230" x2="460" y2="230" stroke="#f39c12" stroke-width="8"/>
-    <rect x="330" y="260" width="16" height="180" fill="#ff0055" opacity="0.85"/>
-    <rect x="375" y="260" width="16" height="180" fill="#ff0055" opacity="0.85"/>
-    <rect x="420" y="260" width="16" height="180" fill="#ff0055" opacity="0.85"/>
+    <!-- Pagoda 2 Calligraphy grid -->
+    <line x1="290" y1="230" x2="460" y2="230" stroke="#e5c158" stroke-width="4"/>
+    <rect x="330" y="300" width="16" height="80" fill="#cc1100" opacity="0.85"/>
+    <rect x="375" y="300" width="16" height="80" fill="#cc1100" opacity="0.85"/>
+    <rect x="420" y="300" width="16" height="80" fill="#cc1100" opacity="0.85"/>
 
-    <!-- Bldg 4 Giant Japanese Kanji/Hologram Text -->
-    <text x="835" y="190" font-family="Impact, sans-serif" font-size="54" fill="#00ffff" letter-spacing="4" transform="rotate(90 835 190)">NINJA</text>
-    <text x="895" y="190" font-family="Impact, sans-serif" font-size="54" fill="#ff0055" letter-spacing="4" transform="rotate(90 895 190)">CYBER</text>
+    <!-- Giant Calligraphic Banner Kanji "忍" and "禅" vertically -->
+    <rect x="850" y="170" width="60" height="240" rx="6" fill="#f5efe0" stroke="#cc1100" stroke-width="2"/>
+    <text x="862" y="225" font-family="serif" font-weight="bold" font-size="48" fill="#151515" letter-spacing="4">忍</text>
+    <text x="862" y="325" font-family="serif" font-weight="bold" font-size="48" fill="#cc1100" letter-spacing="4">禅</text>
 
-    <!-- Bldg 5 Cyber Grid matrix -->
-    <path d="M 1070 280 L 1200 280 M 1070 310 L 1200 310 M 1070 340 L 1200 340 M 1070 370 L 1200 370" stroke="#00ffcc" stroke-width="5" stroke-dasharray="8 4"/>
+    <!-- Spiritual sacred maples flying across background -->
+    <circle cx="640" cy="200" r="14" fill="#cc1100" opacity="0.85"/>
+    <path d="M 625 200 L 655 200 L 640 185 Z" fill="#ffffff"/>
   </g>
 
   </svg>

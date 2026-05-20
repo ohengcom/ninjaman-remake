@@ -1,105 +1,109 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 120" width="140" height="120">
     <defs>
-      <!-- High-Fidelity Filters -->
-      <filter id="cyanGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="3" result="blur" />
-        <feMerge>
-          <feMergeNode in="blur" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <filter id="heavyCyanGlow" x="-80%" y="-80%" width="260%" height="260%">
-        <feGaussianBlur stdDeviation="6" result="blur1" />
-        <feGaussianBlur stdDeviation="2" result="blur2" />
-        <feMerge>
-          <feMergeNode in="blur1" />
-          <feMergeNode in="blur2" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <filter id="pinkGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="3.5" result="blur" />
-        <feMerge>
-          <feMergeNode in="blur" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <filter id="greenGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="3" result="blur" />
-        <feMerge>
-          <feMergeNode in="blur" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <filter id="orangeGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <!-- Premium Oriental Cyber-Zen Filters -->
+      <filter id="goldGlow" x="-50%" y="-50%" width="200%" height="200%">
         <feGaussianBlur stdDeviation="4.5" result="blur" />
         <feMerge>
           <feMergeNode in="blur" />
           <feMergeNode in="SourceGraphic" />
         </feMerge>
       </filter>
+      <filter id="heavyGoldGlow" x="-80%" y="-80%" width="260%" height="260%">
+        <feGaussianBlur stdDeviation="7" result="blur1" />
+        <feGaussianBlur stdDeviation="2.5" result="blur2" />
+        <feMerge>
+          <feMergeNode in="blur1" />
+          <feMergeNode in="blur2" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <filter id="sakuraGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="4" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <filter id="inkMisty" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="1.8" />
+      </filter>
+      <filter id="redGlow" x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur stdDeviation="3.5" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
 
-      <!-- Advanced Cyber Gradients -->
-      <linearGradient id="cyberMetal" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#2a2a3e"/>
-        <stop offset="35%" stop-color="#1b1b26"/>
-        <stop offset="70%" stop-color="#0e0e16"/>
-        <stop offset="100%" stop-color="#050508"/>
+      <!-- Advanced Cyber-Zen Gradients -->
+      <linearGradient id="inkWashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#2a2a2a"/>
+        <stop offset="60%" stop-color="#121212"/>
+        <stop offset="100%" stop-color="#050505"/>
       </linearGradient>
-      <linearGradient id="cyberMetalLight" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#4e4e6a"/>
-        <stop offset="50%" stop-color="#2a2a3c"/>
-        <stop offset="100%" stop-color="#14141e"/>
+      <linearGradient id="inkWashLight" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#6e6e6e"/>
+        <stop offset="50%" stop-color="#3c3c3c"/>
+        <stop offset="100%" stop-color="#1c1c1c"/>
       </linearGradient>
-      <linearGradient id="ninjaBlade" x1="0%" y1="0%" x2="100%" y2="0%">
+      <linearGradient id="spiritGold" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%" stop-color="#ffffff"/>
-        <stop offset="30%" stop-color="#dffffc"/>
-        <stop offset="75%" stop-color="#00ffff"/>
-        <stop offset="100%" stop-color="#0088cc"/>
+        <stop offset="35%" stop-color="#ffe680"/>
+        <stop offset="75%" stop-color="#e5c158"/>
+        <stop offset="100%" stop-color="#b8860b"/>
       </linearGradient>
-      <linearGradient id="cyberScarf" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#ff0055"/>
-        <stop offset="45%" stop-color="#ff3300"/>
-        <stop offset="90%" stop-color="#ffcc00"/>
+      <linearGradient id="sacredMaple" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ff2200"/>
+        <stop offset="50%" stop-color="#d43f00"/>
+        <stop offset="100%" stop-color="#800000"/>
       </linearGradient>
-      <linearGradient id="plasmaBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <linearGradient id="sakuraBlade" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="#ffffff"/>
-        <stop offset="50%" stop-color="#00ffff"/>
-        <stop offset="100%" stop-color="#0033aa"/>
+        <stop offset="40%" stop-color="#ffb3d9"/>
+        <stop offset="85%" stop-color="#ff3399"/>
+        <stop offset="100%" stop-color="#cc0066"/>
       </linearGradient>
-      <linearGradient id="heavyAxe" x1="0%" y1="0%" x2="100%" y2="100%">
+      <linearGradient id="crimsonGaze" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="#ff3333"/>
-        <stop offset="50%" stop-color="#ff7700"/>
+        <stop offset="60%" stop-color="#aa0000"/>
         <stop offset="100%" stop-color="#550000"/>
-      </linearGradient>
-      <linearGradient id="ninjaGreen" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#00ffcc"/>
-        <stop offset="60%" stop-color="#00ff55"/>
-        <stop offset="100%" stop-color="#003311"/>
       </linearGradient>
     </defs>
     
-  <!-- Heavy Reactor Shield Plates -->
-  <path d="M 8 26 L 60 6 L 112 26 L 102 98 L 18 98 Z" fill="#14070b" stroke="#ff0055" stroke-width="5"/>
-  
-  <!-- Hazard safety warnings -->
-  <line x1="22" y1="36" x2="36" y2="22" stroke="#ffcc00" stroke-width="3" opacity="0.6"/>
-  <line x1="84" y1="36" x2="98" y2="22" stroke="#ffcc00" stroke-width="3" opacity="0.6"/>
-  
-  <!-- Evil visor eyes -->
-  <polygon points="42,32 54,36 50,42" fill="#ff0055" filter="url(#pinkGlow)"/>
-  <polygon points="78,32 66,36 70,42" fill="#ff0055" filter="url(#pinkGlow)"/>
+  <!-- Distant Calligraphy Fog -->
+  <circle cx="60" cy="66" r="54" fill="none" stroke="#151515" stroke-width="6" opacity="0.3" filter="url(#inkMisty)"/>
 
-  <!-- CENTRAL FUSION CORE (Pulsing pink reactor) -->
-  <circle cx="60" cy="66" r="22" fill="url(#heavyAxe)" stroke="#ff0055" stroke-width="2" filter="url(#heavyCyanGlow)"/>
-  <circle cx="60" cy="66" r="10" fill="#ffffff" filter="url(#pinkGlow)"/>
+  <!-- Colossal multi-tiered pagoda shrine core structure -->
+  <path d="M 8 26 L 60 6 L 112 26 L 102 98 L 18 98 Z" fill="url(#inkWashGrad)" stroke="#cc1100" stroke-width="5.5"/>
   
-  <!-- Cooling pipe networks -->
-  <path d="M 32 66 L 18 66 M 88 66 L 102 66" stroke="#555" stroke-width="3"/>
-  <path d="M 32 66 L 32 98 M 88 66 L 88 98" stroke="#ff0055" stroke-width="1.5" opacity="0.5"/>
+  <!-- Roof tiles of the Pagoda -->
+  <path d="M 0 28 Q 60 0 120 28" fill="none" stroke="#e5c158" stroke-width="6"/>
+  <path d="M -5 32 Q 60 4 125 32" fill="none" stroke="#cc1100" stroke-width="2"/>
+  
+  <!-- Swirling Bagua Glyphs around Core (乾坤震巽坎离艮兑) -->
+  <!-- Active glowing symbols inside circle -->
+  <circle cx="60" cy="66" r="32" fill="none" stroke="#e5c158" stroke-width="2" stroke-dasharray="15 8" filter="url(#goldGlow)"/>
+  <text x="54" y="44" font-family="sans-serif" font-weight="bold" font-size="9" fill="#e5c158" filter="url(#goldGlow)">乾</text>
+  <text x="54" y="96" font-family="sans-serif" font-weight="bold" font-size="9" fill="#e5c158" filter="url(#goldGlow)">坤</text>
+  <text x="32" y="70" font-family="sans-serif" font-weight="bold" font-size="9" fill="#e5c158" filter="url(#goldGlow)">离</text>
+  <text x="76" y="70" font-family="sans-serif" font-weight="bold" font-size="9" fill="#e5c158" filter="url(#goldGlow)">坎</text>
 
-  <!-- Colossal hydraulic shoulders -->
-  <rect x="-14" y="26" width="30" height="52" rx="10" fill="#0f0709" stroke="#ff0055" stroke-width="3"/>
-  <rect x="104" y="26" width="30" height="52" rx="10" fill="#0f0709" stroke="#ff0055" stroke-width="3"/>
+  <!-- Pulsing central yin-yang reactor core -->
+  <circle cx="60" cy="66" r="18" fill="#1c1c1c" stroke="#e5c158" stroke-width="2" filter="url(#heavyGoldGlow)"/>
+  <path d="M 60 48 A 9 9 0 0 0 60 66 A 9 9 0 0 1 60 84 A 18 18 0 0 0 60 48 Z" fill="#e5c158"/>
+  <circle cx="60" cy="57" r="3" fill="#1c1c1c"/>
+  <circle cx="60" cy="75" r="3" fill="#ffffff"/>
+  
+  <!-- Hanging paper talismans along bottom -->
+  <g fill="#e5c158" stroke="#cc1100" stroke-width="0.8">
+    <rect x="22" y="98" width="8" height="20" rx="1"/>
+    <rect x="42" y="98" width="8" height="24" rx="1"/>
+    <rect x="70" y="98" width="8" height="24" rx="1"/>
+    <rect x="90" y="98" width="8" height="20" rx="1"/>
+  </g>
+
+  <!-- Heavy mechanical iron claws/shoulders on sides -->
+  <rect x="-14" y="26" width="30" height="52" rx="5" fill="#111" stroke="#cc1100" stroke-width="3"/>
+  <rect x="104" y="26" width="30" height="52" rx="5" fill="#111" stroke="#cc1100" stroke-width="3"/>
 
   </svg>
