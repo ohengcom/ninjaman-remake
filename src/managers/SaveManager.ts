@@ -1,11 +1,20 @@
 export interface SaveData {
-  score: number;
+  highScore: number;
   sp: number; // Skill Points
   maxHealth: number;
   unlockedLevel: number;
   comboLevel: number; // 1 = 2 hits, 2 = 3 hits, 3 = 4 hits
   dashInvincible: boolean;
 }
+
+const DEFAULTS: SaveData = {
+  highScore: 0,
+  sp: 0,
+  maxHealth: 100,
+  unlockedLevel: 1,
+  comboLevel: 1,
+  dashInvincible: false,
+};
 
 export class SaveManager {
   private static readonly SAVE_KEY = 'ninjaman_save_data';
@@ -15,25 +24,14 @@ export class SaveManager {
     if (raw) {
       try {
         const decoded = atob(raw);
-        const data = JSON.parse(decoded) as SaveData;
-        // Migration logic for old saves
-        if (data.comboLevel === undefined) data.comboLevel = 1;
-        if (data.dashInvincible === undefined) data.dashInvincible = false;
-        return data;
+        const data = JSON.parse(decoded) as Partial<SaveData>;
+        // Merge with defaults to handle missing fields from old saves
+        return { ...DEFAULTS, ...data };
       } catch (e) {
         console.error("Failed to parse save data. Loading defaults.", e);
       }
     }
-    
-    // Defaults
-    return {
-      score: 0,
-      sp: 0,
-      maxHealth: 100,
-      unlockedLevel: 1,
-      comboLevel: 1,
-      dashInvincible: false
-    };
+    return { ...DEFAULTS };
   }
 
   public static save(data: SaveData) {
@@ -45,10 +43,19 @@ export class SaveManager {
     }
   }
 
-  public static updateScoreAndSp(scoreToAdd: number, spToAdd: number) {
+  /** Update high score if the current run score exceeds it */
+  public static updateHighScore(runScore: number) {
     const data = this.load();
-    data.score += scoreToAdd;
-    data.sp += spToAdd;
+    if (runScore > data.highScore) {
+      data.highScore = runScore;
+      this.save(data);
+    }
+  }
+
+  /** Award SP (e.g., for level completion, death, milestones) */
+  public static addSP(amount: number) {
+    const data = this.load();
+    data.sp += amount;
     this.save(data);
   }
 
@@ -93,4 +100,3 @@ export class SaveManager {
     return false;
   }
 }
-

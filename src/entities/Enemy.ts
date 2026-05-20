@@ -1,7 +1,9 @@
 import Phaser from 'phaser';
 import { StateMachine } from '../utils/StateMachine.js';
+import { ENEMY_STATS } from '../config/enemies.js';
 
 export type EnemyType = 'guard' | 'axe' | 'ninja' | 'sniper';
+type TargetSprite = Phaser.Physics.Arcade.Sprite & { health?: number };
 
 export class Enemy extends Phaser.Physics.Arcade.Sprite {
   public stateMachine: StateMachine<Enemy>;
@@ -11,7 +13,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   
   private patrolDir: number = 1;
   private patrolTimer: number = 0;
-  private target: Phaser.Physics.Arcade.Sprite | null = null;
+  private target: TargetSprite | null = null;
   private isInvulnerable = false;
   
   private moveSpeed: number = 50;
@@ -31,7 +33,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.configureType(type);
 
-    this.stateMachine = new StateMachine(this);
+    this.stateMachine = new StateMachine<Enemy>(this);
     this.setupStates();
     this.stateMachine.setState('patrol');
   }
@@ -51,38 +53,16 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   private configureType(type: EnemyType) {
-    if (type === 'guard') {
-      this.health = 15;
-      this.baseDamage = 10;
-      this.moveSpeed = 40;
-      this.attackReach = 60;
-      this.attackWindup = 500;
-      this.attackCooldown = 800;
-    } else if (type === 'axe') {
-      this.health = 30; // Tanky
-      this.baseDamage = 25; // High damage
-      this.moveSpeed = 25; // Slow
-      this.attackReach = 70;
-      this.attackWindup = 800; // Slow windup
-      this.attackCooldown = 1200;
-    } else if (type === 'ninja') {
-      this.health = 10; // Fragile
-      this.baseDamage = 5; // Low damage
-      this.moveSpeed = 120; // Fast
-      this.attackReach = 50;
-      this.attackWindup = 200; // Fast attack
-      this.attackCooldown = 400;
-    } else if (type === 'sniper') {
-      this.health = 10;
-      this.baseDamage = 15;
-      this.moveSpeed = 0; // Stationary
-      this.attackReach = 600; // Very long range
-      this.attackWindup = 1000; // Slow aim
-      this.attackCooldown = 2000;
-    }
+    const stats = ENEMY_STATS[type];
+    this.health = stats.health;
+    this.baseDamage = stats.baseDamage;
+    this.moveSpeed = stats.moveSpeed;
+    this.attackReach = stats.attackReach;
+    this.attackWindup = stats.attackWindup;
+    this.attackCooldown = stats.attackCooldown;
   }
 
-  public setTarget(target: Phaser.Physics.Arcade.Sprite) {
+  public setTarget(target: TargetSprite) {
     this.target = target;
   }
 
@@ -120,7 +100,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         name: 'chase',
         onUpdate: (e) => {
           if (!e.active) return;
-          if (!e.target || !e.target.active || (e.target as any).health <= 0) {
+          if (!e.target || !e.target.active || (e.target.health ?? 1) <= 0) {
             e.stateMachine.setState('patrol');
             return;
           }
@@ -200,7 +180,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (this.isInvulnerable || this.health <= 0 || !this.active) return;
     this.health -= amount;
     // Heavy enemies get knocked back less
-    const kb = this.enemyType === 'axe' ? 50 : (this.enemyType === 'ninja' ? 250 : 150);
+    const kb = ENEMY_STATS[this.enemyType].knockback;
     this.setVelocityX(dirX * kb);
     this.setVelocityY(-150);
     this.stateMachine.setState('hurt');

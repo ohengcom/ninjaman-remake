@@ -1,8 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 
-const outDir = path.join(process.cwd(), 'public', 'assets', 'sprites');
-const bgDir = path.join(process.cwd(), 'public', 'assets', 'backgrounds');
+const publicDir = path.join(process.cwd(), 'public');
+const assetsDir = path.join(publicDir, 'assets');
+const outDir = path.join(assetsDir, 'sprites');
+const bgDir = path.join(assetsDir, 'backgrounds');
+
+if (!fs.existsSync(publicDir)) {
+  fs.mkdirSync(publicDir, { recursive: true });
+}
 
 [outDir, bgDir].forEach(dir => {
   if (!fs.existsSync(dir)) {

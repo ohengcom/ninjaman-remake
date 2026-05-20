@@ -6,6 +6,10 @@ import { Projectile } from '../entities/Projectile.js';
 import { CombatManager } from '../managers/CombatManager.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import { SoundManager } from '../managers/SoundManager.js';
+import { getLevelConfig, LevelConfig } from '../config/levels.js';
+import { COMBO_CONFIG, SCORE_CONFIG, PLAYER_ATTACKS, PROJECTILE_CONFIG, PLAYER_DEFENSE } from '../config/combat.js';
+import { BOSS_STATS } from '../config/enemies.js';
+import { SeededRandom } from '../utils/SeededRandom.js';
 
 export class GameScene extends Phaser.Scene {
   private player!: Player;
@@ -22,10 +26,33 @@ export class GameScene extends Phaser.Scene {
   private lastSafeX: number = 200;
   private lastSafeY: number = 0;
   private currentLevel: number = 1;
+  private levelCfg!: LevelConfig;
+  private rng!: SeededRandom;
   private mapWidth: number = 0;
   private isTransitioning: boolean = false;
 
   private combatManager!: CombatManager;
+  private readonly onPlayerAttack = (attacker: Player, type: string) => this.combatManager.resolvePlayerAttack(attacker, type, this.enemies, this.boss);
+  private readonly onPlayerParry = (defender: Player) => this.handleParry(defender);
+  private readonly onEnemyAttack = (attacker: Enemy, dmg: number, reach: number) => this.combatManager.resolveEnemyAttack(attacker, dmg, reach, this.player);
+  private readonly onBossAttack = (attacker: Boss) => this.combatManager.resolveBossAttack(attacker, this.player);
+  private readonly onPlayerDead = () => this.handlePlayerDeath();
+  private readonly onEnemyShoot = (attacker: Enemy, damage: number) => {
+    const p = this.projectiles.get(attacker.x, attacker.y) as Projectile;
+    if (p) {
+      const dir = attacker.flipX ? -1 : 1;
+      p.fire(attacker.x + (20 * dir), attacker.y, dir, PROJECTILE_CONFIG.enemyBulletSpeed, damage, 'projectile');
+      SoundManager.playSwing();
+    }
+  };
+  private readonly onPlayerCastWave = (player: Player) => {
+    SoundManager.playHadouken();
+    const wave = this.projectiles.get(player.x, player.y) as Projectile;
+    if (wave) {
+      const dir = player.flipX ? -1 : 1;
+      wave.fire(player.x + (30 * dir), player.y, dir, PLAYER_ATTACKS.wave.speed, PLAYER_ATTACKS.wave.damage, 'player_wave');
+    }
+  };
 
   constructor() {
     super({ key: 'GameScene' });
@@ -34,11 +61,12 @@ export class GameScene extends Phaser.Scene {
   init(data: { level?: number }) {
     const saveData = SaveManager.load();
     this.currentLevel = data.level || saveData.unlockedLevel;
-    this.score = saveData.score || 0;
+    this.score = 0;
     this.isTransitioning = false;
   }
 
   create(): void {
+    this.cameras.main.fadeIn(800, 0, 0, 0);
     SoundManager.startBGM(this.currentLevel);
     this.combatManager = new CombatManager(this);
     this.comboCount = 0;
@@ -51,17 +79,11 @@ export class GameScene extends Phaser.Scene {
     this.isTransitioning = false;
 
     // Level configs
-    let farBg = 'bg_city_far';
-    let midBg = 'bg_city_mid';
-    this.mapWidth = 60 * 64;
-
-    if (this.currentLevel === 1) {
-      farBg = 'bg_city_far'; midBg = 'bg_city_mid'; this.mapWidth = 80 * 64;
-    } else if (this.currentLevel === 2) {
-      farBg = 'bg_forest_far'; midBg = 'bg_forest_mid'; this.mapWidth = 80 * 64;
-    } else if (this.currentLevel === 3) {
-      farBg = 'bg_core_far'; midBg = 'bg_core_mid'; this.mapWidth = 40 * 64;
-    }
+    this.levelCfg = getLevelConfig(this.currentLevel);
+    this.rng = new SeededRandom(this.currentLevel * 12345);
+    const farBg = this.levelCfg.farBg;
+    const midBg = this.levelCfg.midBg;
+    this.mapWidth = this.levelCfg.mapTiles * this.levelCfg.tileSize;
 
     this.add.image(w/2, h/2, farBg).setScrollFactor(0);
     this.add.image(w/2, h/2, midBg).setScrollFactor(0.2);
@@ -72,14 +94,14 @@ export class GameScene extends Phaser.Scene {
 
     // Platforms
     const platforms = this.physics.add.staticGroup();
-    const tiles = Math.floor(this.mapWidth / 64);
+    const tiles = Math.floor(this.mapWidth / this.levelCfg.tileSize);
     
     for (let i = 0; i < tiles; i++) {
       // Create a continuous, solid floor
-      platforms.create(i * 64 + 32, h - 32, 'platform');
+      platforms.create(i * this.levelCfg.tileSize + 32, h - 32, 'platform');
       
-      if (this.currentLevel !== 3 && i > 15 && i % 6 === 0) {
-         platforms.create(i * 64 + 32, h - 160 - Math.random() * 80, 'platform');
+      if (this.levelCfg.hasPlatforms && i > this.levelCfg.platformStartTile && i % this.levelCfg.platformInterval === 0) {
+         platforms.create(i * this.levelCfg.tileSize + 32, h - 160 - this.rng.next() * 80, 'platform');
       }
     }
 
@@ -97,11 +119,12 @@ export class GameScene extends Phaser.Scene {
     this.enemies = this.physics.add.group({ classType: Enemy, maxSize: 30, runChildUpdate: true });
     this.projectiles = this.physics.add.group({ classType: Projectile, maxSize: 20, runChildUpdate: true });
     
-    if (this.currentLevel < 3) {
-      const types: EnemyType[] = ['guard', 'axe', 'ninja', 'sniper'];
-      for (let x = 1200; x < this.mapWidth - 800; x += 600 + Math.random() * 600) {
-        const type = types[Math.floor(Math.random() * types.length)];
-        const yOffset = type === 'sniper' ? 350 : 250; // Snipers spawn higher up sometimes
+    if (!this.levelCfg.isBossLevel) {
+      const types: EnemyType[] = [...this.levelCfg.enemyTypes];
+      const [minSpacing, maxSpacing] = this.levelCfg.enemySpacing;
+      for (let x = this.levelCfg.enemyStartX; x < this.mapWidth - 800; x += minSpacing + this.rng.next() * (maxSpacing - minSpacing)) {
+        const type = this.rng.pick(types);
+        const yOffset = type === 'sniper' ? 350 : 250;
         const enemy = this.enemies.get(x, h - yOffset, type) as Enemy;
         if (enemy) {
             enemy.spawn(x, h - yOffset, type);
@@ -141,31 +164,37 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, this.mapWidth, h);
     this.physics.world.setBounds(0, 0, this.mapWidth, h * 2);
 
-    this.events.on('player_attack', (attacker: Player, type: string) => this.combatManager.resolvePlayerAttack(attacker, type, this.enemies, this.boss));
-    this.events.on('player_parry', (defender: Player) => this.handleParry(defender));
-    this.events.on('enemy_attack', (attacker: Enemy, dmg: number, reach: number) => this.combatManager.resolveEnemyAttack(attacker, dmg, reach, this.player));
-    this.events.on('boss_attack', (attacker: Boss) => this.combatManager.resolveBossAttack(attacker, this.player));
-    this.events.on('player_dead', () => this.handlePlayerDeath());
-    
-    this.events.on('enemy_shoot', (attacker: Enemy, damage: number) => {
-        const p = this.projectiles.get(attacker.x, attacker.y) as Projectile;
-        if (p) {
-            const dir = attacker.flipX ? -1 : 1;
-            p.fire(attacker.x + (20 * dir), attacker.y, dir, 600, damage, 'projectile');
-            SoundManager.playSwing(); // Reuse swing sound for shoot
-        }
-    });
+    // PostFX: cyberpunk atmosphere
+    this.cameras.main.filters.internal.addGlow(0xe94560, 4, 0, 1, undefined, 4, 10);
+    this.cameras.main.filters.internal.addVignette(0.5, 0.5, 0.9, 0.4);
 
-    // Player Hadouken
-    this.events.on('player_cast_wave', (player: Player) => {
-        SoundManager.playHadouken();
-        const wave = this.projectiles.get(player.x, player.y) as Projectile;
-        if (wave) {
-            const dir = player.flipX ? -1 : 1;
-            // High speed, medium damage projectile
-            wave.fire(player.x + (30 * dir), player.y, dir, 800, 20, 'player_wave');
-        }
-    });
+    // Ambient floating particles (data motes)
+    this.add.particles(w / 2, h / 2, 'platform', {
+      x: { min: 0, max: this.mapWidth },
+      y: { min: 0, max: h },
+      scale: { start: 0.02, end: 0 },
+      alpha: { start: 0.6, end: 0 },
+      tint: [0x00ffff, 0xe94560, 0xffffff],
+      blendMode: 'ADD',
+      lifespan: { min: 3000, max: 6000 },
+      speed: { min: 10, max: 40 },
+      angle: { min: 250, max: 290 },
+      frequency: 200,
+      quantity: 1,
+    }).setScrollFactor(0.5);
+
+    this.events.on('player_attack', this.onPlayerAttack);
+    this.events.on('player_parry', this.onPlayerParry);
+    this.events.on('enemy_attack', this.onEnemyAttack);
+    this.events.on('boss_attack', this.onBossAttack);
+    this.events.on('player_dead', this.onPlayerDead);
+    this.events.on('enemy_shoot', this.onEnemyShoot);
+    this.events.on('player_cast_wave', this.onPlayerCastWave);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup, this);
+
+    // Pause support
+    this.input.keyboard!.on('keydown-ESC', this.pauseGame, this);
+    this.input.keyboard!.on('keydown-P', this.pauseGame, this);
 
     this.physics.add.overlap(this.projectiles, this.player, (playerObj, projObj) => {
         const proj = projObj as Projectile;
@@ -199,7 +228,7 @@ export class GameScene extends Phaser.Scene {
             this.emitHitParticle(enemy.x, enemy.y, 10);
             proj.hit(); // Consume wave
             if (enemy.health <= 0) {
-               this.addScore(150);
+               this.addScore(SCORE_CONFIG.waveKill);
                this.incrementCombo();
             }
         }
@@ -212,7 +241,7 @@ export class GameScene extends Phaser.Scene {
             const boss = bossObj as Boss;
             if (proj.active && boss.active && boss.health > 0 && proj.texture.key === 'player_wave') {
                 const dir = proj.body!.velocity.x > 0 ? 1 : -1;
-                boss.takeDamage(proj.damage * 0.5, dir);
+                boss.takeDamage(proj.damage * BOSS_STATS.damageMultiplier, dir);
                 SoundManager.playHit();
                 this.emitHitParticle(boss.x, boss.y, 15);
                 proj.hit();
@@ -228,7 +257,7 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  update(time: number, delta: number): void {
+  update(_time: number, _delta: number): void {
     if (this.player.body!.touching.down && this.player.y < this.cameras.main.height - 50) {
         this.lastSafeX = this.player.x;
         this.lastSafeY = this.player.y;
@@ -236,7 +265,7 @@ export class GameScene extends Phaser.Scene {
 
     if (this.player.y > this.cameras.main.height + 100 && this.player.health > 0) {
       this.resetCombo();
-      this.player.takeDamage(25, 0);
+      this.player.takeDamage(PLAYER_DEFENSE.fallDamage, 0);
       this.events.emit('update_health', this.player.health, this.player.maxHealth);
       if (this.player.health > 0) {
           this.player.setPosition(this.lastSafeX, this.lastSafeY - 100);
@@ -246,18 +275,34 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
-    if (this.currentLevel < 3 && this.player.x > this.mapWidth - 100 && !this.isTransitioning) {
+    if (!this.levelCfg.isBossLevel && this.player.x > this.mapWidth - 100 && !this.isTransitioning) {
        this.isTransitioning = true;
        this.player.setVelocityX(0);
        SaveManager.updateLevel(this.currentLevel + 1);
-       SaveManager.updateScoreAndSp(this.score - SaveManager.load().score, 10); // Reward 10 SP per level
-       this.scene.restart({ level: this.currentLevel + 1 });
+       SaveManager.addSP(this.levelCfg.completionSP);
+       SaveManager.updateHighScore(this.score);
+
+       // Level transition animation
+       const nextLevel = getLevelConfig(this.currentLevel + 1);
+       const transText = this.add.text(
+         this.cameras.main.scrollX + this.cameras.main.width / 2,
+         this.cameras.main.height / 2,
+         `ENTERING\n${nextLevel.name}`,
+         { fontFamily: 'Impact', fontSize: '48px', color: '#00ffff', align: 'center', stroke: '#000', strokeThickness: 6 }
+       ).setOrigin(0.5).setScrollFactor(0).setAlpha(0);
+
+       this.tweens.add({ targets: transText, alpha: 1, duration: 400 });
+       this.cameras.main.fadeOut(1200, 0, 0, 0);
+       this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+         this.scene.restart({ level: this.currentLevel + 1 });
+       });
     }
 
-    if (this.currentLevel === 3 && this.boss && !this.boss.active) {
+    if (this.levelCfg.isBossLevel && this.boss && !this.boss.active) {
        this.boss = null;
-       this.addScore(5000);
-       SaveManager.updateScoreAndSp(this.score - SaveManager.load().score, 50); // Boss reward
+       this.addScore(SCORE_CONFIG.bossKill);
+       SaveManager.addSP(this.levelCfg.completionSP);
+       SaveManager.updateHighScore(this.score);
        this.cameras.main.shake(1000, 0.05);
        
        this.time.delayedCall(2000, () => {
@@ -270,21 +315,20 @@ export class GameScene extends Phaser.Scene {
   public incrementCombo() {
       this.comboCount++;
       
-      let style = 'C';
-      if (this.comboCount > 15) style = 'SSS';
-      else if (this.comboCount > 10) style = 'S';
-      else if (this.comboCount > 7) style = 'A';
-      else if (this.comboCount > 4) style = 'B';
+      let style: string = COMBO_CONFIG.defaultStyle;
+      for (const threshold of COMBO_CONFIG.thresholds) {
+        if (this.comboCount > threshold.count) style = threshold.style;
+      }
 
       if (style !== this.currentStyle) {
           this.currentStyle = style;
           this.events.emit('update_style', style);
       }
 
-      const multiplier = 1 + (this.comboCount * 0.1);
+      const multiplier = 1 + (this.comboCount * COMBO_CONFIG.multiplierPerHit);
       
       if (this.comboTimer) this.comboTimer.remove();
-      this.comboTimer = this.time.delayedCall(3000, () => { this.resetCombo(); });
+      this.comboTimer = this.time.delayedCall(COMBO_CONFIG.timeout, () => { this.resetCombo(); });
       
       return multiplier;
   }
@@ -315,6 +359,22 @@ export class GameScene extends Phaser.Scene {
       this.hitParticles.emitParticleAt(x, y, count);
   }
 
+  /** Freeze the game for a few frames to add weight to hits */
+  public hitstop(durationMs: number = 60) {
+    this.physics.world.pause();
+    this.time.timeScale = 0;
+    this.time.delayedCall(durationMs, () => {
+      this.physics.world.resume();
+      this.time.timeScale = 1;
+    });
+  }
+
+  public upgradePlayerHealth(maxHealth: number) {
+      this.player.maxHealth = maxHealth;
+      this.player.health = maxHealth;
+      this.events.emit('update_health', this.player.health, this.player.maxHealth);
+  }
+
   private handleParry(defender: Player) {
       SoundManager.playParry();
       this.cameras.main.shake(100, 0.01);
@@ -324,7 +384,7 @@ export class GameScene extends Phaser.Scene {
       this.tweens.add({ targets: parryText, y: defender.y - 80, alpha: 0, duration: 600, onComplete: () => parryText.destroy() });
       
       // Bonus points for parry
-      this.addScore(50);
+      this.addScore(SCORE_CONFIG.parryBonus);
       this.events.emit('update_health', this.player.health, this.player.maxHealth);
   }
 
@@ -333,11 +393,38 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.shake(500, 0.03);
     
     // Save current score up to death
-    SaveManager.updateScoreAndSp(this.score - SaveManager.load().score, 5); 
+    SaveManager.addSP(SCORE_CONFIG.deathSP);
+    SaveManager.updateHighScore(this.score); 
     
     this.time.delayedCall(2000, () => {
         this.scene.stop('HUDScene');
         this.scene.start('GameOverScene', { score: this.score, win: false });
     });
+  }
+
+  private cleanup() {
+    this.events.off('player_attack', this.onPlayerAttack);
+    this.events.off('player_parry', this.onPlayerParry);
+    this.events.off('enemy_attack', this.onEnemyAttack);
+    this.events.off('boss_attack', this.onBossAttack);
+    this.events.off('player_dead', this.onPlayerDead);
+    this.events.off('enemy_shoot', this.onEnemyShoot);
+    this.events.off('player_cast_wave', this.onPlayerCastWave);
+    this.input.keyboard?.off('keydown-ESC', this.pauseGame, this);
+    this.input.keyboard?.off('keydown-P', this.pauseGame, this);
+
+    SoundManager.stopBGM();
+
+    if (this.comboTimer) {
+      this.comboTimer.remove();
+      this.comboTimer = null;
+    }
+
+    this.time.removeAllEvents();
+  }
+
+  private pauseGame() {
+    this.scene.pause();
+    this.scene.launch('PauseScene');
   }
 }

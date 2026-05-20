@@ -8,7 +8,8 @@ export class SoundManager {
     public static init() {
         if (!this.ctx && this.enabled) {
             try {
-                this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                this.ctx = new AudioContextClass();
             } catch (e) {
                 console.error("Web Audio API not supported", e);
                 this.enabled = false;
@@ -16,7 +17,7 @@ export class SoundManager {
         }
     }
 
-    public static toggle() {
+    public static toggle(level: number = 1) {
         this.enabled = !this.enabled;
         if (this.enabled) {
             this.init();
@@ -24,7 +25,7 @@ export class SoundManager {
                 this.ctx.resume();
             }
             if (!this.isBGMPlaying) {
-                this.startBGM(1); // Default to level 1 BGM on toggle
+                this.startBGM(level);
             }
         } else {
             this.stopBGM();

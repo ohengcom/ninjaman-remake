@@ -7,8 +7,9 @@ A modern, high-definition action-platformer remake built with Phaser 4, TypeScri
 - **Modern Vector Aesthetics**: Crisp, dynamic SVG graphics with neon glow effects generated procedurally via Canvas.
 - **Advanced Combat System**: 
   - **4-Hit Combos**: Timing-based combos with escalating damage.
+  - **Wave Attack**: Perform a motion input (`DOWN, FORWARD, SPACE`) to launch a long-range energy wave.
   - **Directional Attacks**: Launcher/Uppercut (`UP + SPACE`) and Dive Attacks (`DOWN + SPACE` in the air).
-- **Fluid Movement**: Double jumping, Coyote time, and an invincible horizontal Dash/Roll.
+- **Fluid Movement**: Double jumping, Coyote time, and an invincible horizontal Dash/Roll. No more falling death—focus is on pure combat.
 - **Parry System**: Hold `DOWN` to defend. Perfect blocks mitigate 80% damage, prevent knockback, and award bonus points.
 - **Style Ranking**: Dynamic Devil May Cry-esque style rank (C, B, A, S, SSS) based on continuous combos.
 - **RPG Elements**: 
@@ -31,9 +32,11 @@ A modern, high-definition action-platformer remake built with Phaser 4, TypeScri
 - `DOWN` (hold): Defend/Block (Triggers Parry when hit)
 - `DOUBLE TAP LEFT/RIGHT`: Invincible Dash
 - `SPACE`: Attack (Spam for 4-hit combo)
+- `DOWN, FORWARD, SPACE`: Wave Attack (Hadouken motion)
 - `UP + SPACE` (on ground): Uppercut (Launcher)
 - `DOWN + SPACE` (in air): Dive Attack
 - `K`: Open/Close Skill Tree Menu
+- `M`: Toggle Sound
 
 ## Installation and Running
 
@@ -42,18 +45,22 @@ A modern, high-definition action-platformer remake built with Phaser 4, TypeScri
    npm install
    ```
 
-2. Generate the HD Vector Assets:
-   ```bash
-   node scripts/generate-assets.js
-   ```
-
-3. Start the development server:
+2. Start the development server:
    ```bash
    npm run dev
    ```
+
+   The dev and build scripts generate the HD vector assets automatically.
 
 ## Build for Production
 
 ```bash
 npm run build
+```
+
+## Quality Checks
+
+```bash
+npm run typecheck
+npm test
 ```

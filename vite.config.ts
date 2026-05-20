@@ -7,7 +7,7 @@ export default defineConfig({
     assetsDir: 'assets',
     target: 'es2020',
     sourcemap: false,
-    minify: 'esbuild',
+    minify: 'oxc',
     cssMinify: true,
     chunkSizeWarningLimit: 2000,
     reportCompressedSize: false,

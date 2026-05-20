@@ -1,21 +1,71 @@
 import Phaser from 'phaser';
 import { SaveManager } from '../managers/SaveManager.js';
 import { SoundManager } from '../managers/SoundManager.js';
+import { GameScene } from './GameScene.js';
 
 export class HUDScene extends Phaser.Scene {
   private healthBar!: Phaser.GameObjects.Graphics;
-  private healthText!: Phaser.GameObjects.Text;
   private scoreText!: Phaser.GameObjects.Text;
   private levelText!: Phaser.GameObjects.Text;
   private styleText!: Phaser.GameObjects.Text;
+  private fpsText: Phaser.GameObjects.Text | null = null;
   private soundText!: Phaser.GameObjects.Text;
 
   private currentHealth: number = 100;
   private maxHealth: number = 100;
   private currentScore: number = 0;
+  private currentLevel: number = 1;
+  private gameScene!: GameScene;
   
   private skillMenuContainer!: Phaser.GameObjects.Container;
   private isSkillMenuOpen: boolean = false;
+  private readonly onUpdateHealth = (health: number, max: number) => {
+    this.currentHealth = health;
+    this.maxHealth = max || 100;
+    this.drawHealthBar();
+  };
+  private readonly onUpdateScore = (score: number) => {
+    const diff = score - this.currentScore;
+    this.currentScore = score;
+    this.scoreText.setText(`SCORE: ${this.currentScore}`);
+    
+    if (diff > 0 && diff % 500 === 0) {
+        SaveManager.addSP(1); // Give skill points for milestones
+    }
+    
+    this.tweens.add({ targets: this.scoreText, scaleX: 1.2, scaleY: 1.2, duration: 100, yoyo: true });
+  };
+  private readonly onUpdateLevel = (level: number) => {
+    this.currentLevel = level;
+    let levelName = 'CITY SECTOR';
+    if (level === 2) levelName = 'FOREST SECTOR';
+    if (level === 3) levelName = 'CORE SECTOR';
+    this.levelText.setText(`SECTOR ${level}: ${levelName}`);
+  };
+  private readonly onUpdateStyle = (style: string) => {
+    this.styleText.setText(style);
+    if (style) {
+        this.styleText.setScale(2);
+        this.tweens.add({ targets: this.styleText, scaleX: 1, scaleY: 1, duration: 200, ease: 'Bounce.out' });
+    }
+  };
+  private readonly onToggleSkillMenu = () => {
+     SoundManager.playMenuBlip();
+     this.isSkillMenuOpen = !this.isSkillMenuOpen;
+     this.skillMenuContainer.setVisible(this.isSkillMenuOpen);
+     if (this.isSkillMenuOpen) {
+         this.refreshMenuData();
+         this.gameScene.scene.pause();
+     } else {
+         this.gameScene.scene.resume();
+     }
+  };
+  private readonly onToggleSound = () => {
+     SoundManager.toggle(this.currentLevel);
+     this.soundText.setText(`SOUND: ${SoundManager.enabled ? 'ON' : 'OFF'}`);
+     this.soundText.setColor(SoundManager.enabled ? '#00ffff' : '#aaa');
+     SoundManager.playMenuBlip();
+  };
 
   constructor() {
     super({ key: 'HUDScene' });
@@ -25,13 +75,19 @@ export class HUDScene extends Phaser.Scene {
     const w = this.cameras.main.width;
     const h = this.cameras.main.height;
     
-    const saveData = SaveManager.load();
-    this.currentScore = saveData.score;
+    this.currentScore = 0;
+
+    // FPS counter in dev mode
+    if (import.meta.env.DEV) {
+      this.fpsText = this.add.text(20, this.cameras.main.height - 60, 'FPS: 60', {
+        fontFamily: 'Courier New', fontSize: '14px', color: '#00ff00',
+      });
+    }
 
     this.healthBar = this.add.graphics();
     this.drawHealthBar();
 
-    this.healthText = this.add.text(20, 15, 'INTEGRITY', {
+    this.add.text(20, 15, 'INTEGRITY', {
       fontFamily: 'Arial', fontSize: '16px', color: '#ffffff', fontStyle: 'bold'
     });
 
@@ -59,59 +115,16 @@ export class HUDScene extends Phaser.Scene {
 
     this.createSkillMenu(w, h);
 
-    const gameScene = this.scene.get('GameScene');
+    this.gameScene = this.scene.get('GameScene') as GameScene;
     
-    gameScene.events.on('update_health', (health: number, max: number) => {
-      this.currentHealth = health;
-      this.maxHealth = max || 100;
-      this.drawHealthBar();
-    });
+    this.gameScene.events.on('update_health', this.onUpdateHealth);
+    this.gameScene.events.on('update_score', this.onUpdateScore);
+    this.gameScene.events.on('update_level', this.onUpdateLevel);
+    this.gameScene.events.on('update_style', this.onUpdateStyle);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup, this);
 
-    gameScene.events.on('update_score', (score: number) => {
-      const diff = score - this.currentScore;
-      this.currentScore = score;
-      this.scoreText.setText(`SCORE: ${this.currentScore}`);
-      
-      if (diff > 0 && diff % 500 === 0) {
-          SaveManager.updateScoreAndSp(0, 1); // Give skill points for milestones
-      }
-      
-      this.tweens.add({ targets: this.scoreText, scaleX: 1.2, scaleY: 1.2, duration: 100, yoyo: true });
-    });
-
-    gameScene.events.on('update_level', (level: number) => {
-      let levelName = 'CITY SECTOR';
-      if (level === 2) levelName = 'FOREST SECTOR';
-      if (level === 3) levelName = 'CORE SECTOR';
-      this.levelText.setText(`SECTOR ${level}: ${levelName}`);
-    });
-
-    gameScene.events.on('update_style', (style: string) => {
-      this.styleText.setText(style);
-      if (style) {
-          this.styleText.setScale(2);
-          this.tweens.add({ targets: this.styleText, scaleX: 1, scaleY: 1, duration: 200, ease: 'Bounce.out' });
-      }
-    });
-
-    this.input.keyboard!.on('keydown-K', () => {
-       SoundManager.playMenuBlip();
-       this.isSkillMenuOpen = !this.isSkillMenuOpen;
-       this.skillMenuContainer.setVisible(this.isSkillMenuOpen);
-       if (this.isSkillMenuOpen) {
-           this.refreshMenuData();
-           gameScene.scene.pause();
-       } else {
-           gameScene.scene.resume();
-       }
-    });
-
-    this.input.keyboard!.on('keydown-M', () => {
-       SoundManager.toggle();
-       this.soundText.setText(`SOUND: ${SoundManager.enabled ? 'ON' : 'OFF'}`);
-       this.soundText.setColor(SoundManager.enabled ? '#00ffff' : '#aaa');
-       SoundManager.playMenuBlip();
-    });
+    this.input.keyboard!.on('keydown-K', this.onToggleSkillMenu);
+    this.input.keyboard!.on('keydown-M', this.onToggleSound);
   }
 
   private drawHealthBar() {
@@ -163,9 +176,7 @@ export class HUDScene extends Phaser.Scene {
             this.maxHealth = SaveManager.load().maxHealth;
             this.currentHealth = this.maxHealth; // Heal fully on upgrade
             this.drawHealthBar();
-            const gameScene = this.scene.get('GameScene');
-            (gameScene as any).player.maxHealth = this.maxHealth;
-            (gameScene as any).player.health = this.currentHealth;
+            this.gameScene.upgradePlayerHealth(this.maxHealth);
             this.refreshMenuData();
         } else {
             this.tweens.add({ targets: upgradeHealthBtn, x: -10, duration: 50, yoyo: true, repeat: 3 });
@@ -197,5 +208,22 @@ export class HUDScene extends Phaser.Scene {
     const closeText = this.add.text(0, 150, 'PRESS [K] TO CLOSE', { fontFamily: 'Arial', fontSize: '16px', color: '#aaa' }).setOrigin(0.5);
 
     this.skillMenuContainer.add([bg, title, spText, hpText, upgradeHealthBtn, upgradeComboBtn, upgradeDashBtn, closeText]);
+  }
+
+  private cleanup() {
+    if (!this.gameScene) return;
+
+    this.gameScene.events.off('update_health', this.onUpdateHealth);
+    this.gameScene.events.off('update_score', this.onUpdateScore);
+    this.gameScene.events.off('update_level', this.onUpdateLevel);
+    this.gameScene.events.off('update_style', this.onUpdateStyle);
+    this.input.keyboard?.off('keydown-K', this.onToggleSkillMenu);
+    this.input.keyboard?.off('keydown-M', this.onToggleSound);
+  }
+
+  update() {
+    if (this.fpsText) {
+      this.fpsText.setText(`FPS: ${Math.round(this.game.loop.actualFps)}`);
+    }
   }
 }

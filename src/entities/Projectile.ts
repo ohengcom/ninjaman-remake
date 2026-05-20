@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { PROJECTILE_CONFIG } from '../config/combat.js';
 
 export class Projectile extends Phaser.Physics.Arcade.Sprite {
     public damage: number = 10;
@@ -9,7 +10,7 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
         scene.physics.add.existing(this);
         
         this.body!.setSize(20, 10);
-        this.body!.allowGravity = false;
+        (this.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
     }
 
     public fire(x: number, y: number, dirX: number, speed: number, damage: number, textureKey: string = 'projectile') {
@@ -18,7 +19,7 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
         this.setActive(true);
         this.setVisible(true);
         this.enableBody(true, x, y, true, true);
-        this.body!.allowGravity = false;
+        (this.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
         
         // Adjust hitbox for player wave vs sniper bullet
         if (textureKey === 'player_wave') {
@@ -31,8 +32,8 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
         this.setVelocityX(speed * dirX);
         this.setFlipX(dirX < 0);
         
-        // Auto kill after 2 seconds
-        this.scene.time.delayedCall(2000, () => {
+        // Auto kill after lifetime expires
+        this.scene.time.delayedCall(PROJECTILE_CONFIG.lifetime, () => {
             if (this.active) this.disableBody(true, true);
         });
     }

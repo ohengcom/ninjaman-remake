@@ -16,9 +16,16 @@ export const gameConfig: Phaser.Types.Core.GameConfig = {
   parent: 'game-container',
   backgroundColor: '#1a1a2e',
   pixelArt: false, // We use vector art now
+  fps: {
+    target: 60,
+    forceSetTimeOut: false,
+  },
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
+  },
+  input: {
+    gamepad: true,
   },
   physics: {
     default: 'arcade',

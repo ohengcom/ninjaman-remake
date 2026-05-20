@@ -1,0 +1,64 @@
+import { EnemyType } from '../entities/Enemy.js';
+
+export interface EnemyStats {
+  health: number;
+  baseDamage: number;
+  moveSpeed: number;
+  attackReach: number;
+  attackWindup: number;
+  attackCooldown: number;
+  knockback: number;
+}
+
+export const ENEMY_STATS: Record<EnemyType, EnemyStats> = {
+  guard: {
+    health: 15,
+    baseDamage: 10,
+    moveSpeed: 40,
+    attackReach: 60,
+    attackWindup: 500,
+    attackCooldown: 800,
+    knockback: 150,
+  },
+  axe: {
+    health: 30,
+    baseDamage: 25,
+    moveSpeed: 25,
+    attackReach: 70,
+    attackWindup: 800,
+    attackCooldown: 1200,
+    knockback: 50,
+  },
+  ninja: {
+    health: 10,
+    baseDamage: 5,
+    moveSpeed: 120,
+    attackReach: 50,
+    attackWindup: 200,
+    attackCooldown: 400,
+    knockback: 250,
+  },
+  sniper: {
+    health: 10,
+    baseDamage: 15,
+    moveSpeed: 0,
+    attackReach: 600,
+    attackWindup: 1000,
+    attackCooldown: 2000,
+    knockback: 150,
+  },
+};
+
+export const BOSS_STATS = {
+  health: 300,
+  moveSpeed: 50,
+  attackReach: 200,
+  attackDamage: 30,
+  attackWindup: 1000,
+  attackCooldown: 1500,
+  idleDelay: 2000,
+  engageDistance: 500,
+  meleeDistance: 200,
+  invulnerabilityDuration: 100,
+  damageMultiplier: 0.5,
+} as const;
