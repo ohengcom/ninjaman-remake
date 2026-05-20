@@ -19,6 +19,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     this.body!.setSize(80, 80);
     this.body!.setOffset(20, 40);
     this.body!.immovable = true;
+    (this.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
 
     this.stateMachine = new StateMachine<Boss>(this);
     this.setupStates();

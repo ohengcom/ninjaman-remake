@@ -138,9 +138,10 @@ export class GameScene extends Phaser.Scene {
       this.tweens.add({ targets: portal, alpha: 0.2, yoyo: true, repeat: -1, duration: 800 });
 
     } else {
-      // Boss level: spawn boss closer to player for immediate encounter
+      // Boss level: spawn boss on the ground, close to player
       const bossX = Math.min(this.mapWidth - 400, 800);
-      this.boss = new Boss(this, bossX, h - 150);
+      const bossY = h - 32 - 60; // ground level minus half boss height
+      this.boss = new Boss(this, bossX, bossY);
       this.boss.setTarget(this.player);
       this.physics.add.collider(this.boss, platforms);
       

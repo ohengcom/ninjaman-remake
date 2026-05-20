@@ -12,7 +12,7 @@ export interface EnemyStats {
 
 export const ENEMY_STATS: Record<EnemyType, EnemyStats> = {
   guard: {
-    health: 15,
+    health: 40,
     baseDamage: 10,
     moveSpeed: 40,
     attackReach: 60,
@@ -21,7 +21,7 @@ export const ENEMY_STATS: Record<EnemyType, EnemyStats> = {
     knockback: 150,
   },
   axe: {
-    health: 30,
+    health: 80,
     baseDamage: 25,
     moveSpeed: 25,
     attackReach: 70,
@@ -30,8 +30,8 @@ export const ENEMY_STATS: Record<EnemyType, EnemyStats> = {
     knockback: 50,
   },
   ninja: {
-    health: 10,
-    baseDamage: 5,
+    health: 25,
+    baseDamage: 8,
     moveSpeed: 120,
     attackReach: 50,
     attackWindup: 200,
@@ -39,7 +39,7 @@ export const ENEMY_STATS: Record<EnemyType, EnemyStats> = {
     knockback: 250,
   },
   sniper: {
-    health: 10,
+    health: 20,
     baseDamage: 15,
     moveSpeed: 0,
     attackReach: 600,

@@ -55,13 +55,13 @@ export const PLAYER_DEFENSE = {
 
 /** Combo / Style system */
 export const COMBO_CONFIG = {
-  timeout: 3000,
+  timeout: 5000,
   multiplierPerHit: 0.1,
   thresholds: [
-    { count: 4, style: 'B' },
-    { count: 7, style: 'A' },
-    { count: 10, style: 'S' },
-    { count: 15, style: 'SSS' },
+    { count: 3, style: 'B' },
+    { count: 5, style: 'A' },
+    { count: 8, style: 'S' },
+    { count: 12, style: 'SSS' },
   ] as const,
   defaultStyle: 'C',
 } as const;
