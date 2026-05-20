@@ -89,9 +89,7 @@ export class GameScene extends Phaser.Scene {
     const bgWidth = (bgTemp && bgTemp.width) ? bgTemp.width : w;
     const bgHeight = (bgTemp && bgTemp.height) ? bgTemp.height : h;
     
-    // The AI generated image contains two panoramic strips vertically, we only want the top half!
-    const halfHeight = bgHeight / 2;
-    const scale = h / halfHeight;
+    const scale = h / bgHeight;
     const scaledWidth = bgWidth * scale;
     
     // Calculate how many background panels we need based on scroll factor (0.2)
@@ -100,7 +98,6 @@ export class GameScene extends Phaser.Scene {
     
     for (let i = 0; i < numImages; i++) {
         const bg = this.add.image(scaledWidth * i, 0, farBg).setOrigin(0, 0).setScrollFactor(0.2);
-        bg.setCrop(0, 0, bgWidth, halfHeight);
         bg.displayHeight = h;
         bg.displayWidth = scaledWidth;
         // Mirror every alternate image to create a seamless infinite loop

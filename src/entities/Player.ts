@@ -195,9 +195,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   public setPlayerTexture(texture: string) {
     this.setTexture(texture);
     
-    // Multiply blend mode removes the white background from the AI generated ninja
-    this.setBlendMode(Phaser.BlendModes.MULTIPLY);
-    
     // Scale the 1024x1024 AI image down to a reasonable player size
     this.setDisplaySize(120, 120);
 
