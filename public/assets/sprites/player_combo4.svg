@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 80" width="90" height="80">
+    <defs>
+      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="2.5" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+      <filter id="heavyGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="5" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+      <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#3a3a4f"/>
+        <stop offset="50%" stop-color="#1e1e2f"/>
+        <stop offset="100%" stop-color="#0a0a14"/>
+      </linearGradient>
+      <linearGradient id="blade" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="100%" stop-color="#00ffff"/>
+      </linearGradient>
+      <linearGradient id="energy" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ff0055"/>
+        <stop offset="100%" stop-color="#ff9900"/>
+      </linearGradient>
+    </defs>
+    
+  <!-- Massive downward impact -->
+  <path d="M 30 0 L 50 0 L 80 70 L 0 70 Z" fill="#00ffff" filter="url(#heavyGlow)" opacity="0.5"/>
+  <!-- Impact sparks at bottom -->
+  <circle cx="40" cy="65" r="15" fill="#ffffff" filter="url(#heavyGlow)" opacity="0.6"/>
+  <line x1="20" y1="70" x2="0" y2="75" stroke="#00ffff" stroke-width="3" filter="url(#glow)"/>
+  <line x1="60" y1="70" x2="80" y2="75" stroke="#00ffff" stroke-width="3" filter="url(#glow)"/>
+  <!-- Body slamming down -->
+  <g transform="translate(5, 10)">
+    <path d="M 25 15 L 55 15 L 50 48 L 30 48 Z" fill="url(#metal)" stroke="#00ffff" stroke-width="2"/>
+    <circle cx="40" cy="30" r="6" fill="#00ffff" filter="url(#glow)"/>
+    <path d="M 28 8 Q 40 -12 52 8 L 48 18 L 32 18 Z" fill="#0f0f15"/>
+    <path d="M 36 3 L 50 3 L 43 10 Z" fill="#ffffff" filter="url(#heavyGlow)"/>
+    <!-- Both arms overhead driving katana down -->
+    <path d="M 35 18 L 40 -5 L 45 18 Z" fill="url(#metal)"/>
+  </g>
+  <!-- Katana vertical -->
+  <path d="M 38 -10 L 42 -10 L 44 65 L 36 65 Z" fill="url(#blade)" filter="url(#heavyGlow)"/>
+
+  </svg>

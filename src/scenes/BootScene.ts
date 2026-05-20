@@ -11,6 +11,10 @@ export class BootScene extends Phaser.Scene {
     this.load.svg('player_run', 'assets/sprites/player_run.svg');
     this.load.svg('player_jump', 'assets/sprites/player_jump.svg');
     this.load.svg('player_attack', 'assets/sprites/player_attack.svg');
+    this.load.svg('player_combo1', 'assets/sprites/player_combo1.svg');
+    this.load.svg('player_combo2', 'assets/sprites/player_combo2.svg');
+    this.load.svg('player_combo3', 'assets/sprites/player_combo3.svg');
+    this.load.svg('player_combo4', 'assets/sprites/player_combo4.svg');
     this.load.svg('player_dash', 'assets/sprites/player_dash.svg');
     this.load.svg('player_defend', 'assets/sprites/player_defend.svg');
     this.load.svg('player_uppercut', 'assets/sprites/player_uppercut.svg');
@@ -25,6 +29,8 @@ export class BootScene extends Phaser.Scene {
     this.load.svg('projectile', 'assets/sprites/projectile.svg');
     this.load.svg('boss_idle', 'assets/sprites/boss_idle.svg');
     this.load.svg('boss_attack', 'assets/sprites/boss_attack.svg');
+    this.load.svg('boss_rush', 'assets/sprites/boss_rush.svg');
+    this.load.svg('boss_windup', 'assets/sprites/boss_windup.svg');
     
     this.load.svg('bg_city_far', 'assets/backgrounds/bg_city_far.svg');
     this.load.svg('bg_city_mid', 'assets/backgrounds/bg_city_mid.svg');

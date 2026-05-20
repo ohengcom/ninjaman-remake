@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 135 80" width="135" height="80">
+    <defs>
+      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="2.5" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+      <filter id="heavyGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="5" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+      <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#3a3a4f"/>
+        <stop offset="50%" stop-color="#1e1e2f"/>
+        <stop offset="100%" stop-color="#0a0a14"/>
+      </linearGradient>
+      <linearGradient id="blade" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="100%" stop-color="#00ffff"/>
+      </linearGradient>
+      <linearGradient id="energy" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ff0055"/>
+        <stop offset="100%" stop-color="#ff9900"/>
+      </linearGradient>
+    </defs>
+    
+  <!-- Quick horizontal slash trail -->
+  <path d="M 30 35 L 120 30 L 115 40 L 30 42 Z" fill="#00ffff" filter="url(#heavyGlow)" opacity="0.8"/>
+  <!-- Body leaning forward -->
+  <g transform="rotate(5 40 40)">
+    <path d="M 25 22 L 55 22 L 50 55 L 30 55 Z" fill="url(#metal)" stroke="#00ffff" stroke-width="1.5"/>
+    <circle cx="40" cy="38" r="5" fill="#00ffff"/>
+    <path d="M 28 15 Q 40 -5 52 15 L 48 25 L 32 25 Z" fill="#0f0f15"/>
+    <path d="M 36 10 L 50 10 L 43 17 Z" fill="#00ffff" filter="url(#glow)"/>
+    <!-- Extended arm -->
+    <path d="M 45 28 L 80 32 L 78 38 L 43 34 Z" fill="url(#metal)"/>
+  </g>
+  <!-- Katana horizontal -->
+  <path d="M 75 30 L 130 28 L 128 34 L 73 36 Z" fill="url(#blade)" filter="url(#glow)"/>
+
+  </svg>

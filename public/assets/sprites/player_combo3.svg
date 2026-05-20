@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 80" width="110" height="80">
+    <defs>
+      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="2.5" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+      <filter id="heavyGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="5" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+      <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#3a3a4f"/>
+        <stop offset="50%" stop-color="#1e1e2f"/>
+        <stop offset="100%" stop-color="#0a0a14"/>
+      </linearGradient>
+      <linearGradient id="blade" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="100%" stop-color="#00ffff"/>
+      </linearGradient>
+      <linearGradient id="energy" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ff0055"/>
+        <stop offset="100%" stop-color="#ff9900"/>
+      </linearGradient>
+    </defs>
+    
+  <!-- Circular spin trail -->
+  <path d="M 10 40 A 40 40 0 1 1 70 40" fill="none" stroke="#00ffff" stroke-width="8" filter="url(#heavyGlow)" opacity="0.6" stroke-linecap="round"/>
+  <path d="M 10 40 A 40 40 0 1 1 70 40" fill="none" stroke="#ffffff" stroke-width="3" filter="url(#glow)" opacity="0.8" stroke-linecap="round"/>
+  <!-- Body mid-spin -->
+  <g transform="rotate(180 40 40) translate(0, -5)">
+    <path d="M 25 22 L 55 22 L 50 55 L 30 55 Z" fill="url(#metal)" stroke="#e94560" stroke-width="1.5"/>
+    <circle cx="40" cy="38" r="5" fill="#e94560"/>
+    <path d="M 28 15 Q 40 -5 52 15 L 48 25 L 32 25 Z" fill="#0f0f15"/>
+    <path d="M 36 10 L 50 10 L 43 17 Z" fill="#e94560" filter="url(#glow)"/>
+  </g>
+  <!-- Scarf whipping -->
+  <path d="M 40 25 Q 80 10 100 30 Q 80 20 50 30" fill="url(#energy)" filter="url(#glow)" opacity="0.9"/>
+
+  </svg>

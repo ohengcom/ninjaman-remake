@@ -51,13 +51,13 @@ export const ENEMY_STATS: Record<EnemyType, EnemyStats> = {
 
 export const BOSS_STATS = {
   health: 300,
-  moveSpeed: 50,
+  moveSpeed: 150,
   attackReach: 200,
   attackDamage: 30,
-  attackWindup: 1000,
-  attackCooldown: 1500,
-  idleDelay: 2000,
-  engageDistance: 500,
+  attackWindup: 700,
+  attackCooldown: 1000,
+  idleDelay: 600,
+  engageDistance: 800,
   meleeDistance: 200,
   invulnerabilityDuration: 100,
   damageMultiplier: 0.5,

@@ -271,14 +271,45 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'attack_combo',
         onEnter: (p) => {
-          p.setTexture('player_attack');
-          p.setVelocityX(p.flipX ? -PLAYER_ATTACKS.combo.forwardMomentum : PLAYER_ATTACKS.combo.forwardMomentum); // slight forward momentum
-          p.scene.cameras.main.shake(100, 0.005);
+          // Each combo step has a distinct animation and feel
+          const comboTextures = ['player_combo1', 'player_combo2', 'player_combo3', 'player_combo4'];
+          const comboMomentum = [
+            PLAYER_ATTACKS.combo.forwardMomentum,       // step 0: quick jab forward
+            PLAYER_ATTACKS.combo.forwardMomentum * 0.5, // step 1: upward slash, less forward
+            PLAYER_ATTACKS.combo.forwardMomentum * 1.5, // step 2: spinning, more forward
+            PLAYER_ATTACKS.combo.forwardMomentum * 2,   // step 3: heavy slam, big lunge
+          ];
+          const comboRecovery = [
+            PLAYER_ATTACKS.combo.recovery,         // step 0: fast
+            PLAYER_ATTACKS.combo.recovery,         // step 1: fast
+            PLAYER_ATTACKS.combo.recovery * 1.2,   // step 2: slightly slower
+            PLAYER_ATTACKS.combo.recovery * 1.8,   // step 3: heavy, slow recovery
+          ];
+          const comboShake: [number, number][] = [
+            [80, 0.004],   // step 0: light
+            [100, 0.006],  // step 1: medium
+            [120, 0.008],  // step 2: strong
+            [180, 0.015],  // step 3: heavy impact
+          ];
+
+          const step = p.comboStep;
+          const texture = comboTextures[step] ?? 'player_combo1';
+          const momentum = comboMomentum[step] ?? PLAYER_ATTACKS.combo.forwardMomentum;
+          const recovery = comboRecovery[step] ?? PLAYER_ATTACKS.combo.recovery;
+          const [shakeDur, shakeIntensity] = comboShake[step] ?? [100, 0.005];
+
+          p.setTexture(texture);
+          p.setVelocityX(p.flipX ? -momentum : momentum);
+
+          // Step 3 (heavy slam) also pushes down slightly for impact feel
+          if (step === 3 && !p.body!.touching.down) {
+            p.setVelocityY(200);
+          }
+
+          p.scene.cameras.main.shake(shakeDur, shakeIntensity);
           p.scene.events.emit('player_attack', p, 'combo');
           
-          p.applySquash(1.2, 0.9, 100);
-          
-          p.scene.time.delayedCall(PLAYER_ATTACKS.combo.recovery, () => {
+          p.scene.time.delayedCall(recovery, () => {
             if (p.health > 0) p.stateMachine.setState(p.body!.touching.down ? 'idle' : 'fall');
           });
         }

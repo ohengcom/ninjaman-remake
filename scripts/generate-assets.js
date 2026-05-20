@@ -284,6 +284,113 @@ saveSvg('boss_attack.svg', `
   <path d="M -20 60 A 120 120 0 0 1 200 60" fill="none" stroke="#ffffff" stroke-width="5" filter="url(#glow)" stroke-linecap="round"/>
 `, 220, 120);
 
+// Boss - Charge/Rush pose
+saveSvg('boss_rush.svg', `
+  <g transform="rotate(15 60 60)">
+    <path d="M 10 30 L 60 10 L 110 30 L 100 100 L 20 100 Z" fill="#1a0b12" stroke="#ff0000" stroke-width="4"/>
+    <!-- Angry Eyes -->
+    <line x1="40" y1="30" x2="55" y2="38" stroke="#ff0000" stroke-width="5" filter="url(#heavyGlow)"/>
+    <line x1="80" y1="30" x2="65" y2="38" stroke="#ff0000" stroke-width="5" filter="url(#heavyGlow)"/>
+    <!-- Core overheating -->
+    <circle cx="60" cy="70" r="18" fill="#ff0000" filter="url(#heavyGlow)"/>
+    <circle cx="60" cy="70" r="8" fill="#ffffff"/>
+    <!-- Speed lines -->
+    <line x1="-20" y1="50" x2="-50" y2="50" stroke="#ff0055" stroke-width="6" filter="url(#glow)"/>
+    <line x1="-15" y1="70" x2="-45" y2="70" stroke="#ff0055" stroke-width="4" filter="url(#glow)"/>
+    <line x1="-10" y1="90" x2="-40" y2="90" stroke="#ff0055" stroke-width="5" filter="url(#glow)"/>
+  </g>
+`, 160, 120);
+
+// Boss - Windup/Telegraph pose
+saveSvg('boss_windup.svg', `
+  <path d="M 10 30 L 60 10 L 110 30 L 100 100 L 20 100 Z" fill="#1a0b12" stroke="#ffaa00" stroke-width="4"/>
+  <polygon points="60,10 40,-15 50,10" fill="#ffaa00"/>
+  <polygon points="60,10 80,-15 70,10" fill="#ffaa00"/>
+  <!-- Glowing eyes warning -->
+  <circle cx="48" cy="37" r="6" fill="#ffaa00" filter="url(#heavyGlow)"/>
+  <circle cx="72" cy="37" r="6" fill="#ffaa00" filter="url(#heavyGlow)"/>
+  <!-- Core charging -->
+  <circle cx="60" cy="70" r="20" fill="none" stroke="#ffaa00" stroke-width="3" filter="url(#heavyGlow)"/>
+  <circle cx="60" cy="70" r="12" fill="#ffaa00" filter="url(#heavyGlow)"/>
+  <circle cx="60" cy="70" r="5" fill="#fff"/>
+  <!-- Raised arms -->
+  <rect x="-15" y="10" width="30" height="50" rx="10" fill="#111" stroke="#ffaa00" stroke-width="3" transform="rotate(-30 0 35)"/>
+  <rect x="105" y="10" width="30" height="50" rx="10" fill="#111" stroke="#ffaa00" stroke-width="3" transform="rotate(30 120 35)"/>
+`, 140, 120);
+
+// === PLAYER COMBO FRAMES ===
+
+// Combo Hit 1: Quick horizontal slash (left to right)
+saveSvg('player_combo1.svg', `
+  <!-- Quick horizontal slash trail -->
+  <path d="M 30 35 L 120 30 L 115 40 L 30 42 Z" fill="#00ffff" filter="url(#heavyGlow)" opacity="0.8"/>
+  <!-- Body leaning forward -->
+  <g transform="rotate(5 40 40)">
+    <path d="M 25 22 L 55 22 L 50 55 L 30 55 Z" fill="url(#metal)" stroke="#00ffff" stroke-width="1.5"/>
+    <circle cx="40" cy="38" r="5" fill="#00ffff"/>
+    <path d="M 28 15 Q 40 -5 52 15 L 48 25 L 32 25 Z" fill="#0f0f15"/>
+    <path d="M 36 10 L 50 10 L 43 17 Z" fill="#00ffff" filter="url(#glow)"/>
+    <!-- Extended arm -->
+    <path d="M 45 28 L 80 32 L 78 38 L 43 34 Z" fill="url(#metal)"/>
+  </g>
+  <!-- Katana horizontal -->
+  <path d="M 75 30 L 130 28 L 128 34 L 73 36 Z" fill="url(#blade)" filter="url(#glow)"/>
+`, 135, 80);
+
+// Combo Hit 2: Upward diagonal slash
+saveSvg('player_combo2.svg', `
+  <!-- Diagonal slash trail (low to high) -->
+  <path d="M 30 60 Q 60 30 100 5 L 95 15 Q 55 40 35 65 Z" fill="#00ffff" filter="url(#heavyGlow)" opacity="0.7"/>
+  <!-- Body twisting -->
+  <g transform="rotate(-10 40 40)">
+    <path d="M 25 25 L 55 25 L 50 58 L 30 58 Z" fill="url(#metal)" stroke="#00ffff" stroke-width="1.5"/>
+    <circle cx="40" cy="40" r="5" fill="#00ffff"/>
+    <path d="M 28 18 Q 40 -2 52 18 L 48 28 L 32 28 Z" fill="#0f0f15"/>
+    <path d="M 36 13 L 50 13 L 43 20 Z" fill="#00ffff" filter="url(#glow)"/>
+    <!-- Arm swinging up -->
+    <path d="M 45 30 L 70 15 L 68 22 L 43 36 Z" fill="url(#metal)"/>
+  </g>
+  <!-- Katana diagonal -->
+  <path d="M 65 18 L 105 -5 L 102 2 L 62 24 Z" fill="url(#blade)" filter="url(#heavyGlow)"/>
+`, 110, 80);
+
+// Combo Hit 3: Spinning back slash
+saveSvg('player_combo3.svg', `
+  <!-- Circular spin trail -->
+  <path d="M 10 40 A 40 40 0 1 1 70 40" fill="none" stroke="#00ffff" stroke-width="8" filter="url(#heavyGlow)" opacity="0.6" stroke-linecap="round"/>
+  <path d="M 10 40 A 40 40 0 1 1 70 40" fill="none" stroke="#ffffff" stroke-width="3" filter="url(#glow)" opacity="0.8" stroke-linecap="round"/>
+  <!-- Body mid-spin -->
+  <g transform="rotate(180 40 40) translate(0, -5)">
+    <path d="M 25 22 L 55 22 L 50 55 L 30 55 Z" fill="url(#metal)" stroke="#e94560" stroke-width="1.5"/>
+    <circle cx="40" cy="38" r="5" fill="#e94560"/>
+    <path d="M 28 15 Q 40 -5 52 15 L 48 25 L 32 25 Z" fill="#0f0f15"/>
+    <path d="M 36 10 L 50 10 L 43 17 Z" fill="#e94560" filter="url(#glow)"/>
+  </g>
+  <!-- Scarf whipping -->
+  <path d="M 40 25 Q 80 10 100 30 Q 80 20 50 30" fill="url(#energy)" filter="url(#glow)" opacity="0.9"/>
+`, 110, 80);
+
+// Combo Hit 4: Heavy overhead slam
+saveSvg('player_combo4.svg', `
+  <!-- Massive downward impact -->
+  <path d="M 30 0 L 50 0 L 80 70 L 0 70 Z" fill="#00ffff" filter="url(#heavyGlow)" opacity="0.5"/>
+  <!-- Impact sparks at bottom -->
+  <circle cx="40" cy="65" r="15" fill="#ffffff" filter="url(#heavyGlow)" opacity="0.6"/>
+  <line x1="20" y1="70" x2="0" y2="75" stroke="#00ffff" stroke-width="3" filter="url(#glow)"/>
+  <line x1="60" y1="70" x2="80" y2="75" stroke="#00ffff" stroke-width="3" filter="url(#glow)"/>
+  <!-- Body slamming down -->
+  <g transform="translate(5, 10)">
+    <path d="M 25 15 L 55 15 L 50 48 L 30 48 Z" fill="url(#metal)" stroke="#00ffff" stroke-width="2"/>
+    <circle cx="40" cy="30" r="6" fill="#00ffff" filter="url(#glow)"/>
+    <path d="M 28 8 Q 40 -12 52 8 L 48 18 L 32 18 Z" fill="#0f0f15"/>
+    <path d="M 36 3 L 50 3 L 43 10 Z" fill="#ffffff" filter="url(#heavyGlow)"/>
+    <!-- Both arms overhead driving katana down -->
+    <path d="M 35 18 L 40 -5 L 45 18 Z" fill="url(#metal)"/>
+  </g>
+  <!-- Katana vertical -->
+  <path d="M 38 -10 L 42 -10 L 44 65 L 36 65 Z" fill="url(#blade)" filter="url(#heavyGlow)"/>
+`, 90, 80);
+
 
 // === BACKGROUNDS ===
 
