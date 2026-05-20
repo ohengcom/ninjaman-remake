@@ -47,7 +47,7 @@ export class MainMenuScene extends Phaser.Scene {
     this.input.keyboard!.once('keydown-SPACE', () => {
       this.cameras.main.fadeOut(500, 0, 0, 0);
       this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-        this.scene.start('GameScene');
+        this.scene.start('GameScene', { level: 1 });
       });
     });
   }

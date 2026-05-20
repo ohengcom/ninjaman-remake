@@ -64,7 +64,7 @@ export const LEVELS: readonly LevelConfig[] = [
     name: 'CORE SECTOR',
     farBg: 'bg_core_far',
     midBg: 'bg_core_mid',
-    mapTiles: 40,
+    mapTiles: 20,
     tileSize: 64,
     hasPlatforms: false,
     platformStartTile: 0,

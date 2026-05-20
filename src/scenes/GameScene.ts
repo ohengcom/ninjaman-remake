@@ -138,11 +138,13 @@ export class GameScene extends Phaser.Scene {
       this.tweens.add({ targets: portal, alpha: 0.2, yoyo: true, repeat: -1, duration: 800 });
 
     } else {
-      this.boss = new Boss(this, this.mapWidth - 400, h - 150);
+      // Boss level: spawn boss closer to player for immediate encounter
+      const bossX = Math.min(this.mapWidth - 400, 800);
+      this.boss = new Boss(this, bossX, h - 150);
       this.boss.setTarget(this.player);
       this.physics.add.collider(this.boss, platforms);
       
-      this.add.text(this.mapWidth - 400, 100, 'WARNING: CORE GUARDIAN', {
+      this.add.text(bossX, 100, 'WARNING: CORE GUARDIAN', {
          fontFamily: 'Impact', fontSize: '48px', color: '#ff0055'
       }).setOrigin(0.5);
     }
