@@ -82,11 +82,27 @@ export class GameScene extends Phaser.Scene {
     this.levelCfg = getLevelConfig(this.currentLevel);
     this.rng = new SeededRandom(this.currentLevel * 12345);
     const farBg = this.levelCfg.farBg;
-    const midBg = this.levelCfg.midBg;
     this.mapWidth = this.levelCfg.mapTiles * this.levelCfg.tileSize;
 
-    this.add.image(w/2, h/2, farBg).setScrollFactor(0);
-    this.add.image(w/2, h/2, midBg).setScrollFactor(0.2);
+    // Create seamless mirrored parallax background
+    const bgTemp = this.textures.get(farBg).getSourceImage();
+    const bgWidth = (bgTemp && bgTemp.width) ? bgTemp.width : w;
+    const bgHeight = (bgTemp && bgTemp.height) ? bgTemp.height : h;
+    
+    const scale = h / bgHeight;
+    const scaledWidth = bgWidth * scale;
+    
+    // Calculate how many background panels we need based on scroll factor (0.2)
+    const requiredWidth = w + (this.mapWidth - w) * 0.2;
+    const numImages = Math.max(2, Math.ceil(requiredWidth / scaledWidth));
+    
+    for (let i = 0; i < numImages; i++) {
+        const bg = this.add.image(scaledWidth * i, 0, farBg).setOrigin(0, 0).setScrollFactor(0.2);
+        bg.displayHeight = h;
+        bg.displayWidth = scaledWidth;
+        // Mirror every alternate image to create a seamless infinite loop
+        if (i % 2 === 1) bg.setFlipX(true);
+    }
 
     // Refresh HUD properly by stopping and re-launching it so events connect to the new GameScene instance
     this.scene.stop('HUDScene');

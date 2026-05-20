@@ -37,42 +37,42 @@
 
       <!-- Advanced Cyber-Zen Gradients -->
       <linearGradient id="inkWashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#2a2a2a"/>
-        <stop offset="60%" stop-color="#121212"/>
-        <stop offset="100%" stop-color="#050505"/>
+        <stop offset="0%" stop-color="#313244"/>
+        <stop offset="60%" stop-color="#11111b"/>
+        <stop offset="100%" stop-color="#11111b"/>
       </linearGradient>
       <linearGradient id="inkWashLight" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#6e6e6e"/>
-        <stop offset="50%" stop-color="#3c3c3c"/>
-        <stop offset="100%" stop-color="#1c1c1c"/>
+        <stop offset="0%" stop-color="#6c7086"/>
+        <stop offset="50%" stop-color="#45475a"/>
+        <stop offset="100%" stop-color="#1e1e2e"/>
       </linearGradient>
       <linearGradient id="spiritGold" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#ffffff"/>
-        <stop offset="35%" stop-color="#ffe680"/>
-        <stop offset="75%" stop-color="#e5c158"/>
-        <stop offset="100%" stop-color="#b8860b"/>
+        <stop offset="0%" stop-color="#cdd6f4"/>
+        <stop offset="35%" stop-color="#f9e2af"/>
+        <stop offset="75%" stop-color="#fab387"/>
+        <stop offset="100%" stop-color="#fab387"/>
       </linearGradient>
       <linearGradient id="sacredMaple" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#ff2200"/>
-        <stop offset="50%" stop-color="#d43f00"/>
-        <stop offset="100%" stop-color="#800000"/>
+        <stop offset="0%" stop-color="#f38ba8"/>
+        <stop offset="50%" stop-color="#fab387"/>
+        <stop offset="100%" stop-color="#eba0ac"/>
       </linearGradient>
       <linearGradient id="sakuraBlade" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#ffffff"/>
-        <stop offset="40%" stop-color="#ffb3d9"/>
-        <stop offset="85%" stop-color="#ff3399"/>
-        <stop offset="100%" stop-color="#cc0066"/>
+        <stop offset="0%" stop-color="#cdd6f4"/>
+        <stop offset="40%" stop-color="#f2cdcd"/>
+        <stop offset="85%" stop-color="#f5c2e7"/>
+        <stop offset="100%" stop-color="#cba6f7"/>
       </linearGradient>
       <linearGradient id="crimsonGaze" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#ff3333"/>
-        <stop offset="60%" stop-color="#aa0000"/>
-        <stop offset="100%" stop-color="#550000"/>
+        <stop offset="0%" stop-color="#f38ba8"/>
+        <stop offset="60%" stop-color="#eba0ac"/>
+        <stop offset="100%" stop-color="#1e1e2e"/>
       </linearGradient>
     </defs>
     
   <!-- Solid defensive posture -->
-  <path d="M 22 25 L 50 25 L 44 55 L 26 55 Z" fill="url(#inkWashGrad)" stroke="#e5c158" stroke-width="1.8"/>
-  <ellipse cx="36" cy="18" rx="22" ry="6" fill="url(#inkWashLight)" stroke="#e5c158" stroke-width="1.5"/>
+  <path d="M 22 25 L 50 25 L 44 55 L 26 55 Z" fill="url(#inkWashGrad)" stroke="#fab387" stroke-width="1.8"/>
+  <ellipse cx="36" cy="18" rx="22" ry="6" fill="url(#inkWashLight)" stroke="#fab387" stroke-width="1.5"/>
   <path d="M 14 18 Q 36 2 58 18 Z" fill="url(#inkWashGrad)"/>
 
   <!-- Calligraphy Katana Blocking Position -->
@@ -80,18 +80,18 @@
 
   <!-- High-Fidelity Calligraphy Bagua Shield Matrix -->
   <!-- Outer glowing zen circle (Enso shape) -->
-  <circle cx="50" cy="36" r="32" fill="none" stroke="#e5c158" stroke-width="4.5" stroke-dasharray="160 40" filter="url(#heavyGoldGlow)" opacity="0.95"/>
+  <circle cx="50" cy="36" r="32" fill="none" stroke="#fab387" stroke-width="4.5" stroke-dasharray="160 40" filter="url(#heavyGoldGlow)" opacity="0.95"/>
   
   <!-- Inner Bagua symbols -->
-  <circle cx="50" cy="36" r="22" fill="rgba(229, 193, 88, 0.08)" stroke="#e5c158" stroke-width="1.5" stroke-dasharray="6 3"/>
-  <path d="M 50 22 C 40 22 40 36 50 36 C 60 36 60 50 50 50" fill="none" stroke="#e5c158" stroke-width="2"/>
+  <circle cx="50" cy="36" r="22" fill="rgba(229, 193, 88, 0.08)" stroke="#fab387" stroke-width="1.5" stroke-dasharray="6 3"/>
+  <path d="M 50 22 C 40 22 40 36 50 36 C 60 36 60 50 50 50" fill="none" stroke="#fab387" stroke-width="2"/>
   
   <!-- Digital brush details inside shield -->
-  <circle cx="50" cy="29" r="2" fill="#e5c158"/>
-  <circle cx="50" cy="43" r="2" fill="#ffffff"/>
+  <circle cx="50" cy="29" r="2" fill="#fab387"/>
+  <circle cx="50" cy="43" r="2" fill="#cdd6f4"/>
   
   <!-- Impact spark beads -->
-  <circle cx="72" cy="18" r="4.5" fill="#ffffff" filter="url(#goldGlow)"/>
-  <circle cx="28" cy="48" r="4" fill="#e5c158" filter="url(#goldGlow)"/>
+  <circle cx="72" cy="18" r="4.5" fill="#cdd6f4" filter="url(#goldGlow)"/>
+  <circle cx="28" cy="48" r="4" fill="#fab387" filter="url(#goldGlow)"/>
 
   </svg>

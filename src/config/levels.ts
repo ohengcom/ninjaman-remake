@@ -29,9 +29,9 @@ export interface LevelConfig {
 export const LEVELS: readonly LevelConfig[] = [
   {
     id: 1,
-    name: 'CITY SECTOR',
-    farBg: 'bg_city_far',
-    midBg: 'bg_city_mid',
+    name: 'MYSTICAL FOREST',
+    farBg: 'bg_forest',
+    midBg: '',
     mapTiles: 80,
     tileSize: 64,
     hasPlatforms: true,
@@ -45,9 +45,9 @@ export const LEVELS: readonly LevelConfig[] = [
   },
   {
     id: 2,
-    name: 'FOREST SECTOR',
-    farBg: 'bg_forest_far',
-    midBg: 'bg_forest_mid',
+    name: 'SERENE BEACH',
+    farBg: 'bg_beach',
+    midBg: '',
     mapTiles: 80,
     tileSize: 64,
     hasPlatforms: true,
@@ -61,9 +61,9 @@ export const LEVELS: readonly LevelConfig[] = [
   },
   {
     id: 3,
-    name: 'CORE SECTOR',
-    farBg: 'bg_core_far',
-    midBg: 'bg_core_mid',
+    name: 'ANCIENT CASTLE',
+    farBg: 'bg_castle',
+    midBg: '',
     mapTiles: 20,
     tileSize: 64,
     hasPlatforms: false,

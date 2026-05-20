@@ -37,47 +37,47 @@
 
       <!-- Advanced Cyber-Zen Gradients -->
       <linearGradient id="inkWashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#2a2a2a"/>
-        <stop offset="60%" stop-color="#121212"/>
-        <stop offset="100%" stop-color="#050505"/>
+        <stop offset="0%" stop-color="#313244"/>
+        <stop offset="60%" stop-color="#11111b"/>
+        <stop offset="100%" stop-color="#11111b"/>
       </linearGradient>
       <linearGradient id="inkWashLight" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#6e6e6e"/>
-        <stop offset="50%" stop-color="#3c3c3c"/>
-        <stop offset="100%" stop-color="#1c1c1c"/>
+        <stop offset="0%" stop-color="#6c7086"/>
+        <stop offset="50%" stop-color="#45475a"/>
+        <stop offset="100%" stop-color="#1e1e2e"/>
       </linearGradient>
       <linearGradient id="spiritGold" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#ffffff"/>
-        <stop offset="35%" stop-color="#ffe680"/>
-        <stop offset="75%" stop-color="#e5c158"/>
-        <stop offset="100%" stop-color="#b8860b"/>
+        <stop offset="0%" stop-color="#cdd6f4"/>
+        <stop offset="35%" stop-color="#f9e2af"/>
+        <stop offset="75%" stop-color="#fab387"/>
+        <stop offset="100%" stop-color="#fab387"/>
       </linearGradient>
       <linearGradient id="sacredMaple" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#ff2200"/>
-        <stop offset="50%" stop-color="#d43f00"/>
-        <stop offset="100%" stop-color="#800000"/>
+        <stop offset="0%" stop-color="#f38ba8"/>
+        <stop offset="50%" stop-color="#fab387"/>
+        <stop offset="100%" stop-color="#eba0ac"/>
       </linearGradient>
       <linearGradient id="sakuraBlade" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#ffffff"/>
-        <stop offset="40%" stop-color="#ffb3d9"/>
-        <stop offset="85%" stop-color="#ff3399"/>
-        <stop offset="100%" stop-color="#cc0066"/>
+        <stop offset="0%" stop-color="#cdd6f4"/>
+        <stop offset="40%" stop-color="#f2cdcd"/>
+        <stop offset="85%" stop-color="#f5c2e7"/>
+        <stop offset="100%" stop-color="#cba6f7"/>
       </linearGradient>
       <linearGradient id="crimsonGaze" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#ff3333"/>
-        <stop offset="60%" stop-color="#aa0000"/>
-        <stop offset="100%" stop-color="#550000"/>
+        <stop offset="0%" stop-color="#f38ba8"/>
+        <stop offset="60%" stop-color="#eba0ac"/>
+        <stop offset="100%" stop-color="#1e1e2e"/>
       </linearGradient>
     </defs>
     
   <!-- Upward slash curve -->
   <path d="M 26 62 Q 58 32 98 6 L 92 16 Q 54 40 32 67 Z" fill="url(#inkWashGrad)" filter="url(#inkMisty)" opacity="0.95"/>
   <path d="M 32 58 Q 58 32 92 10 L 88 15 Q 54 38 36 61 Z" fill="url(#sakuraBlade)" filter="url(#sakuraGlow)" opacity="0.85"/>
-  <path d="M 35 52 Q 58 32 86 14" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.9"/>
+  <path d="M 35 52 Q 58 32 86 14" fill="none" stroke="#cdd6f4" stroke-width="2" opacity="0.9"/>
 
   <g transform="rotate(-8 40 40)">
-    <path d="M 22 24 L 50 24 L 44 54 L 26 54 Z" fill="url(#inkWashGrad)" stroke="#e5c158" stroke-width="1.5"/>
-    <ellipse cx="36" cy="16" rx="20" ry="5" fill="url(#inkWashLight)" stroke="#e5c158" stroke-width="1.2"/>
+    <path d="M 22 24 L 50 24 L 44 54 L 26 54 Z" fill="url(#inkWashGrad)" stroke="#fab387" stroke-width="1.5"/>
+    <ellipse cx="36" cy="16" rx="20" ry="5" fill="url(#inkWashLight)" stroke="#fab387" stroke-width="1.2"/>
     <!-- Uppercut swing arm -->
     <path d="M 40 28 L 66 14 L 64 21 L 38 34 Z" fill="url(#inkWashLight)"/>
   </g>

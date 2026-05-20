@@ -37,57 +37,57 @@
 
       <!-- Advanced Cyber-Zen Gradients -->
       <linearGradient id="inkWashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#2a2a2a"/>
-        <stop offset="60%" stop-color="#121212"/>
-        <stop offset="100%" stop-color="#050505"/>
+        <stop offset="0%" stop-color="#313244"/>
+        <stop offset="60%" stop-color="#11111b"/>
+        <stop offset="100%" stop-color="#11111b"/>
       </linearGradient>
       <linearGradient id="inkWashLight" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#6e6e6e"/>
-        <stop offset="50%" stop-color="#3c3c3c"/>
-        <stop offset="100%" stop-color="#1c1c1c"/>
+        <stop offset="0%" stop-color="#6c7086"/>
+        <stop offset="50%" stop-color="#45475a"/>
+        <stop offset="100%" stop-color="#1e1e2e"/>
       </linearGradient>
       <linearGradient id="spiritGold" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#ffffff"/>
-        <stop offset="35%" stop-color="#ffe680"/>
-        <stop offset="75%" stop-color="#e5c158"/>
-        <stop offset="100%" stop-color="#b8860b"/>
+        <stop offset="0%" stop-color="#cdd6f4"/>
+        <stop offset="35%" stop-color="#f9e2af"/>
+        <stop offset="75%" stop-color="#fab387"/>
+        <stop offset="100%" stop-color="#fab387"/>
       </linearGradient>
       <linearGradient id="sacredMaple" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#ff2200"/>
-        <stop offset="50%" stop-color="#d43f00"/>
-        <stop offset="100%" stop-color="#800000"/>
+        <stop offset="0%" stop-color="#f38ba8"/>
+        <stop offset="50%" stop-color="#fab387"/>
+        <stop offset="100%" stop-color="#eba0ac"/>
       </linearGradient>
       <linearGradient id="sakuraBlade" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#ffffff"/>
-        <stop offset="40%" stop-color="#ffb3d9"/>
-        <stop offset="85%" stop-color="#ff3399"/>
-        <stop offset="100%" stop-color="#cc0066"/>
+        <stop offset="0%" stop-color="#cdd6f4"/>
+        <stop offset="40%" stop-color="#f2cdcd"/>
+        <stop offset="85%" stop-color="#f5c2e7"/>
+        <stop offset="100%" stop-color="#cba6f7"/>
       </linearGradient>
       <linearGradient id="crimsonGaze" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#ff3333"/>
-        <stop offset="60%" stop-color="#aa0000"/>
-        <stop offset="100%" stop-color="#550000"/>
+        <stop offset="0%" stop-color="#f38ba8"/>
+        <stop offset="60%" stop-color="#eba0ac"/>
+        <stop offset="100%" stop-color="#1e1e2e"/>
       </linearGradient>
     </defs>
     
-  <path d="M 8 26 L 60 6 L 112 26 L 102 98 L 18 98 Z" fill="url(#inkWashGrad)" stroke="#e5c158" stroke-width="5.5"/>
-  <path d="M 0 28 Q 60 0 120 28" fill="none" stroke="#cc1100" stroke-width="6"/>
+  <path d="M 8 26 L 60 6 L 112 26 L 102 98 L 18 98 Z" fill="url(#inkWashGrad)" stroke="#fab387" stroke-width="5.5"/>
+  <path d="M 0 28 Q 60 0 120 28" fill="none" stroke="#cba6f7" stroke-width="6"/>
 
   <!-- Core charging yellow-hot -->
-  <circle cx="60" cy="66" r="34" fill="none" stroke="#e5c158" stroke-width="4" stroke-dasharray="8 6" filter="url(#goldGlow)"/>
+  <circle cx="60" cy="66" r="34" fill="none" stroke="#fab387" stroke-width="4" stroke-dasharray="8 6" filter="url(#goldGlow)"/>
   
   <!-- Yin-Yang spinning actively -->
-  <circle cx="60" cy="66" r="22" fill="#1c1c1c" stroke="#ffffff" stroke-width="2.5" filter="url(#heavyGoldGlow)"/>
-  <path d="M 60 44 A 11 11 0 0 0 60 66 A 11 11 0 0 1 60 88 A 22 22 0 0 0 60 44 Z" fill="#e5c158"/>
+  <circle cx="60" cy="66" r="22" fill="#1e1e2e" stroke="#cdd6f4" stroke-width="2.5" filter="url(#heavyGoldGlow)"/>
+  <path d="M 60 44 A 11 11 0 0 0 60 66 A 11 11 0 0 1 60 88 A 22 22 0 0 0 60 44 Z" fill="#fab387"/>
 
   <!-- Massive glowing calligraphy signs erupting (Sanskrit/Kanji "神" / "力") -->
-  <text x="32" y="42" font-family="serif" font-weight="bold" font-size="15" fill="#cc1100" filter="url(#redGlow)">神</text>
-  <text x="76" y="42" font-family="serif" font-weight="bold" font-size="15" fill="#cc1100" filter="url(#redGlow)">机</text>
-  <text x="32" y="96" font-family="serif" font-weight="bold" font-size="15" fill="#e5c158" filter="url(#goldGlow)">乾</text>
-  <text x="76" y="96" font-family="serif" font-weight="bold" font-size="15" fill="#e5c158" filter="url(#goldGlow)">坤</text>
+  <text x="32" y="42" font-family="serif" font-weight="bold" font-size="15" fill="#cba6f7" filter="url(#redGlow)">神</text>
+  <text x="76" y="42" font-family="serif" font-weight="bold" font-size="15" fill="#cba6f7" filter="url(#redGlow)">机</text>
+  <text x="32" y="96" font-family="serif" font-weight="bold" font-size="15" fill="#fab387" filter="url(#goldGlow)">乾</text>
+  <text x="76" y="96" font-family="serif" font-weight="bold" font-size="15" fill="#fab387" filter="url(#goldGlow)">坤</text>
 
   <!-- Claws raised in charging pose -->
-  <rect x="-20" y="8" width="30" height="52" rx="5" fill="#111" stroke="#e5c158" stroke-width="3" transform="rotate(-26 0 32)"/>
-  <rect x="110" y="8" width="30" height="52" rx="5" fill="#111" stroke="#e5c158" stroke-width="3" transform="rotate(26 120 32)"/>
+  <rect x="-20" y="8" width="30" height="52" rx="5" fill="#11111b" stroke="#fab387" stroke-width="3" transform="rotate(-26 0 32)"/>
+  <rect x="110" y="8" width="30" height="52" rx="5" fill="#11111b" stroke="#fab387" stroke-width="3" transform="rotate(26 120 32)"/>
 
   </svg>

@@ -24,29 +24,29 @@
       </linearGradient>
     </defs>
     
-  <rect width="64" height="64" fill="url(#inkWashGrad)" stroke="#1c1c1c" stroke-width="2.5"/>
+  <rect width="64" height="64" fill="url(#inkWashGrad)" stroke="#1e1e2e" stroke-width="2.5"/>
   
   <!-- Golden/copper grain lines on lacquered wood -->
-  <path d="M 0 18 Q 32 12 64 18 M 0 34 Q 32 28 64 34 M 0 50 Q 32 44 64 50" stroke="#2d1d11" stroke-width="1.8"/>
+  <path d="M 0 18 Q 32 12 64 18 M 0 34 Q 32 28 64 34 M 0 50 Q 32 44 64 50" stroke="#585b70" stroke-width="1.8"/>
   <path d="M 8 0 Q 8 32 12 64 M 54 0 Q 52 32 54 64" stroke="#150d08" stroke-width="1"/>
   
   <!-- Digital brush grains for rustic traditional feel -->
-  <line x1="4" y1="8" x2="60" y2="8" stroke="#e5c158" stroke-width="0.5" opacity="0.15"/>
-  <line x1="4" y1="42" x2="60" y2="42" stroke="#e5c158" stroke-width="0.5" opacity="0.15"/>
+  <line x1="4" y1="8" x2="60" y2="8" stroke="#fab387" stroke-width="0.5" opacity="0.15"/>
+  <line x1="4" y1="42" x2="60" y2="42" stroke="#fab387" stroke-width="0.5" opacity="0.15"/>
 
   <!-- Ancient Sacred Top Edge Golden Border (The Golden Seal / 符文) -->
-  <rect x="0" y="0" width="64" height="6.5" fill="#e5c158" filter="url(#bgGlow)"/>
-  <rect x="0" y="0" width="64" height="2" fill="#ffffff"/>
+  <rect x="0" y="0" width="64" height="6.5" fill="#fab387" filter="url(#bgGlow)"/>
+  <rect x="0" y="0" width="64" height="2" fill="#cdd6f4"/>
   
   <!-- Red sacred warning symbols on the gold edge -->
-  <rect x="12" y="2.5" width="4" height="2" fill="#cc1100"/>
-  <rect x="30" y="2.5" width="4" height="2" fill="#cc1100"/>
-  <rect x="48" y="2.5" width="4" height="2" fill="#cc1100"/>
+  <rect x="12" y="2.5" width="4" height="2" fill="#cba6f7"/>
+  <rect x="30" y="2.5" width="4" height="2" fill="#cba6f7"/>
+  <rect x="48" y="2.5" width="4" height="2" fill="#cba6f7"/>
 
   <!-- Copper corner reinforcement brackets and rivets -->
-  <circle cx="8" cy="12" r="2.8" fill="#e5c158" filter="url(#bgGlow)"/>
-  <circle cx="56" cy="12" r="2.8" fill="#e5c158" filter="url(#bgGlow)"/>
-  <circle cx="8" cy="52" r="2" fill="#2d1d11"/>
-  <circle cx="56" cy="52" r="2" fill="#2d1d11"/>
+  <circle cx="8" cy="12" r="2.8" fill="#fab387" filter="url(#bgGlow)"/>
+  <circle cx="56" cy="12" r="2.8" fill="#fab387" filter="url(#bgGlow)"/>
+  <circle cx="8" cy="52" r="2" fill="#585b70"/>
+  <circle cx="56" cy="52" r="2" fill="#585b70"/>
 
   </svg>

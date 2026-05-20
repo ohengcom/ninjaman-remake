@@ -32,12 +32,9 @@ export class BootScene extends Phaser.Scene {
     this.load.svg('boss_rush', 'assets/sprites/boss_rush.svg?v=2');
     this.load.svg('boss_windup', 'assets/sprites/boss_windup.svg?v=2');
     
-    this.load.svg('bg_city_far', 'assets/backgrounds/bg_city_far.svg?v=2');
-    this.load.svg('bg_city_mid', 'assets/backgrounds/bg_city_mid.svg?v=2');
-    this.load.svg('bg_forest_far', 'assets/backgrounds/bg_forest_far.svg?v=2');
-    this.load.svg('bg_forest_mid', 'assets/backgrounds/bg_forest_mid.svg?v=2');
-    this.load.svg('bg_core_far', 'assets/backgrounds/bg_core_far.svg?v=2');
-    this.load.svg('bg_core_mid', 'assets/backgrounds/bg_core_mid.svg?v=2');
+    this.load.image('bg_forest', 'assets/backgrounds/bg_forest.png');
+    this.load.image('bg_beach', 'assets/backgrounds/bg_beach.png');
+    this.load.image('bg_castle', 'assets/backgrounds/bg_castle.png');
     this.load.svg('platform', 'assets/backgrounds/platform.svg?v=2');
 
     const w = this.cameras.main.width;

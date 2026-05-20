@@ -27,7 +27,7 @@
   <rect width="1280" height="720" fill="url(#parchmentFade)"/>
   
   <!-- Distant giant calligraphic gold-red moon -->
-  <circle cx="1020" cy="190" r="105" fill="#e5c158" filter="url(#bgGlow)" opacity="0.65"/>
+  <circle cx="1020" cy="190" r="105" fill="#fab387" filter="url(#bgGlow)" opacity="0.65"/>
   <circle cx="1020" cy="190" r="90" fill="url(#spiritGold)" opacity="0.85"/>
   <!-- Traditional brush-stroke ink clouds slicing the golden moon -->
   <path d="M 820 180 Q 980 140 1140 180 Q 1020 200 820 180 Z" fill="#ccc1aa" opacity="0.9"/>
@@ -35,7 +35,7 @@
   <path d="M 850 140 Q 960 115 1070 140 Q 960 155 850 140 Z" fill="#ccc1aa" opacity="0.75"/>
 
   <!-- High-fidelity flying paper-cranes silhouette (distant stars replacement) -->
-  <g fill="#cc1100" opacity="0.65" filter="url(#bgGlow)">
+  <g fill="#cba6f7" opacity="0.65" filter="url(#bgGlow)">
     <!-- Crane 1 -->
     <polygon points="120,100 135,90 128,105 125,102" transform="rotate(-15 120 100)"/>
     <!-- Crane 2 -->
@@ -52,6 +52,6 @@
   <!-- Mountain Tier 2 (Mid-distance - ink grey) -->
   <path d="M 0 570 C 150 500 250 440 380 520 C 500 600 720 400 920 500 C 1080 580 1180 480 1280 550 L 1280 720 L 0 720 Z" fill="#a69b85" filter="url(#inkMistyBg)" opacity="0.9"/>
   <!-- Mountain Tier 3 (Closest - deep black brush stroke silhouette) -->
-  <path d="M 0 600 L 150 530 L 280 590 L 450 460 L 620 560 L 820 410 L 980 520 L 1150 440 L 1280 520 L 1280 720 L 0 720 Z" fill="#2d281e" stroke="#1c1c1c" stroke-width="3"/>
+  <path d="M 0 600 L 150 530 L 280 590 L 450 460 L 620 560 L 820 410 L 980 520 L 1150 440 L 1280 520 L 1280 720 L 0 720 Z" fill="#2d281e" stroke="#1e1e2e" stroke-width="3"/>
 
   </svg>

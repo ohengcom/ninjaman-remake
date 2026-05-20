@@ -32,53 +32,53 @@
   </defs>
   
   <!-- Beautiful multi-tiered Silhouette Pagodas and Shrines -->
-  <g fill="url(#pagodaGrad)" stroke="#e5c158" stroke-width="2">
+  <g fill="url(#pagodaGrad)" stroke="#fab387" stroke-width="2">
     <!-- Pagoda 1 -->
     <rect x="50" y="280" width="130" height="440" />
-    <path d="M 30 280 Q 115 220 200 280" fill="url(#pagodaGrad)" stroke="#cc1100" stroke-width="2.5"/>
-    <path d="M 40 360 Q 115 310 190 360" fill="url(#pagodaGrad)" stroke="#cc1100" stroke-width="2"/>
+    <path d="M 30 280 Q 115 220 200 280" fill="url(#pagodaGrad)" stroke="#cba6f7" stroke-width="2.5"/>
+    <path d="M 40 360 Q 115 310 190 360" fill="url(#pagodaGrad)" stroke="#cba6f7" stroke-width="2"/>
     
     <!-- Pagoda 2 -->
     <rect x="290" y="160" width="170" height="560" />
-    <path d="M 270 160 Q 375 100 480 160" fill="url(#pagodaGrad)" stroke="#cc1100" stroke-width="2.5"/>
-    <path d="M 280 280 Q 375 220 470 280" fill="url(#pagodaGrad)" stroke="#cc1100" stroke-width="2"/>
-    <path d="M 285 400 Q 375 340 465 400" fill="url(#pagodaGrad)" stroke="#cc1100" stroke-width="2"/>
+    <path d="M 270 160 Q 375 100 480 160" fill="url(#pagodaGrad)" stroke="#cba6f7" stroke-width="2.5"/>
+    <path d="M 280 280 Q 375 220 470 280" fill="url(#pagodaGrad)" stroke="#cba6f7" stroke-width="2"/>
+    <path d="M 285 400 Q 375 340 465 400" fill="url(#pagodaGrad)" stroke="#cba6f7" stroke-width="2"/>
     
     <!-- Pagoda 3 -->
     <rect x="560" y="320" width="160" height="400" />
-    <path d="M 540 320 Q 640 260 740 320" fill="url(#pagodaGrad)" stroke="#cc1100" stroke-width="2.5"/>
+    <path d="M 540 320 Q 640 260 740 320" fill="url(#pagodaGrad)" stroke="#cba6f7" stroke-width="2.5"/>
     
     <!-- Pagoda 4 -->
     <rect x="800" y="110" width="160" height="610" />
-    <path d="M 780 110 Q 880 50 980 110" fill="url(#pagodaGrad)" stroke="#cc1100" stroke-width="2.5"/>
-    <path d="M 790 230 Q 880 170 970 230" fill="url(#pagodaGrad)" stroke="#cc1100" stroke-width="2"/>
-    <path d="M 795 350 Q 880 290 965 350" fill="url(#pagodaGrad)" stroke="#cc1100" stroke-width="2"/>
+    <path d="M 780 110 Q 880 50 980 110" fill="url(#pagodaGrad)" stroke="#cba6f7" stroke-width="2.5"/>
+    <path d="M 790 230 Q 880 170 970 230" fill="url(#pagodaGrad)" stroke="#cba6f7" stroke-width="2"/>
+    <path d="M 795 350 Q 880 290 965 350" fill="url(#pagodaGrad)" stroke="#cba6f7" stroke-width="2"/>
     
     <!-- Pagoda 5 -->
     <rect x="1060" y="240" width="150" height="480" />
-    <path d="M 1040 240 Q 1135 180 1230 240" fill="url(#pagodaGrad)" stroke="#cc1100" stroke-width="2.5"/>
+    <path d="M 1040 240 Q 1135 180 1230 240" fill="url(#pagodaGrad)" stroke="#cba6f7" stroke-width="2.5"/>
   </g>
 
   <!-- Glowing spiritual paper lanterns and calligraphic typography signs -->
   <g filter="url(#bgGlow)">
     <!-- Pagoda 1 hanging lantern lights -->
-    <rect x="105" y="300" width="20" height="30" rx="3" fill="#e5c158" opacity="0.9"/>
-    <line x1="115" y1="300" x2="115" y2="330" stroke="#cc1100" stroke-width="1.8"/>
+    <rect x="105" y="300" width="20" height="30" rx="3" fill="#fab387" opacity="0.9"/>
+    <line x1="115" y1="300" x2="115" y2="330" stroke="#cba6f7" stroke-width="1.8"/>
 
     <!-- Pagoda 2 Calligraphy grid -->
-    <line x1="290" y1="230" x2="460" y2="230" stroke="#e5c158" stroke-width="4"/>
-    <rect x="330" y="300" width="16" height="80" fill="#cc1100" opacity="0.85"/>
-    <rect x="375" y="300" width="16" height="80" fill="#cc1100" opacity="0.85"/>
-    <rect x="420" y="300" width="16" height="80" fill="#cc1100" opacity="0.85"/>
+    <line x1="290" y1="230" x2="460" y2="230" stroke="#fab387" stroke-width="4"/>
+    <rect x="330" y="300" width="16" height="80" fill="#cba6f7" opacity="0.85"/>
+    <rect x="375" y="300" width="16" height="80" fill="#cba6f7" opacity="0.85"/>
+    <rect x="420" y="300" width="16" height="80" fill="#cba6f7" opacity="0.85"/>
 
     <!-- Giant Calligraphic Banner Kanji "忍" and "禅" vertically -->
-    <rect x="850" y="170" width="60" height="240" rx="6" fill="#f5efe0" stroke="#cc1100" stroke-width="2"/>
-    <text x="862" y="225" font-family="serif" font-weight="bold" font-size="48" fill="#151515" letter-spacing="4">忍</text>
-    <text x="862" y="325" font-family="serif" font-weight="bold" font-size="48" fill="#cc1100" letter-spacing="4">禅</text>
+    <rect x="850" y="170" width="60" height="240" rx="6" fill="#f5efe0" stroke="#cba6f7" stroke-width="2"/>
+    <text x="862" y="225" font-family="serif" font-weight="bold" font-size="48" fill="#181825" letter-spacing="4">忍</text>
+    <text x="862" y="325" font-family="serif" font-weight="bold" font-size="48" fill="#cba6f7" letter-spacing="4">禅</text>
 
     <!-- Spiritual sacred maples flying across background -->
-    <circle cx="640" cy="200" r="14" fill="#cc1100" opacity="0.85"/>
-    <path d="M 625 200 L 655 200 L 640 185 Z" fill="#ffffff"/>
+    <circle cx="640" cy="200" r="14" fill="#cba6f7" opacity="0.85"/>
+    <path d="M 625 200 L 655 200 L 640 185 Z" fill="#cdd6f4"/>
   </g>
 
   </svg>

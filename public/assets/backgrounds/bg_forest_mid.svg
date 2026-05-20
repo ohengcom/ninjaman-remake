@@ -25,7 +25,7 @@
     </defs>
     
   <!-- Digital Zen bamboo stalks in ink-black with golden rings -->
-  <g fill="#221e16" stroke="#e5c158" stroke-width="2">
+  <g fill="#221e16" stroke="#fab387" stroke-width="2">
     <!-- Bamboo 1 -->
     <rect x="180" y="80" width="70" height="640" rx="3" />
     <!-- Bamboo 2 -->
@@ -34,36 +34,36 @@
     <rect x="880" y="120" width="65" height="600" rx="3" />
     
     <!-- Golden segments connections -->
-    <rect x="178" y="240" width="74" height="6" fill="#e5c158"/>
-    <rect x="178" y="420" width="74" height="6" fill="#e5c158"/>
-    <rect x="578" y="200" width="94" height="8" fill="#e5c158"/>
-    <rect x="578" y="440" width="94" height="8" fill="#e5c158"/>
-    <rect x="878" y="300" width="69" height="6" fill="#e5c158"/>
-    <rect x="878" y="480" width="69" height="6" fill="#e5c158"/>
+    <rect x="178" y="240" width="74" height="6" fill="#fab387"/>
+    <rect x="178" y="420" width="74" height="6" fill="#fab387"/>
+    <rect x="578" y="200" width="94" height="8" fill="#fab387"/>
+    <rect x="578" y="440" width="94" height="8" fill="#fab387"/>
+    <rect x="878" y="300" width="69" height="6" fill="#fab387"/>
+    <rect x="878" y="480" width="69" height="6" fill="#fab387"/>
 
     <!-- High-fidelity segmented bamboo leaves (gold/crimson water-color brush paths) -->
     <!-- Leaf clusters -->
-    <polygon points="120,180 200,90 280,180 200,140" fill="#cc1100" stroke="#e5c158" stroke-width="1.2"/>
-    <polygon points="480,130 625,30 770,130 625,90" fill="#2d281e" stroke="#e5c158" stroke-width="1.2"/>
-    <polygon points="780,220 910,120 1040,220 910,180" fill="#cc1100" stroke="#e5c158" stroke-width="1.2"/>
+    <polygon points="120,180 200,90 280,180 200,140" fill="#cba6f7" stroke="#fab387" stroke-width="1.2"/>
+    <polygon points="480,130 625,30 770,130 625,90" fill="#2d281e" stroke="#fab387" stroke-width="1.2"/>
+    <polygon points="780,220 910,120 1040,220 910,180" fill="#cba6f7" stroke="#fab387" stroke-width="1.2"/>
   </g>
 
   <!-- Glowing spiritual calligraphic lanterns suspended from stalks -->
-  <g fill="#e5c158" filter="url(#bgGlow)">
-    <rect x="207" y="270" width="16" height="50" rx="4" fill="#e5c158"/>
-    <rect x="612" y="220" width="26" height="80" rx="6" fill="#ffffff"/>
-    <rect x="898" y="320" width="28" height="60" rx="5" fill="#e5c158"/>
+  <g fill="#fab387" filter="url(#bgGlow)">
+    <rect x="207" y="270" width="16" height="50" rx="4" fill="#fab387"/>
+    <rect x="612" y="220" width="26" height="80" rx="6" fill="#cdd6f4"/>
+    <rect x="898" y="320" width="28" height="60" rx="5" fill="#fab387"/>
     
     <!-- Calligraphic red ink tassels on lanterns -->
-    <line x1="215" y1="320" x2="215" y2="335" stroke="#cc1100" stroke-width="1.5"/>
-    <line x1="625" y1="300" x2="625" y2="320" stroke="#cc1100" stroke-width="2"/>
-    <line x1="912" y1="380" x2="912" y2="400" stroke="#cc1100" stroke-width="1.8"/>
+    <line x1="215" y1="320" x2="215" y2="335" stroke="#cba6f7" stroke-width="1.5"/>
+    <line x1="625" y1="300" x2="625" y2="320" stroke="#cba6f7" stroke-width="2"/>
+    <line x1="912" y1="380" x2="912" y2="400" stroke="#cba6f7" stroke-width="1.8"/>
 
     <!-- Floating spirit cherry blossom flower seeds -->
-    <circle cx="280" cy="360" r="5" fill="#ff5599" filter="url(#bgGlow)"/>
-    <circle cx="480" cy="460" r="4.5" fill="#ff5599" filter="url(#bgGlow)"/>
-    <circle cx="780" cy="260" r="6" fill="#e5c158"/>
-    <circle cx="1080" cy="400" r="5" fill="#e5c158"/>
+    <circle cx="280" cy="360" r="5" fill="#f5c2e7" filter="url(#bgGlow)"/>
+    <circle cx="480" cy="460" r="4.5" fill="#f5c2e7" filter="url(#bgGlow)"/>
+    <circle cx="780" cy="260" r="6" fill="#fab387"/>
+    <circle cx="1080" cy="400" r="5" fill="#fab387"/>
   </g>
 
   </svg>
