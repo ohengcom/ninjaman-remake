@@ -215,7 +215,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'dash',
         onEnter: (p) => {
-          SoundManager.playDash();
+          SoundManager.playDash((p.scene as any).getPan?.(p.x) ?? 0);
           p.setTexture('player_dash');
           p.setVelocityX(p.dashDir * PLAYER_MOVEMENT.dashSpeed);
           
@@ -244,7 +244,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'jump',
         onEnter: (p) => {
-          SoundManager.playJump();
+          SoundManager.playJump((p.scene as any).getPan?.(p.x) ?? 0);
           p.setTexture('player_jump');
           p.setVelocityY(p.jumpCount === 0 ? PLAYER_MOVEMENT.jumpVelocity : PLAYER_MOVEMENT.doubleJumpVelocity);
           p.jumpCount++;

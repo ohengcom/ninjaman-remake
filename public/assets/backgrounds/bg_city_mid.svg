@@ -1,54 +1,66 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
     <defs>
       <filter id="bgGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="4" result="blur" />
-        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        <feGaussianBlur stdDeviation="5" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
       </filter>
       <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00ffff" stroke-width="0.5" opacity="0.15"/>
+        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00ffff" stroke-width="0.75" opacity="0.12"/>
       </pattern>
       <linearGradient id="bgFade" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#05050a"/>
-        <stop offset="50%" stop-color="#151025"/>
-        <stop offset="100%" stop-color="#2a1b40"/>
+        <stop offset="0%" stop-color="#04030a"/>
+        <stop offset="40%" stop-color="#0f0c21"/>
+        <stop offset="85%" stop-color="#180e32"/>
+        <stop offset="100%" stop-color="#241245"/>
       </linearGradient>
     </defs>
     
   <defs>
-    <linearGradient id="bldg" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#141428"/>
-      <stop offset="100%" stop-color="#0a0a14"/>
+    <linearGradient id="bldgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#120e24"/>
+      <stop offset="100%" stop-color="#05030d"/>
     </linearGradient>
   </defs>
   
-  <!-- Buildings -->
-  <g fill="url(#bldg)" stroke="#00ffff" stroke-width="1.5">
-    <rect x="50" y="280" width="140" height="440" />
-    <polygon points="50,280 120,220 190,280" fill="url(#bldg)"/>
-    <rect x="280" y="180" width="160" height="540" />
-    <rect x="520" y="320" width="180" height="400" />
-    <rect x="760" y="120" width="150" height="600" />
-    <polygon points="760,120 835,60 910,120" fill="url(#bldg)"/>
-    <rect x="1000" y="250" width="160" height="470" />
+  <!-- Detailed Buildings -->
+  <g fill="url(#bldgGrad)" stroke="#00ffff" stroke-width="1.8">
+    <rect x="40" y="260" width="150" height="460" />
+    <polygon points="40,260 115,190 190,260" fill="url(#bldgGrad)"/>
+    
+    <rect x="290" y="160" width="170" height="560" />
+    
+    <rect x="540" y="300" width="190" height="420" />
+    
+    <rect x="800" y="100" width="160" height="620" />
+    <polygon points="800,100 880,30 960,100" fill="url(#bldgGrad)"/>
+    
+    <rect x="1050" y="230" width="170" height="490" />
   </g>
 
-  <!-- Intense Neon Accents -->
+  <!-- High-Fidelity Hologram Ads & Neon Signage -->
   <g filter="url(#bgGlow)">
     <!-- Bldg 1 Windows -->
-    <rect x="70" y="320" width="20" height="40" fill="#00ffff" opacity="0.9"/>
-    <rect x="110" y="320" width="20" height="40" fill="#00ffff" opacity="0.9"/>
-    <rect x="150" y="320" width="20" height="40" fill="#00ffff" opacity="0.9"/>
-    <rect x="70" y="380" width="20" height="40" fill="#ff0055" opacity="0.8"/>
-    <!-- Bldg 2 Cyber Lines -->
-    <line x1="280" y1="250" x2="440" y2="250" stroke="#f39c12" stroke-width="6"/>
-    <rect x="320" y="280" width="15" height="150" fill="#ff0055" opacity="0.8"/>
-    <rect x="360" y="280" width="15" height="150" fill="#ff0055" opacity="0.8"/>
-    <rect x="400" y="280" width="15" height="150" fill="#ff0055" opacity="0.8"/>
-    <!-- Bldg 4 Hologram Text -->
-    <text x="800" y="200" font-family="Impact" font-size="60" fill="#00ffff" transform="rotate(90 800 200)">NINJA</text>
-    <text x="860" y="200" font-family="Impact" font-size="60" fill="#ff0055" transform="rotate(90 860 200)">CYBER</text>
-    <!-- Bldg 5 Grid -->
-    <path d="M 1020 300 L 1140 300 M 1020 330 L 1140 330 M 1020 360 L 1140 360" stroke="#00ffcc" stroke-width="4"/>
+    <rect x="65" y="300" width="22" height="44" fill="#00ffff" opacity="0.85"/>
+    <rect x="105" y="300" width="22" height="44" fill="#00ffff" opacity="0.85"/>
+    <rect x="145" y="300" width="22" height="44" fill="#00ffff" opacity="0.85"/>
+    <rect x="65" y="370" width="22" height="44" fill="#ff0055" opacity="0.8"/>
+    <rect x="105" y="370" width="22" height="44" fill="#ff0055" opacity="0.8"/>
+
+    <!-- Bldg 2 Cyber Circuit Core -->
+    <line x1="290" y1="230" x2="460" y2="230" stroke="#f39c12" stroke-width="8"/>
+    <rect x="330" y="260" width="16" height="180" fill="#ff0055" opacity="0.85"/>
+    <rect x="375" y="260" width="16" height="180" fill="#ff0055" opacity="0.85"/>
+    <rect x="420" y="260" width="16" height="180" fill="#ff0055" opacity="0.85"/>
+
+    <!-- Bldg 4 Giant Japanese Kanji/Hologram Text -->
+    <text x="835" y="190" font-family="Impact, sans-serif" font-size="54" fill="#00ffff" letter-spacing="4" transform="rotate(90 835 190)">NINJA</text>
+    <text x="895" y="190" font-family="Impact, sans-serif" font-size="54" fill="#ff0055" letter-spacing="4" transform="rotate(90 895 190)">CYBER</text>
+
+    <!-- Bldg 5 Cyber Grid matrix -->
+    <path d="M 1070 280 L 1200 280 M 1070 310 L 1200 310 M 1070 340 L 1200 340 M 1070 370 L 1200 370" stroke="#00ffcc" stroke-width="5" stroke-dasharray="8 4"/>
   </g>
 
   </svg>

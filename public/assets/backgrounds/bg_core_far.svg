@@ -1,22 +1,28 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
     <defs>
       <filter id="bgGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="4" result="blur" />
-        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        <feGaussianBlur stdDeviation="5" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
       </filter>
       <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00ffff" stroke-width="0.5" opacity="0.15"/>
+        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00ffff" stroke-width="0.75" opacity="0.12"/>
       </pattern>
       <linearGradient id="bgFade" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#05050a"/>
-        <stop offset="50%" stop-color="#151025"/>
-        <stop offset="100%" stop-color="#2a1b40"/>
+        <stop offset="0%" stop-color="#04030a"/>
+        <stop offset="40%" stop-color="#0f0c21"/>
+        <stop offset="85%" stop-color="#180e32"/>
+        <stop offset="100%" stop-color="#241245"/>
       </linearGradient>
     </defs>
     
-  <rect width="1280" height="720" fill="#150505"/>
-  <rect width="1280" height="720" fill="url(#grid)" opacity="0.3"/>
-  <circle cx="200" cy="400" r="350" fill="none" stroke="#2a0505" stroke-width="60" stroke-dasharray="80 30"/>
-  <circle cx="1100" cy="200" r="300" fill="none" stroke="#2a0505" stroke-width="50" stroke-dasharray="60 30"/>
+  <rect width="1280" height="720" fill="#0d0202"/>
+  <rect width="1280" height="720" fill="url(#grid)" opacity="0.35"/>
+  
+  <!-- Distant massive rotating fans -->
+  <circle cx="200" cy="360" r="320" fill="none" stroke="#220505" stroke-width="50" stroke-dasharray="70 40"/>
+  <circle cx="1080" cy="200" r="280" fill="none" stroke="#220505" stroke-width="40" stroke-dasharray="60 30"/>
 
   </svg>

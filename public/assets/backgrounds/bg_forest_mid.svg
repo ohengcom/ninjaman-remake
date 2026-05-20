@@ -1,35 +1,44 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
     <defs>
       <filter id="bgGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="4" result="blur" />
-        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        <feGaussianBlur stdDeviation="5" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
       </filter>
       <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00ffff" stroke-width="0.5" opacity="0.15"/>
+        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00ffff" stroke-width="0.75" opacity="0.12"/>
       </pattern>
       <linearGradient id="bgFade" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#05050a"/>
-        <stop offset="50%" stop-color="#151025"/>
-        <stop offset="100%" stop-color="#2a1b40"/>
+        <stop offset="0%" stop-color="#04030a"/>
+        <stop offset="40%" stop-color="#0f0c21"/>
+        <stop offset="85%" stop-color="#180e32"/>
+        <stop offset="100%" stop-color="#241245"/>
       </linearGradient>
     </defs>
     
-  <g fill="#0c3a1c" stroke="#00ff55" stroke-width="2">
-    <rect x="200" y="100" width="80" height="620" />
-    <rect x="600" y="50" width="100" height="670" />
-    <rect x="900" y="150" width="70" height="570" />
-    <!-- Angular Digital Leaves -->
-    <polygon points="150,200 240,100 330,200 240,150" fill="#0f4a25"/>
-    <polygon points="500,150 650,50 800,150 650,100" fill="#0f4a25"/>
-    <polygon points="800,250 935,150 1070,250 935,200" fill="#0f4a25"/>
+  <!-- Digital trees -->
+  <g fill="#072b12" stroke="#00ff55" stroke-width="2">
+    <rect x="180" y="80" width="85" height="640" />
+    <rect x="580" y="40" width="105" height="680" />
+    <rect x="880" y="120" width="75" height="600" />
+    
+    <!-- Segmented angular high tech leaves -->
+    <polygon points="120,180 220,70 320,180 220,130" fill="#083d19" stroke="#00ff55" stroke-width="1"/>
+    <polygon points="480,130 630,20 780,130 630,80" fill="#083d19" stroke="#00ff55" stroke-width="1"/>
+    <polygon points="780,220 915,110 1050,220 915,170" fill="#083d19" stroke="#00ff55" stroke-width="1"/>
   </g>
+
+  <!-- Glowing cybernetic data spores -->
   <g fill="#00ff55" filter="url(#bgGlow)">
-    <rect x="235" y="300" width="10" height="80" rx="5"/>
-    <rect x="640" y="250" width="20" height="120" rx="10"/>
-    <circle cx="935" cy="400" r="15"/>
-    <!-- Floating Data Spores -->
-    <circle cx="300" cy="400" r="4"/><circle cx="500" cy="500" r="3"/>
-    <circle cx="800" cy="300" r="5"/><circle cx="1100" cy="450" r="4"/>
+    <rect x="215" y="260" width="15" height="90" rx="7" fill="#00ffcc"/>
+    <rect x="620" y="200" width="25" height="140" rx="12" fill="#00ff55"/>
+    <circle cx="915" cy="350" r="18" fill="#00ffcc"/>
+
+    <!-- Code spores floating in forest -->
+    <circle cx="280" cy="360" r="5"/><circle cx="480" cy="460" r="4"/>
+    <circle cx="780" cy="260" r="6"/><circle cx="1080" cy="400" r="5"/>
   </g>
 
   </svg>

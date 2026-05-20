@@ -1,40 +1,101 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 120" width="140" height="120">
     <defs>
-      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="2.5" result="blur" />
-        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      <!-- High-Fidelity Filters -->
+      <filter id="cyanGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
       </filter>
-      <filter id="heavyGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="5" result="blur" />
-        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      <filter id="heavyCyanGlow" x="-80%" y="-80%" width="260%" height="260%">
+        <feGaussianBlur stdDeviation="6" result="blur1" />
+        <feGaussianBlur stdDeviation="2" result="blur2" />
+        <feMerge>
+          <feMergeNode in="blur1" />
+          <feMergeNode in="blur2" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
       </filter>
-      <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#3a3a4f"/>
-        <stop offset="50%" stop-color="#1e1e2f"/>
-        <stop offset="100%" stop-color="#0a0a14"/>
+      <filter id="pinkGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3.5" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <filter id="greenGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <filter id="orangeGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="4.5" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+
+      <!-- Advanced Cyber Gradients -->
+      <linearGradient id="cyberMetal" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#2a2a3e"/>
+        <stop offset="35%" stop-color="#1b1b26"/>
+        <stop offset="70%" stop-color="#0e0e16"/>
+        <stop offset="100%" stop-color="#050508"/>
       </linearGradient>
-      <linearGradient id="blade" x1="0%" y1="0%" x2="100%" y2="0%">
+      <linearGradient id="cyberMetalLight" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#4e4e6a"/>
+        <stop offset="50%" stop-color="#2a2a3c"/>
+        <stop offset="100%" stop-color="#14141e"/>
+      </linearGradient>
+      <linearGradient id="ninjaBlade" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%" stop-color="#ffffff"/>
-        <stop offset="100%" stop-color="#00ffff"/>
+        <stop offset="30%" stop-color="#dffffc"/>
+        <stop offset="75%" stop-color="#00ffff"/>
+        <stop offset="100%" stop-color="#0088cc"/>
       </linearGradient>
-      <linearGradient id="energy" x1="0%" y1="0%" x2="100%" y2="100%">
+      <linearGradient id="cyberScarf" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="#ff0055"/>
-        <stop offset="100%" stop-color="#ff9900"/>
+        <stop offset="45%" stop-color="#ff3300"/>
+        <stop offset="90%" stop-color="#ffcc00"/>
+      </linearGradient>
+      <linearGradient id="plasmaBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="50%" stop-color="#00ffff"/>
+        <stop offset="100%" stop-color="#0033aa"/>
+      </linearGradient>
+      <linearGradient id="heavyAxe" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ff3333"/>
+        <stop offset="50%" stop-color="#ff7700"/>
+        <stop offset="100%" stop-color="#550000"/>
+      </linearGradient>
+      <linearGradient id="ninjaGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#00ffcc"/>
+        <stop offset="60%" stop-color="#00ff55"/>
+        <stop offset="100%" stop-color="#003311"/>
       </linearGradient>
     </defs>
     
-  <path d="M 10 30 L 60 10 L 110 30 L 100 100 L 20 100 Z" fill="#1a0b12" stroke="#ffaa00" stroke-width="4"/>
-  <polygon points="60,10 40,-15 50,10" fill="#ffaa00"/>
-  <polygon points="60,10 80,-15 70,10" fill="#ffaa00"/>
-  <!-- Glowing eyes warning -->
-  <circle cx="48" cy="37" r="6" fill="#ffaa00" filter="url(#heavyGlow)"/>
-  <circle cx="72" cy="37" r="6" fill="#ffaa00" filter="url(#heavyGlow)"/>
-  <!-- Core charging -->
-  <circle cx="60" cy="70" r="20" fill="none" stroke="#ffaa00" stroke-width="3" filter="url(#heavyGlow)"/>
-  <circle cx="60" cy="70" r="12" fill="#ffaa00" filter="url(#heavyGlow)"/>
-  <circle cx="60" cy="70" r="5" fill="#fff"/>
-  <!-- Raised arms -->
-  <rect x="-15" y="10" width="30" height="50" rx="10" fill="#111" stroke="#ffaa00" stroke-width="3" transform="rotate(-30 0 35)"/>
-  <rect x="105" y="10" width="30" height="50" rx="10" fill="#111" stroke="#ffaa00" stroke-width="3" transform="rotate(30 120 35)"/>
+  <path d="M 8 26 L 60 6 L 112 26 L 102 98 L 18 98 Z" fill="#1c1206" stroke="#ffaa00" stroke-width="5"/>
+  
+  <!-- Visor overloaded warning yellow -->
+  <polygon points="42,32 54,36 50,42" fill="#ffaa00" filter="url(#orangeGlow)"/>
+  <polygon points="78,32 66,36 70,42" fill="#ffaa00" filter="url(#orangeGlow)"/>
+
+  <!-- Core charging yellow-hot -->
+  <circle cx="60" cy="66" r="28" fill="none" stroke="#ffaa00" stroke-width="4" stroke-dasharray="8 4" filter="url(#orangeGlow)"/>
+  <circle cx="60" cy="66" r="22" fill="url(#heavyAxe)" filter="url(#orangeGlow)"/>
+  <circle cx="60" cy="66" r="8" fill="#ffffff"/>
+
+  <!-- Power gathering grids -->
+  <path d="M 32 40 L 40 66 L 32 90" fill="none" stroke="#ffaa00" stroke-width="2" opacity="0.8"/>
+  <path d="M 88 40 L 80 66 L 88 90" fill="none" stroke="#ffaa00" stroke-width="2" opacity="0.8"/>
+
+  <!-- Hydraulic arms raised -->
+  <rect x="-20" y="8" width="30" height="52" rx="10" fill="#111" stroke="#ffaa00" stroke-width="3" transform="rotate(-26 0 32)"/>
+  <rect x="110" y="8" width="30" height="52" rx="10" fill="#111" stroke="#ffaa00" stroke-width="3" transform="rotate(26 120 32)"/>
 
   </svg>

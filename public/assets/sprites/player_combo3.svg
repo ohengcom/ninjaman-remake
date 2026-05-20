@@ -1,39 +1,95 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 80" width="110" height="80">
     <defs>
-      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="2.5" result="blur" />
-        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      <!-- High-Fidelity Filters -->
+      <filter id="cyanGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
       </filter>
-      <filter id="heavyGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="5" result="blur" />
-        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      <filter id="heavyCyanGlow" x="-80%" y="-80%" width="260%" height="260%">
+        <feGaussianBlur stdDeviation="6" result="blur1" />
+        <feGaussianBlur stdDeviation="2" result="blur2" />
+        <feMerge>
+          <feMergeNode in="blur1" />
+          <feMergeNode in="blur2" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
       </filter>
-      <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#3a3a4f"/>
-        <stop offset="50%" stop-color="#1e1e2f"/>
-        <stop offset="100%" stop-color="#0a0a14"/>
+      <filter id="pinkGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3.5" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <filter id="greenGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <filter id="orangeGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="4.5" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+
+      <!-- Advanced Cyber Gradients -->
+      <linearGradient id="cyberMetal" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#2a2a3e"/>
+        <stop offset="35%" stop-color="#1b1b26"/>
+        <stop offset="70%" stop-color="#0e0e16"/>
+        <stop offset="100%" stop-color="#050508"/>
       </linearGradient>
-      <linearGradient id="blade" x1="0%" y1="0%" x2="100%" y2="0%">
+      <linearGradient id="cyberMetalLight" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#4e4e6a"/>
+        <stop offset="50%" stop-color="#2a2a3c"/>
+        <stop offset="100%" stop-color="#14141e"/>
+      </linearGradient>
+      <linearGradient id="ninjaBlade" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%" stop-color="#ffffff"/>
-        <stop offset="100%" stop-color="#00ffff"/>
+        <stop offset="30%" stop-color="#dffffc"/>
+        <stop offset="75%" stop-color="#00ffff"/>
+        <stop offset="100%" stop-color="#0088cc"/>
       </linearGradient>
-      <linearGradient id="energy" x1="0%" y1="0%" x2="100%" y2="100%">
+      <linearGradient id="cyberScarf" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="#ff0055"/>
-        <stop offset="100%" stop-color="#ff9900"/>
+        <stop offset="45%" stop-color="#ff3300"/>
+        <stop offset="90%" stop-color="#ffcc00"/>
+      </linearGradient>
+      <linearGradient id="plasmaBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="50%" stop-color="#00ffff"/>
+        <stop offset="100%" stop-color="#0033aa"/>
+      </linearGradient>
+      <linearGradient id="heavyAxe" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ff3333"/>
+        <stop offset="50%" stop-color="#ff7700"/>
+        <stop offset="100%" stop-color="#550000"/>
+      </linearGradient>
+      <linearGradient id="ninjaGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#00ffcc"/>
+        <stop offset="60%" stop-color="#00ff55"/>
+        <stop offset="100%" stop-color="#003311"/>
       </linearGradient>
     </defs>
     
-  <!-- Circular spin trail -->
-  <path d="M 10 40 A 40 40 0 1 1 70 40" fill="none" stroke="#00ffff" stroke-width="8" filter="url(#heavyGlow)" opacity="0.6" stroke-linecap="round"/>
-  <path d="M 10 40 A 40 40 0 1 1 70 40" fill="none" stroke="#ffffff" stroke-width="3" filter="url(#glow)" opacity="0.8" stroke-linecap="round"/>
-  <!-- Body mid-spin -->
-  <g transform="rotate(180 40 40) translate(0, -5)">
-    <path d="M 25 22 L 55 22 L 50 55 L 30 55 Z" fill="url(#metal)" stroke="#e94560" stroke-width="1.5"/>
-    <circle cx="40" cy="38" r="5" fill="#e94560"/>
-    <path d="M 28 15 Q 40 -5 52 15 L 48 25 L 32 25 Z" fill="#0f0f15"/>
-    <path d="M 36 10 L 50 10 L 43 17 Z" fill="#e94560" filter="url(#glow)"/>
+  <!-- Full circular trace -->
+  <circle cx="40" cy="40" r="36" fill="none" stroke="url(#ninjaBlade)" stroke-width="8" filter="url(#heavyCyanGlow)" opacity="0.65" stroke-dasharray="140 80"/>
+  <circle cx="40" cy="40" r="36" fill="none" stroke="#ffffff" stroke-width="2.5" opacity="0.9" stroke-dasharray="100 120"/>
+
+  <!-- Body in extreme rotation spin -->
+  <g transform="rotate(180 40 40) translate(0, -4)">
+    <path d="M 22 22 L 50 22 L 44 52 L 26 52 Z" fill="url(#cyberMetal)" stroke="#ff0055" stroke-width="1.5"/>
+    <path d="M 24 14 Q 36 -6 48 14 Z" fill="#0f0f18"/>
+    <path d="M 30 10 L 36 15 L 42 10 Z" fill="#ff0055" filter="url(#pinkGlow)"/>
   </g>
-  <!-- Scarf whipping -->
-  <path d="M 40 25 Q 80 10 100 30 Q 80 20 50 30" fill="url(#energy)" filter="url(#glow)" opacity="0.9"/>
+  <!-- Scarf whipping outwards -->
+  <path d="M 38 22 C 75 8 96 26 102 32 C 84 18 52 24 44 26" fill="url(#cyberScarf)" filter="url(#pinkGlow)" opacity="0.9"/>
 
   </svg>

@@ -1,38 +1,99 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
     <defs>
-      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="2.5" result="blur" />
-        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      <!-- High-Fidelity Filters -->
+      <filter id="cyanGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
       </filter>
-      <filter id="heavyGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="5" result="blur" />
-        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      <filter id="heavyCyanGlow" x="-80%" y="-80%" width="260%" height="260%">
+        <feGaussianBlur stdDeviation="6" result="blur1" />
+        <feGaussianBlur stdDeviation="2" result="blur2" />
+        <feMerge>
+          <feMergeNode in="blur1" />
+          <feMergeNode in="blur2" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
       </filter>
-      <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#3a3a4f"/>
-        <stop offset="50%" stop-color="#1e1e2f"/>
-        <stop offset="100%" stop-color="#0a0a14"/>
+      <filter id="pinkGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3.5" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <filter id="greenGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <filter id="orangeGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="4.5" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+
+      <!-- Advanced Cyber Gradients -->
+      <linearGradient id="cyberMetal" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#2a2a3e"/>
+        <stop offset="35%" stop-color="#1b1b26"/>
+        <stop offset="70%" stop-color="#0e0e16"/>
+        <stop offset="100%" stop-color="#050508"/>
       </linearGradient>
-      <linearGradient id="blade" x1="0%" y1="0%" x2="100%" y2="0%">
+      <linearGradient id="cyberMetalLight" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#4e4e6a"/>
+        <stop offset="50%" stop-color="#2a2a3c"/>
+        <stop offset="100%" stop-color="#14141e"/>
+      </linearGradient>
+      <linearGradient id="ninjaBlade" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%" stop-color="#ffffff"/>
-        <stop offset="100%" stop-color="#00ffff"/>
+        <stop offset="30%" stop-color="#dffffc"/>
+        <stop offset="75%" stop-color="#00ffff"/>
+        <stop offset="100%" stop-color="#0088cc"/>
       </linearGradient>
-      <linearGradient id="energy" x1="0%" y1="0%" x2="100%" y2="100%">
+      <linearGradient id="cyberScarf" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="#ff0055"/>
-        <stop offset="100%" stop-color="#ff9900"/>
+        <stop offset="45%" stop-color="#ff3300"/>
+        <stop offset="90%" stop-color="#ffcc00"/>
+      </linearGradient>
+      <linearGradient id="plasmaBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="50%" stop-color="#00ffff"/>
+        <stop offset="100%" stop-color="#0033aa"/>
+      </linearGradient>
+      <linearGradient id="heavyAxe" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ff3333"/>
+        <stop offset="50%" stop-color="#ff7700"/>
+        <stop offset="100%" stop-color="#550000"/>
+      </linearGradient>
+      <linearGradient id="ninjaGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#00ffcc"/>
+        <stop offset="60%" stop-color="#00ff55"/>
+        <stop offset="100%" stop-color="#003311"/>
       </linearGradient>
     </defs>
     
-  <g transform="translate(0, -5)">
-    <!-- Scarf trailing straight down -->
-    <path d="M 35 25 Q 30 60 35 80 Q 45 55 45 25" fill="url(#energy)" filter="url(#glow)" opacity="0.8"/>
-    <!-- Tucked Body -->
-    <path d="M 25 20 L 55 20 L 45 45 L 35 45 Z" fill="url(#metal)" stroke="#00ffff" stroke-width="1.5"/>
-    <!-- Legs tucked -->
-    <path d="M 30 45 L 20 65 M 50 45 L 60 65" stroke="#ff0055" stroke-width="4" stroke-linecap="round"/>
-    <!-- Head -->
-    <path d="M 28 12 Q 40 -8 52 12 L 48 22 L 32 22 Z" fill="#0f0f15"/>
-    <path d="M 32 7 L 48 7 L 40 15 Z" fill="#00ffff" filter="url(#glow)"/>
+  <!-- Vertical scarf trail -->
+  <path d="M 40 20 C 35 48 30 72 25 95 C 45 70 48 45 42 20" fill="url(#cyberScarf)" filter="url(#pinkGlow)"/>
+  
+  <g transform="translate(0, -6)">
+    <!-- Tucked cyber-shell body -->
+    <path d="M 26 18 L 54 18 L 44 48 L 30 48 Z" fill="url(#cyberMetal)" stroke="#00ffff" stroke-width="1.5"/>
+    <polygon points="40,22 45,27 43,34 37,34 35,27" fill="#00ffff" filter="url(#cyanGlow)"/>
+    
+    <!-- Tucked legs -->
+    <path d="M 30 48 C 20 62 16 75 14 82" stroke="#ff0055" stroke-width="5" stroke-linecap="round" filter="url(#pinkGlow)"/>
+    <path d="M 44 48 C 54 62 58 75 60 82" stroke="#00ffff" stroke-width="5" stroke-linecap="round" filter="url(#cyanGlow)"/>
+    
+    <!-- Head tucked down -->
+    <path d="M 28 10 Q 40 -8 52 10 L 47 20 L 33 20 Z" fill="#0f0f18"/>
+    <path d="M 32 6 L 40 14 L 48 6 Z" fill="#00ffff" filter="url(#cyanGlow)"/>
   </g>
 
   </svg>

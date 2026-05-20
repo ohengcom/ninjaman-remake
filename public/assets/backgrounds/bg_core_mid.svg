@@ -1,35 +1,43 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
     <defs>
       <filter id="bgGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="4" result="blur" />
-        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        <feGaussianBlur stdDeviation="5" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
       </filter>
       <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00ffff" stroke-width="0.5" opacity="0.15"/>
+        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00ffff" stroke-width="0.75" opacity="0.12"/>
       </pattern>
       <linearGradient id="bgFade" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#05050a"/>
-        <stop offset="50%" stop-color="#151025"/>
-        <stop offset="100%" stop-color="#2a1b40"/>
+        <stop offset="0%" stop-color="#04030a"/>
+        <stop offset="40%" stop-color="#0f0c21"/>
+        <stop offset="85%" stop-color="#180e32"/>
+        <stop offset="100%" stop-color="#241245"/>
       </linearGradient>
     </defs>
     
-  <!-- Pipes -->
-  <g fill="#1a0005" stroke="#ff0055" stroke-width="4">
-    <rect x="280" y="0" width="120" height="720" />
-    <rect x="880" y="0" width="120" height="720" />
+  <!-- Power Pipes -->
+  <g fill="#140003" stroke="#ff0055" stroke-width="4.5">
+    <rect x="250" y="0" width="130" height="720" />
+    <rect x="900" y="0" width="130" height="720" />
   </g>
-  <!-- Main Core -->
-  <circle cx="640" cy="360" r="220" fill="#1a0005" stroke="#ff0055" stroke-width="15"/>
-  <circle cx="640" cy="360" r="180" fill="none" stroke="#ff9900" stroke-width="5" stroke-dasharray="20 10"/>
-  <circle cx="640" cy="360" r="120" fill="#ff0055" filter="url(#heavyGlow)" opacity="0.5"/>
-  <circle cx="640" cy="360" r="60" fill="#ffffff" filter="url(#heavyGlow)"/>
   
+  <!-- High Tech Central Fusion Core Engine -->
+  <circle cx="640" cy="360" r="230" fill="#140003" stroke="#ff0055" stroke-width="16"/>
+  <!-- Warning neon orange outer core ring -->
+  <circle cx="640" cy="360" r="190" fill="none" stroke="#ff9900" stroke-width="6" stroke-dasharray="30 15" filter="url(#bgGlow)"/>
+  <!-- Active plasma center (Extremely glowing) -->
+  <circle cx="640" cy="360" r="130" fill="url(#heavyAxe)" filter="url(#bgGlow)" opacity="0.6"/>
+  <circle cx="640" cy="360" r="70" fill="#ffffff" filter="url(#bgGlow)"/>
+  
+  <!-- Glowing warning terminals on midground towers -->
   <g fill="#ffffff" filter="url(#bgGlow)">
-    <rect x="320" y="100" width="40" height="40" rx="20"/>
-    <rect x="320" y="400" width="40" height="40" rx="20"/>
-    <rect x="920" y="200" width="40" height="40" rx="20"/>
-    <rect x="920" y="500" width="40" height="40" rx="20"/>
+    <rect x="295" y="100" width="40" height="40" rx="20" fill="#ff0055"/>
+    <rect x="295" y="420" width="40" height="40" rx="20" fill="#ff0055"/>
+    <rect x="945" y="200" width="40" height="40" rx="20" fill="#ff0055"/>
+    <rect x="945" y="520" width="40" height="40" rx="20" fill="#ff0055"/>
   </g>
 
   </svg>

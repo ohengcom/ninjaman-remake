@@ -1,39 +1,43 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
     <defs>
       <filter id="bgGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="4" result="blur" />
-        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        <feGaussianBlur stdDeviation="5" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
       </filter>
       <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00ffff" stroke-width="0.5" opacity="0.15"/>
+        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00ffff" stroke-width="0.75" opacity="0.12"/>
       </pattern>
       <linearGradient id="bgFade" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#05050a"/>
-        <stop offset="50%" stop-color="#151025"/>
-        <stop offset="100%" stop-color="#2a1b40"/>
+        <stop offset="0%" stop-color="#04030a"/>
+        <stop offset="40%" stop-color="#0f0c21"/>
+        <stop offset="85%" stop-color="#180e32"/>
+        <stop offset="100%" stop-color="#241245"/>
       </linearGradient>
     </defs>
     
   <rect width="1280" height="720" fill="url(#bgFade)"/>
-  <rect width="1280" height="720" fill="url(#grid)"/>
+  <rect width="1280" height="720" fill="url(#grid)" opacity="0.6"/>
   
-  <!-- Cyber Moon / Data Sun -->
-  <circle cx="1000" cy="200" r="120" fill="#e94560" filter="url(#bgGlow)" opacity="0.6"/>
-  <circle cx="1000" cy="200" r="100" fill="#ff0055" opacity="0.8"/>
-  <rect x="800" y="180" width="400" height="10" fill="#151025"/>
-  <rect x="850" y="220" width="300" height="15" fill="#151025"/>
-  <rect x="820" y="260" width="350" height="8" fill="#151025"/>
+  <!-- Giant Cyber Moon -->
+  <circle cx="1020" cy="180" r="110" fill="#ff0055" filter="url(#bgGlow)" opacity="0.55"/>
+  <circle cx="1020" cy="180" r="95" fill="url(#cyberScarf)" opacity="0.8"/>
+  <!-- Horizon Scanlines slicing the moon -->
+  <rect x="800" y="150" width="400" height="12" fill="#0f0c21"/>
+  <rect x="830" y="190" width="350" height="16" fill="#0f0c21"/>
+  <rect x="810" y="230" width="380" height="8" fill="#0f0c21"/>
 
-  <!-- Stars / Data Particles -->
+  <!-- High tech floating data spores -->
   <g fill="#00ffff" filter="url(#bgGlow)" opacity="0.7">
-    <circle cx="100" cy="80" r="2"/><circle cx="250" cy="150" r="3"/>
-    <circle cx="500" cy="100" r="2"/><circle cx="800" cy="60" r="1.5"/>
-    <circle cx="1150" cy="80" r="4"/><circle cx="350" cy="250" r="2"/>
-    <rect x="400" y="50" width="4" height="4" transform="rotate(45 402 52)"/>
-    <rect x="700" y="120" width="6" height="6" transform="rotate(45 703 123)"/>
+    <circle cx="120" cy="100" r="2.5"/><circle cx="280" cy="140" r="3.5"/>
+    <circle cx="530" cy="90" r="2"/><circle cx="780" cy="110" r="3"/>
+    <rect x="340" y="70" width="6" height="6" transform="rotate(45 343 73)"/>
+    <rect x="880" y="60" width="5" height="5" transform="rotate(45 882 62)"/>
   </g>
 
-  <!-- Distant Megastructures -->
-  <path d="M 0 500 L 80 400 L 120 400 L 160 450 L 250 350 L 300 350 L 340 420 L 450 300 L 520 300 L 580 380 L 700 280 L 760 280 L 850 400 L 1000 320 L 1080 320 L 1150 420 L 1280 350 L 1280 720 L 0 720 Z" fill="#0c0715" stroke="#3a1b40" stroke-width="2"/>
+  <!-- Distant Megastructures Skyline -->
+  <path d="M 0 530 L 100 440 L 150 440 L 180 470 L 290 360 L 360 360 L 400 410 L 520 290 L 610 290 L 680 370 L 810 260 L 880 260 L 960 370 L 1080 300 L 1160 300 L 1220 380 L 1280 310 L 1280 720 L 0 720 Z" fill="#090515" stroke="#33144a" stroke-width="2.5"/>
 
   </svg>

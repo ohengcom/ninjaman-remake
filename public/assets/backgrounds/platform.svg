@@ -1,34 +1,43 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
     <defs>
       <filter id="bgGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="4" result="blur" />
-        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        <feGaussianBlur stdDeviation="5" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
       </filter>
       <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00ffff" stroke-width="0.5" opacity="0.15"/>
+        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00ffff" stroke-width="0.75" opacity="0.12"/>
       </pattern>
       <linearGradient id="bgFade" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#05050a"/>
-        <stop offset="50%" stop-color="#151025"/>
-        <stop offset="100%" stop-color="#2a1b40"/>
+        <stop offset="0%" stop-color="#04030a"/>
+        <stop offset="40%" stop-color="#0f0c21"/>
+        <stop offset="85%" stop-color="#180e32"/>
+        <stop offset="100%" stop-color="#241245"/>
       </linearGradient>
     </defs>
     
-  <defs>
-    <linearGradient id="pGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#1f1f2e"/>
-      <stop offset="100%" stop-color="#0d0d16"/>
-    </linearGradient>
-  </defs>
-  <rect width="64" height="64" fill="url(#pGrad)" stroke="#0f3460" stroke-width="2"/>
-  <!-- Hexagon grid inside platform -->
-  <path d="M 0 16 L 64 16 M 0 32 L 64 32 M 0 48 L 64 48" stroke="#111" stroke-width="2"/>
-  <path d="M 16 0 L 16 64 M 32 0 L 32 64 M 48 0 L 48 64" stroke="#111" stroke-width="2"/>
-  <!-- Neon Edge Glow -->
-  <rect x="0" y="0" width="64" height="5" fill="#00ffff" filter="url(#bgGlow)"/>
+  <rect width="64" height="64" fill="url(#cyberMetal)" stroke="#1a1a2e" stroke-width="2.5"/>
+  
+  <!-- Hexagonal reinforcement pattern inside platform -->
+  <path d="M 0 16 L 64 16 M 0 32 L 64 32 M 0 48 L 64 48" stroke="#111" stroke-width="1.5"/>
+  <path d="M 16 0 L 16 64 M 32 0 L 32 64 M 48 0 L 48 64" stroke="#111" stroke-width="1.5"/>
+  
+  <!-- Diagonal braces for extra detail -->
+  <line x1="0" y1="16" x2="16" y2="0" stroke="#00ffff" stroke-width="0.5" opacity="0.3"/>
+  <line x1="48" y1="64" x2="64" y2="48" stroke="#00ffff" stroke-width="0.5" opacity="0.3"/>
+  <line x1="0" y1="48" x2="16" y2="64" stroke="#00ffff" stroke-width="0.5" opacity="0.3"/>
+  <line x1="48" y1="0" x2="64" y2="16" stroke="#00ffff" stroke-width="0.5" opacity="0.3"/>
+
+  <!-- Cyberpunk Top Edge Neon Glow -->
+  <rect x="0" y="0" width="64" height="6" fill="#00ffff" filter="url(#bgGlow)"/>
   <rect x="0" y="0" width="64" height="2" fill="#ffffff"/>
-  <!-- Rivets -->
-  <circle cx="8" cy="10" r="2" fill="#00ffff" filter="url(#bgGlow)"/>
-  <circle cx="56" cy="10" r="2" fill="#00ffff" filter="url(#bgGlow)"/>
+
+  <!-- Cyber rivets -->
+  <circle cx="8" cy="11" r="2.5" fill="#00ffff" filter="url(#bgGlow)"/>
+  <circle cx="56" cy="11" r="2.5" fill="#00ffff" filter="url(#bgGlow)"/>
+  <circle cx="8" cy="53" r="2" fill="#333"/>
+  <circle cx="56" cy="53" r="2" fill="#333"/>
 
   </svg>

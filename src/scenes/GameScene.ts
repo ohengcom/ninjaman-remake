@@ -42,11 +42,11 @@ export class GameScene extends Phaser.Scene {
     if (p) {
       const dir = attacker.flipX ? -1 : 1;
       p.fire(attacker.x + (20 * dir), attacker.y, dir, PROJECTILE_CONFIG.enemyBulletSpeed, damage, 'projectile');
-      SoundManager.playSwing();
+      SoundManager.playSwing(this.getPan(attacker.x));
     }
   };
   private readonly onPlayerCastWave = (player: Player) => {
-    SoundManager.playHadouken();
+    SoundManager.playHadouken(this.getPan(player.x));
     const wave = this.projectiles.get(player.x, player.y) as Projectile;
     if (wave) {
       const dir = player.flipX ? -1 : 1;
@@ -211,7 +211,7 @@ export class GameScene extends Phaser.Scene {
                  player.setVelocityX(dir * 50);
             } else {
                  player.takeDamage(proj.damage, dir);
-                 SoundManager.playDamage();
+                 SoundManager.playDamage(this.getPan(proj.x));
                  this.emitHitParticle(player.x, player.y, 5);
                  this.cameras.main.shake(200, 0.02);
             }
@@ -227,7 +227,7 @@ export class GameScene extends Phaser.Scene {
         if (proj.active && enemy.active && enemy.health > 0 && proj.texture.key === 'player_wave') {
             const dir = proj.body!.velocity.x > 0 ? 1 : -1;
             enemy.takeDamage(proj.damage, dir);
-            SoundManager.playHit();
+            SoundManager.playHit(this.getPan(enemy.x));
             this.emitHitParticle(enemy.x, enemy.y, 10);
             proj.hit(); // Consume wave
             if (enemy.health <= 0) {
@@ -245,7 +245,7 @@ export class GameScene extends Phaser.Scene {
             if (proj.active && boss.active && boss.health > 0 && proj.texture.key === 'player_wave') {
                 const dir = proj.body!.velocity.x > 0 ? 1 : -1;
                 boss.takeDamage(proj.damage * BOSS_STATS.damageMultiplier, dir);
-                SoundManager.playHit();
+                SoundManager.playHit(this.getPan(boss.x));
                 this.emitHitParticle(boss.x, boss.y, 15);
                 proj.hit();
                 this.incrementCombo();
@@ -380,7 +380,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private handleParry(defender: Player) {
-      SoundManager.playParry();
+      SoundManager.playParry(this.getPan(defender.x));
       this.cameras.main.shake(100, 0.01);
       const parryText = this.add.text(defender.x, defender.y - 40, 'PARRY!', {
           fontFamily: 'Impact', fontSize: '24px', color: '#00ffff'
@@ -425,6 +425,13 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.time.removeAllEvents();
+  }
+
+  public getPan(sourceX: number): number {
+    if (!this.player) return 0;
+    const dx = sourceX - this.player.x;
+    const halfWidth = this.cameras.main.width / 2;
+    return Phaser.Math.Clamp(dx / halfWidth, -1, 1);
   }
 
   private pauseGame() {

@@ -26,6 +26,7 @@ export class CombatManager {
     const attackRect = new Phaser.Geom.Rectangle(dir > 0 ? attacker.x : attacker.x - reach, attacker.y - attacker.height / 2, reach, attacker.height);
 
     let hitAnything = false;
+    let lastHitX = attacker.x;
 
     enemies.getChildren().forEach((obj) => {
       const enemy = obj as Enemy;
@@ -36,6 +37,7 @@ export class CombatManager {
       if (Phaser.Geom.Rectangle.Overlaps(attackRect, enemyRect)) {
         enemy.takeDamage(baseDamage, dir);
         hitAnything = true;
+        lastHitX = enemy.x;
         this.scene.emitHitParticle(enemy.x, enemy.y, 15);
         if (enemy.health <= 0) {
           this.scene.addScore(Math.floor(SCORE_CONFIG.enemyKill * this.scene.incrementCombo()));
@@ -48,20 +50,21 @@ export class CombatManager {
       if (Phaser.Geom.Rectangle.Overlaps(attackRect, bossRect)) {
         boss.takeDamage(baseDamage * BOSS_STATS.damageMultiplier, dir);
         hitAnything = true;
+        lastHitX = boss.x;
         this.scene.emitHitParticle(boss.x, boss.y, 25);
         this.scene.incrementCombo();
       }
     }
 
     if (hitAnything) {
-      SoundManager.playHit();
+      SoundManager.playHit(this.scene.getPan(lastHitX));
       this.scene.hitstop(60);
       this.scene.cameras.main.shake(150, 0.015);
       if (this.scene.getComboCount() > 1) {
         this.scene.showComboPopup(attacker.x + (50 * dir), attacker.y - 40);
       }
     } else if (type !== 'dive_land') {
-      SoundManager.playSwing();
+      SoundManager.playSwing(this.scene.getPan(attacker.x));
     }
   }
 
@@ -76,7 +79,7 @@ export class CombatManager {
       player.takeDamage(damage, dir);
       this.scene.events.emit('update_health', player.health, player.maxHealth);
       if (!player.isBlocking) {
-        SoundManager.playDamage();
+        SoundManager.playDamage(this.scene.getPan(attacker.x));
         this.scene.emitHitParticle(player.x, player.y, 5);
         this.scene.cameras.main.shake(200, 0.02);
       } else {
@@ -97,7 +100,7 @@ export class CombatManager {
       player.takeDamage(BOSS_STATS.attackDamage, dir);
       this.scene.events.emit('update_health', player.health, player.maxHealth);
       if (!player.isBlocking) {
-        SoundManager.playDamage();
+        SoundManager.playDamage(this.scene.getPan(attacker.x));
         this.scene.emitHitParticle(player.x, player.y, 20);
         this.scene.cameras.main.shake(300, 0.04);
       }

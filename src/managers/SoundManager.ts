@@ -8,7 +8,7 @@ export class SoundManager {
     public static init() {
         if (!this.ctx && this.enabled) {
             try {
-                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
                 this.ctx = new AudioContextClass();
             } catch (e) {
                 console.error("Web Audio API not supported", e);
@@ -32,7 +32,15 @@ export class SoundManager {
         }
     }
 
-    private static playSweep(type: OscillatorType, startFreq: number, endFreq: number, duration: number, vol: number = 0.1) {
+    private static playSweep(
+        type: OscillatorType,
+        startFreq: number,
+        endFreq: number,
+        duration: number,
+        vol: number = 0.1,
+        pan: number = 0,
+        adsr?: { attack?: number; decay?: number; sustain?: number; release?: number }
+    ) {
         if (!this.enabled || !this.ctx) return;
         
         const osc = this.ctx.createOscillator();
@@ -42,17 +50,35 @@ export class SoundManager {
         osc.frequency.setValueAtTime(startFreq, this.ctx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(endFreq, this.ctx.currentTime + duration);
         
-        gain.gain.setValueAtTime(vol, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+        // Dynamic ADSR Volume Envelope
+        const now = this.ctx.currentTime;
+        const a = (adsr?.attack ?? 0.05) * duration;
+        const d = (adsr?.decay ?? 0.15) * duration;
+        const s = adsr?.sustain ?? 0.6;
+        const r = (adsr?.release ?? 0.2) * duration;
+
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(vol, now + a);
+        gain.gain.exponentialRampToValueAtTime(vol * s, now + a + d);
+        
+        const releaseStart = now + duration - r;
+        gain.gain.setValueAtTime(vol * s, Math.max(now + a + d, releaseStart));
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
         
         osc.connect(gain);
-        gain.connect(this.ctx.destination);
         
-        osc.start();
-        osc.stop(this.ctx.currentTime + duration);
+        // Panning node
+        const panner = this.ctx.createStereoPanner();
+        panner.pan.setValueAtTime(pan, now);
+        
+        gain.connect(panner);
+        panner.connect(this.ctx.destination);
+        
+        osc.start(now);
+        osc.stop(now + duration);
     }
 
-    private static playNoise(duration: number, vol: number = 0.1) {
+    private static playNoise(duration: number, vol: number = 0.1, pan: number = 0) {
         if (!this.enabled || !this.ctx) return;
         
         const bufferSize = this.ctx.sampleRate * duration;
@@ -70,14 +96,101 @@ export class SoundManager {
         filter.frequency.value = 1000;
         
         const gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(vol, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+        
+        // Simplified ADSR envelope for noise bursts
+        const now = this.ctx.currentTime;
+        const a = 0.05 * duration;
+        const d = 0.15 * duration;
+        const s = 0.6;
+        const r = 0.3 * duration;
+
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(vol, now + a);
+        gain.gain.exponentialRampToValueAtTime(vol * s, now + a + d);
+        
+        const releaseStart = now + duration - r;
+        gain.gain.setValueAtTime(vol * s, Math.max(now + a + d, releaseStart));
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
         
         noise.connect(filter);
         filter.connect(gain);
-        gain.connect(this.ctx.destination);
         
-        noise.start();
+        // Panning node
+        const panner = this.ctx.createStereoPanner();
+        panner.pan.setValueAtTime(pan, now);
+        
+        gain.connect(panner);
+        panner.connect(this.ctx.destination);
+        
+        noise.start(now);
+        noise.stop(now + duration);
+    }
+
+    /** FM (Frequency Modulation) synthesis sweep for modern digital/futuristic sound effects */
+    private static playFMSweep(
+        carrierType: OscillatorType,
+        modulatorType: OscillatorType,
+        carrierFreq: number,
+        modulatorFreq: number,
+        modulationIndex: number,
+        duration: number,
+        vol: number = 0.1,
+        pan: number = 0,
+        adsr?: { attack?: number; decay?: number; sustain?: number; release?: number }
+    ) {
+        if (!this.enabled || !this.ctx) return;
+
+        const carrier = this.ctx.createOscillator();
+        const modulator = this.ctx.createOscillator();
+        const modGain = this.ctx.createGain();
+        const mainGain = this.ctx.createGain();
+
+        carrier.type = carrierType;
+        carrier.frequency.setValueAtTime(carrierFreq, this.ctx.currentTime);
+
+        modulator.type = modulatorType;
+        modulator.frequency.setValueAtTime(modulatorFreq, this.ctx.currentTime);
+
+        modGain.gain.setValueAtTime(modulationIndex, this.ctx.currentTime);
+
+        // Cyber frequency sweeps
+        carrier.frequency.exponentialRampToValueAtTime(carrierFreq * 0.2, this.ctx.currentTime + duration);
+        modulator.frequency.exponentialRampToValueAtTime(modulatorFreq * 0.5, this.ctx.currentTime + duration);
+
+        // Apply ADSR envelope to mainGain
+        const now = this.ctx.currentTime;
+        const a = (adsr?.attack ?? 0.05) * duration;
+        const d = (adsr?.decay ?? 0.15) * duration;
+        const s = adsr?.sustain ?? 0.5;
+        const r = (adsr?.release ?? 0.2) * duration;
+
+        mainGain.gain.setValueAtTime(0, now);
+        mainGain.gain.linearRampToValueAtTime(vol, now + a);
+        mainGain.gain.exponentialRampToValueAtTime(vol * s, now + a + d);
+        
+        const releaseStart = now + duration - r;
+        mainGain.gain.setValueAtTime(vol * s, Math.max(now + a + d, releaseStart));
+        mainGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+        // Connect modulator to modulator gain, and connect modulator gain to carrier frequency
+        modulator.connect(modGain);
+        modGain.connect(carrier.frequency);
+
+        carrier.connect(mainGain);
+
+        // Panning node
+        const panner = this.ctx.createStereoPanner();
+        panner.pan.setValueAtTime(pan, now);
+        
+        mainGain.connect(panner);
+        panner.connect(this.ctx.destination);
+
+        // Start both oscillators
+        modulator.start(now);
+        carrier.start(now);
+
+        modulator.stop(now + duration);
+        carrier.stop(now + duration);
     }
 
     // --- Procedural BGM ---
@@ -88,7 +201,10 @@ export class SoundManager {
         
         this.isBGMPlaying = true;
         this.bgmGain = this.ctx.createGain();
-        this.bgmGain.gain.value = 0.05; // Low volume for BGM
+        
+        // Smooth BGM fade-in to prevent pops
+        this.bgmGain.gain.setValueAtTime(0, this.ctx.currentTime);
+        this.bgmGain.gain.linearRampToValueAtTime(0.05, this.ctx.currentTime + 1.5);
         this.bgmGain.connect(this.ctx.destination);
 
         const baseFreq = level === 3 ? 65 : (level === 2 ? 82 : 55); // Different root note per sector
@@ -145,41 +261,49 @@ export class SoundManager {
 
     // --- Specific Sound Effects ---
 
-    public static playJump() {
-        this.playSweep('square', 150, 400, 0.2, 0.05);
+    public static playJump(pan: number = 0) {
+        // Crisp, clean rising jump sweep
+        this.playSweep('triangle', 180, 480, 0.18, 0.06, pan, { attack: 0.05, decay: 0.1, sustain: 0.6 });
     }
 
-    public static playDash() {
-        this.playNoise(0.3, 0.15);
-        this.playSweep('sine', 400, 100, 0.3, 0.1);
+    public static playDash(pan: number = 0) {
+        // Sleek plasma rush: noisy swoosh overlaid with metallic FM sweep
+        this.playNoise(0.24, 0.08, pan);
+        this.playFMSweep('sawtooth', 'square', 320, 100, 300, 0.22, 0.06, pan, { attack: 0.08, decay: 0.15, sustain: 0.4 });
     }
 
-    public static playSwing() {
-        this.playNoise(0.1, 0.05);
-        this.playSweep('triangle', 600, 200, 0.1, 0.1);
+    public static playSwing(pan: number = 0) {
+        // Saber swing sound: high-tech slash swoosh
+        this.playNoise(0.08, 0.03, pan);
+        this.playFMSweep('triangle', 'sawtooth', 720, 180, 400, 0.1, 0.05, pan, { attack: 0.05, decay: 0.15, sustain: 0.5 });
     }
 
-    public static playHit() {
-        this.playNoise(0.15, 0.2);
-        this.playSweep('sawtooth', 200, 50, 0.15, 0.2);
+    public static playHit(pan: number = 0) {
+        // Cyber slice hit impact: metal clashing shockwave
+        this.playNoise(0.12, 0.12, pan);
+        this.playFMSweep('sawtooth', 'square', 380, 750, 800, 0.18, 0.12, pan, { attack: 0.02, decay: 0.2, sustain: 0.3 });
     }
 
-    public static playParry() {
-        this.playSweep('sine', 1200, 2000, 0.1, 0.3);
-        this.playSweep('square', 800, 1600, 0.1, 0.1);
+    public static playParry(pan: number = 0) {
+        // Energy shield deflection: high-pitched digital laser deflect
+        this.playFMSweep('sine', 'triangle', 1500, 2200, 1000, 0.16, 0.14, pan, { attack: 0.01, decay: 0.08, sustain: 0.6 });
+        this.playSweep('square', 800, 1600, 0.12, 0.05, pan, { attack: 0.02, decay: 0.1, sustain: 0.4 });
     }
 
-    public static playDamage() {
-        this.playNoise(0.3, 0.3);
-        this.playSweep('sawtooth', 150, 40, 0.3, 0.3);
+    public static playDamage(pan: number = 0) {
+        // Cybernetic frame disruption alert: glitchy digital warning
+        this.playNoise(0.28, 0.18, pan);
+        this.playFMSweep('square', 'sawtooth', 160, 44, 1000, 0.3, 0.16, pan, { attack: 0.04, decay: 0.18, sustain: 0.5 });
     }
 
-    public static playHadouken() {
-        this.playSweep('sawtooth', 300, 800, 0.3, 0.1);
-        this.playNoise(0.2, 0.1);
+    public static playHadouken(pan: number = 0) {
+        // Plasma wave charge & release: growing sweep followed by electric release noise
+        this.playFMSweep('sawtooth', 'sine', 200, 600, 500, 0.36, 0.08, pan, { attack: 0.18, decay: 0.15, sustain: 0.6 });
+        this.playNoise(0.18, 0.06, pan);
     }
 
     public static playMenuBlip() {
-        this.playSweep('square', 800, 900, 0.05, 0.05);
+        // Ultra crisp high-frequency synth click
+        this.playSweep('sine', 1100, 1200, 0.04, 0.05, 0, { attack: 0.01, decay: 0.03, sustain: 0.5 });
     }
 }

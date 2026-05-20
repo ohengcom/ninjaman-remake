@@ -1,6 +1,11 @@
 import Phaser from 'phaser';
 
 export class GameOverScene extends Phaser.Scene {
+  private domGameOverOverlay: HTMLElement | null = null;
+  private domGameOverTitle: HTMLElement | null = null;
+  private domGameOverScore: HTMLElement | null = null;
+  private domBtnRestart: HTMLElement | null = null;
+
   constructor() {
     super({ key: 'GameOverScene' });
   }
@@ -11,35 +16,62 @@ export class GameOverScene extends Phaser.Scene {
   }
 
   create() {
-    const w = this.cameras.main.width;
-    const h = this.cameras.main.height;
     const isWin = this.registry.get('win');
+    const score = this.registry.get('score');
 
     this.cameras.main.fadeIn(500, 0, 0, 0);
 
-    this.add.text(w / 2, h / 2 - 100, isWin ? 'MISSION ACCOMPLISHED' : 'SYSTEM FAILURE', {
-      fontFamily: 'Impact, sans-serif',
-      fontSize: '80px',
-      color: isWin ? '#00ffff' : '#ff0000',
-      stroke: '#000000',
-      strokeThickness: 8
-    }).setOrigin(0.5);
+    // Cache and configure DOM Elements
+    this.domGameOverOverlay = document.getElementById('menu-gameover-overlay');
+    this.domGameOverTitle = document.getElementById('gameover-title');
+    this.domGameOverScore = document.getElementById('gameover-score');
+    this.domBtnRestart = document.getElementById('btn-restart-game');
 
-    const score = this.registry.get('score');
-    this.add.text(w / 2, h / 2 + 20, `FINAL SCORE: ${score}`, {
-      fontFamily: 'Arial',
-      fontSize: '40px',
-      color: '#ffffff'
-    }).setOrigin(0.5);
+    if (this.domGameOverTitle) {
+      if (isWin) {
+        this.domGameOverTitle.innerText = 'SECTOR SECURED';
+        this.domGameOverTitle.classList.add('win');
+      } else {
+        this.domGameOverTitle.innerText = 'SECTOR COMPROMISED';
+        this.domGameOverTitle.classList.remove('win');
+      }
+    }
 
-    this.add.text(w / 2, h / 2 + 120, 'PRESS SPACE TO REBOOT', {
-      fontFamily: 'Arial',
-      fontSize: '28px',
-      color: '#aaaaaa'
-    }).setOrigin(0.5);
+    if (this.domGameOverScore) {
+      this.domGameOverScore.innerText = score.toString();
+    }
+
+    if (this.domGameOverOverlay) {
+      this.domGameOverOverlay.style.display = 'flex';
+    }
+
+    if (this.domBtnRestart) {
+      this.domBtnRestart.onclick = (e) => {
+        e.stopPropagation();
+        this.restartGame();
+      };
+    }
 
     this.input.keyboard!.once('keydown-SPACE', () => {
-      this.scene.start('GameScene', { level: 1, score: 0 });
+      this.restartGame();
     });
+
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup, this);
+  }
+
+  private restartGame() {
+    if (this.domGameOverOverlay) {
+      this.domGameOverOverlay.style.display = 'none';
+    }
+    this.scene.start('GameScene', { level: 1, score: 0 });
+  }
+
+  private cleanup() {
+    if (this.domGameOverOverlay) {
+      this.domGameOverOverlay.style.display = 'none';
+    }
+    if (this.domBtnRestart) {
+      this.domBtnRestart.onclick = null;
+    }
   }
 }
