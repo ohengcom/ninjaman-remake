@@ -601,8 +601,7 @@
         <!-- Footer HUD: Keyboard controllers & procedurally generated Sound switches -->
         <footer class="hud-footer">
           <div class="controls-guide">
-            Move <kbd>Arrows</kbd> &nbsp;&middot;&nbsp; Dash <kbd>Double-Tap</kbd> &nbsp;&middot;&nbsp; Jump <kbd>Up</kbd> &nbsp;&middot;&nbsp;
-            Attack <kbd>Space</kbd> &nbsp;&middot;&nbsp; Wave <kbd>&darr;</kbd> <kbd>&rarr;</kbd> <kbd>Space</kbd> &nbsp;&middot;&nbsp; Defend <kbd>&darr;</kbd> &nbsp;&middot;&nbsp; Menu <kbd>K</kbd>
+            Move <kbd>A</kbd>/<kbd>S</kbd>/<kbd>D</kbd>/<kbd>W</kbd> &nbsp;&middot;&nbsp; Jump <kbd>Space</kbd> &nbsp;&middot;&nbsp; Attack <kbd>J</kbd> &nbsp;&middot;&nbsp; Defend <kbd>K</kbd> &nbsp;&middot;&nbsp; Wave <kbd>L</kbd> &nbsp;&middot;&nbsp; Dash <kbd>Double-Tap</kbd>
           </div>
           <div id="hud-sound-toggle" class="sound-indicator interactive" onclick="window.toggleHUDGameSound()">
             SOUND: <span id="hud-sound-status">OFF</span>
@@ -611,37 +610,11 @@
 
       </div>
 
-      <!-- INTERACTIVE OVERLAY: CYBER ENHANCEMENTS (SKILL UPGRADE TERMINAL) -->
-      <div id="menu-skill-overlay" class="fullscreen-overlay interactive">
-        <div class="terminal-panel">
-          <h2 class="terminal-title">CYBER ENHANCEMENTS</h2>
-          <div id="menu-sp-text" class="terminal-sp">SKILL POINTS: 0</div>
-          <div id="menu-hp-text" class="terminal-hp-status">MAX INTEGRITY: 100</div>
-
-          <nav class="skill-list" aria-label="Cyber enhancements skills list">
-            <button id="btn-upgrade-hp" class="skill-btn cost-hp">
-              <span>[CLICK] MAX INTEGRITY +20</span>
-              <span>1 SP</span>
-            </button>
-            <button id="btn-upgrade-combo" class="skill-btn cost-combo">
-              <span>[CLICK] COMBO LV 2 (3 Hits)</span>
-              <span>2 SP</span>
-            </button>
-            <button id="btn-upgrade-dash" class="skill-btn cost-dash">
-              <span>[CLICK] DASH INVINCIBILITY</span>
-              <span>3 SP</span>
-            </button>
-          </nav>
-
-          <p class="close-panel-tip">PRESS [K] OR CLICK TO EXIT ENHANCEMENTS</p>
-        </div>
-      </div>
-
       <!-- INTERACTIVE OVERLAY: SYSTEM PAUSED -->
       <div id="menu-pause-overlay" class="fullscreen-overlay">
         <div class="pause-panel">
           <h2 class="pause-title">SYSTEM PAUSED</h2>
-          <p class="close-panel-tip" style="margin-top: 15px;">PRESS [ESC] OR [P] TO RESUME ACTION</p>
+          <p class="close-panel-tip" style="margin-top: 15px;">PRESS [ESC] TO RESUME ACTION</p>
         </div>
       </div>
 

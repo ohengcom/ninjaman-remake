@@ -1,13 +1,14 @@
 import Phaser from 'phaser';
 import { StateMachine } from '../utils/StateMachine.js';
 import { SoundManager } from '../managers/SoundManager.js';
-import { SaveManager } from '../managers/SaveManager.js';
 import { PLAYER_MOVEMENT, PLAYER_ATTACKS, PLAYER_DEFENSE } from '../config/combat.js';
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
   public stateMachine: StateMachine<Player>;
   public cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   public attackKey!: Phaser.Input.Keyboard.Key;
+  public defendKey!: Phaser.Input.Keyboard.Key;
+  public waveKey!: Phaser.Input.Keyboard.Key;
   private pad: Phaser.Input.Gamepad.Gamepad | null = null;
   
   public health: number = 100;
@@ -37,8 +38,18 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.body!.setSize(30, 40);
     this.body!.setOffset(25, 20);
 
-    this.cursors = scene.input.keyboard!.createCursorKeys();
-    this.attackKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    // Set keys to A, S, D, W, SPACE
+    this.cursors = scene.input.keyboard!.addKeys({
+      up: Phaser.Input.Keyboard.KeyCodes.W,
+      down: Phaser.Input.Keyboard.KeyCodes.S,
+      left: Phaser.Input.Keyboard.KeyCodes.A,
+      right: Phaser.Input.Keyboard.KeyCodes.D,
+      space: Phaser.Input.Keyboard.KeyCodes.SPACE
+    }) as any;
+
+    this.attackKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.J);
+    this.defendKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.K);
+    this.waveKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.L);
 
     // Gamepad support
     if (scene.input.gamepad) {
@@ -102,20 +113,28 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private checkAttackInput(): string | null {
     const time = this.scene.time.now;
 
+    // Direct check for Wave Key (L) for one-button special move
+    if (Phaser.Input.Keyboard.JustDown(this.waveKey) || (this.pad && this.pad.X)) {
+      if (time - this.lastWaveTime > PLAYER_ATTACKS.wave.cooldown) {
+        this.lastWaveTime = time;
+        return 'attack_wave';
+      }
+    }
+
     if (!this.isAttackJustDown()) return null;
 
     // Check for Hadouken motion: Down -> Forward -> Attack
     const forwardKey = this.flipX ? 'left' : 'right';
     if (time - this.lastWaveTime > PLAYER_ATTACKS.wave.cooldown && this.checkMotionInput(['down', forwardKey])) {
-       this.lastWaveTime = time;
-       return 'attack_wave';
+        this.lastWaveTime = time;
+        return 'attack_wave';
     }
     
     if (this.isUpDown()) return 'attack_uppercut';
     if (!this.body!.touching.down && this.isDownDown()) return 'attack_dive';
     
-    // Combo logic
-    const maxComboHits = SaveManager.load().comboLevel + 1; // Level 1 = 2 hits, Level 2 = 3 hits, Level 3 = 4 hits
+    // Combo logic: Always enable full 4-stage combo now that upgrade menu is removed
+    const maxComboHits = 4;
 
     if (time - this.lastAttackTime < PLAYER_MOVEMENT.comboWindow) {
       this.comboStep = (this.comboStep + 1) % maxComboHits;
@@ -131,7 +150,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       p.stateMachine.setState('dash');
       return true;
     }
-    if (p.isDownDown() && p.body!.touching.down) {
+    if (p.isDefendDown() && p.body!.touching.down) {
       p.stateMachine.setState('defend');
       return true;
     }
@@ -140,7 +159,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       p.stateMachine.setState(attackState);
       return true;
     }
-    if ((Phaser.Input.Keyboard.JustDown(p.cursors.up) || (p.pad && p.pad.A)) && p.jumpCount === 0) {
+    // Jump with independent Space key, allow single & double jumps
+    if (Phaser.Input.Keyboard.JustDown(p.cursors.space) || (p.pad && p.pad.A)) {
       const now = p.scene.time.now;
       const isGroundedOrCoyote = p.body!.touching.down || (now - p.lastGroundedTime < PLAYER_MOVEMENT.coyoteTime);
       if (isGroundedOrCoyote && p.jumpCount === 0) {
@@ -219,9 +239,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           p.setTexture('player_dash');
           p.setVelocityX(p.dashDir * PLAYER_MOVEMENT.dashSpeed);
           
-          if (SaveManager.load().dashInvincible) {
-             p.isInvulnerable = true;
-          }
+          // Dash grants invincibility frames by default now that upgrade menu is removed
+          p.isInvulnerable = true;
 
           p.scene.time.delayedCall(PLAYER_MOVEMENT.dashDuration, () => {
              if (p.health > 0) p.stateMachine.setState('idle');
@@ -237,7 +256,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           p.isBlocking = true;
         },
         onUpdate: (p) => {
-          if (!p.isDownDown()) p.stateMachine.setState('idle');
+          if (!p.isDefendDown()) p.stateMachine.setState('idle');
         },
         onExit: (p) => { p.isBlocking = false; }
       })
@@ -431,6 +450,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private isAttackJustDown(): boolean {
     if (Phaser.Input.Keyboard.JustDown(this.attackKey)) return true;
     if (this.pad && this.pad.A) return true;
+    return false;
+  }
+
+  private isDefendDown(): boolean {
+    if (this.defendKey.isDown) return true;
+    if (this.pad && this.pad.B) return true;
     return false;
   }
 

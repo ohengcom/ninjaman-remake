@@ -197,7 +197,6 @@ export class GameScene extends Phaser.Scene {
 
     // Pause support
     this.input.keyboard!.on('keydown-ESC', this.pauseGame, this);
-    this.input.keyboard!.on('keydown-P', this.pauseGame, this);
 
     this.physics.add.overlap(this.projectiles, this.player, (playerObj, projObj) => {
         const proj = projObj as Projectile;
@@ -414,7 +413,6 @@ export class GameScene extends Phaser.Scene {
     this.events.off('enemy_shoot', this.onEnemyShoot);
     this.events.off('player_cast_wave', this.onPlayerCastWave);
     this.input.keyboard?.off('keydown-ESC', this.pauseGame, this);
-    this.input.keyboard?.off('keydown-P', this.pauseGame, this);
 
     SoundManager.stopBGM();
 

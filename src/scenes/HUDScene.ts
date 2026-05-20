@@ -11,7 +11,6 @@ export class HUDScene extends Phaser.Scene {
   private currentScore: number = 0;
   private currentLevel: number = 1;
   private gameScene!: GameScene;
-  private isSkillMenuOpen: boolean = false;
 
   // DOM Elements
   private domIntegrityBar: HTMLElement | null = null;
@@ -22,12 +21,6 @@ export class HUDScene extends Phaser.Scene {
   private domStyleLetter: HTMLElement | null = null;
   private domSoundStatus: HTMLElement | null = null;
   private domSoundToggle: HTMLElement | null = null;
-  private domSkillOverlay: HTMLElement | null = null;
-  private domSpText: HTMLElement | null = null;
-  private domHpText: HTMLElement | null = null;
-  private domBtnUpgradeHp: HTMLElement | null = null;
-  private domBtnUpgradeCombo: HTMLElement | null = null;
-  private domBtnUpgradeDash: HTMLElement | null = null;
 
   private readonly onUpdateHealth = (health: number, max: number) => {
     this.currentHealth = health;
@@ -36,18 +29,10 @@ export class HUDScene extends Phaser.Scene {
   };
 
   private readonly onUpdateScore = (score: number) => {
-    const diff = score - this.currentScore;
     this.currentScore = score;
     
     if (this.domScoreValue) {
       this.domScoreValue.innerText = this.currentScore.toString();
-    }
-    
-    if (diff > 0 && diff % 500 === 0) {
-      SaveManager.addSP(1); // Give skill points for milestones
-      if (this.isSkillMenuOpen) {
-        this.refreshMenuData();
-      }
     }
   };
 
@@ -82,22 +67,6 @@ export class HUDScene extends Phaser.Scene {
     }
   };
 
-  private readonly onToggleSkillMenu = () => {
-    SoundManager.playMenuBlip();
-    this.isSkillMenuOpen = !this.isSkillMenuOpen;
-    
-    if (this.domSkillOverlay) {
-      this.domSkillOverlay.style.display = this.isSkillMenuOpen ? 'flex' : 'none';
-    }
-    
-    if (this.isSkillMenuOpen) {
-      this.refreshMenuData();
-      this.gameScene.scene.pause();
-    } else {
-      this.gameScene.scene.resume();
-    }
-  };
-
   private readonly onToggleSound = () => {
     SoundManager.toggle(this.currentLevel);
     this.updateSoundDisplay();
@@ -120,46 +89,11 @@ export class HUDScene extends Phaser.Scene {
     this.domStyleLetter = document.getElementById('hud-style-letter');
     this.domSoundStatus = document.getElementById('hud-sound-status');
     this.domSoundToggle = document.getElementById('hud-sound-toggle');
-    this.domSkillOverlay = document.getElementById('menu-skill-overlay');
-    this.domSpText = document.getElementById('menu-sp-text');
-    this.domHpText = document.getElementById('menu-hp-text');
-    this.domBtnUpgradeHp = document.getElementById('btn-upgrade-hp');
-    this.domBtnUpgradeCombo = document.getElementById('btn-upgrade-combo');
-    this.domBtnUpgradeDash = document.getElementById('btn-upgrade-dash');
 
     // Register global listener for DOM sound toggle
     (window as any).toggleHUDGameSound = () => {
       this.onToggleSound();
     };
-
-    // Bind skill upgrades
-    if (this.domBtnUpgradeHp) {
-      this.domBtnUpgradeHp.onclick = (e) => {
-        e.stopPropagation();
-        this.handleUpgradeHp();
-      };
-    }
-    if (this.domBtnUpgradeCombo) {
-      this.domBtnUpgradeCombo.onclick = (e) => {
-        e.stopPropagation();
-        this.handleUpgradeCombo();
-      };
-    }
-    if (this.domBtnUpgradeDash) {
-      this.domBtnUpgradeDash.onclick = (e) => {
-        e.stopPropagation();
-        this.handleUpgradeDash();
-      };
-    }
-
-    // Bind click outside to close skill menu
-    if (this.domSkillOverlay) {
-      this.domSkillOverlay.onclick = (e) => {
-        if (e.target === this.domSkillOverlay) {
-          this.onToggleSkillMenu();
-        }
-      };
-    }
 
     // Set initial display
     const sd = SaveManager.load();
@@ -188,8 +122,7 @@ export class HUDScene extends Phaser.Scene {
     this.gameScene.events.on('update_style', this.onUpdateStyle);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup, this);
 
-    this.input.keyboard!.on('keydown-K', this.onToggleSkillMenu);
-    this.input.keyboard!.on('keydown-M', this.onToggleSound);
+    this.input.keyboard!.on('keydown-Y', this.onToggleSound);
   }
 
   private updateDOMHealth() {
@@ -222,85 +155,7 @@ export class HUDScene extends Phaser.Scene {
     }
   }
 
-  private refreshMenuData() {
-    const sd = SaveManager.load();
-    if (this.domSpText) this.domSpText.innerText = `SKILL POINTS: ${sd.sp}`;
-    if (this.domHpText) this.domHpText.innerText = `MAX INTEGRITY: ${sd.maxHealth}`;
-
-    if (this.domBtnUpgradeHp) {
-      // HP can be upgraded indefinitely
-      this.domBtnUpgradeHp.innerHTML = `<span>[CLICK] MAX INTEGRITY +20</span><span>1 SP</span>`;
-    }
-
-    if (this.domBtnUpgradeCombo) {
-      if (sd.comboLevel >= 3) {
-        this.domBtnUpgradeCombo.classList.add('maxed');
-        this.domBtnUpgradeCombo.innerHTML = `<span>COMBO LV.MAX (4 Hits)</span><span>MAXED</span>`;
-      } else {
-        this.domBtnUpgradeCombo.classList.remove('maxed');
-        const nextLevel = sd.comboLevel + 1;
-        const nextHits = sd.comboLevel + 2;
-        this.domBtnUpgradeCombo.innerHTML = `<span>[CLICK] COMBO LV ${nextLevel} (${nextHits} Hits)</span><span>2 SP</span>`;
-      }
-    }
-
-    if (this.domBtnUpgradeDash) {
-      if (sd.dashInvincible) {
-        this.domBtnUpgradeDash.classList.add('maxed');
-        this.domBtnUpgradeDash.innerHTML = `<span>DASH INVINCIBILITY (MAXED)</span><span>MAXED</span>`;
-      } else {
-        this.domBtnUpgradeDash.classList.remove('maxed');
-        this.domBtnUpgradeDash.innerHTML = `<span>[CLICK] DASH INVINCIBILITY</span><span>3 SP</span>`;
-      }
-    }
-  }
-
-  private handleUpgradeHp() {
-    if (SaveManager.upgradeHealth(20, 1)) {
-      SoundManager.playMenuBlip();
-      const sd = SaveManager.load();
-      this.maxHealth = sd.maxHealth;
-      this.currentHealth = this.maxHealth; // Heal fully on upgrade
-      this.updateDOMHealth();
-      this.gameScene.upgradePlayerHealth(this.maxHealth);
-      this.refreshMenuData();
-    } else {
-      this.shakeButton(this.domBtnUpgradeHp);
-    }
-  }
-
-  private handleUpgradeCombo() {
-    if (SaveManager.upgradeCombo(2)) {
-      SoundManager.playMenuBlip();
-      this.refreshMenuData();
-    } else {
-      this.shakeButton(this.domBtnUpgradeCombo);
-    }
-  }
-
-  private handleUpgradeDash() {
-    if (SaveManager.unlockDashInvincibility(3)) {
-      SoundManager.playMenuBlip();
-      this.refreshMenuData();
-    } else {
-      this.shakeButton(this.domBtnUpgradeDash);
-    }
-  }
-
-  private shakeButton(btn: HTMLElement | null) {
-    if (!btn) return;
-    btn.classList.add('shake');
-    this.time.delayedCall(400, () => {
-      btn.classList.remove('shake');
-    });
-  }
-
   private cleanup() {
-    // Hide overlay if open on exit
-    if (this.domSkillOverlay) {
-      this.domSkillOverlay.style.display = 'none';
-    }
-    
     // Clear global function
     (window as any).toggleHUDGameSound = undefined;
 
@@ -309,8 +164,7 @@ export class HUDScene extends Phaser.Scene {
     this.gameScene.events.off('update_score', this.onUpdateScore);
     this.gameScene.events.off('update_level', this.onUpdateLevel);
     this.gameScene.events.off('update_style', this.onUpdateStyle);
-    this.input.keyboard?.off('keydown-K', this.onToggleSkillMenu);
-    this.input.keyboard?.off('keydown-M', this.onToggleSound);
+    this.input.keyboard?.off('keydown-Y', this.onToggleSound);
   }
 
   update() {
