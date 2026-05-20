@@ -6,20 +6,22 @@ export class BootScene extends Phaser.Scene {
   }
 
   preload(): void {
-    // Load Modern Vector SVGs
-    this.load.svg('player_idle', 'assets/sprites/player_idle.svg?v=2');
-    this.load.svg('player_run', 'assets/sprites/player_run.svg?v=2');
-    this.load.svg('player_jump', 'assets/sprites/player_jump.svg?v=2');
-    this.load.svg('player_attack', 'assets/sprites/player_attack.svg?v=2');
-    this.load.svg('player_combo1', 'assets/sprites/player_combo1.svg?v=2');
-    this.load.svg('player_combo2', 'assets/sprites/player_combo2.svg?v=2');
-    this.load.svg('player_combo3', 'assets/sprites/player_combo3.svg?v=2');
-    this.load.svg('player_combo4', 'assets/sprites/player_combo4.svg?v=2');
-    this.load.svg('player_dash', 'assets/sprites/player_dash.svg?v=2');
-    this.load.svg('player_defend', 'assets/sprites/player_defend.svg?v=2');
-    this.load.svg('player_uppercut', 'assets/sprites/player_uppercut.svg?v=2');
-    this.load.svg('player_dive', 'assets/sprites/player_dive.svg?v=2');
-    this.load.svg('player_cast', 'assets/sprites/player_cast.svg?v=2');
+    // Load Player high-quality Ninja Sprite
+    this.load.image('ninja_sprite', 'assets/sprites/ninja.png');
+    // Map all player states to the high-quality sprite for now
+    this.load.image('player_idle', 'assets/sprites/ninja.png');
+    this.load.image('player_run', 'assets/sprites/ninja.png');
+    this.load.image('player_jump', 'assets/sprites/ninja.png');
+    this.load.image('player_dash', 'assets/sprites/ninja.png');
+    this.load.image('player_dive', 'assets/sprites/ninja.png');
+    this.load.image('player_attack', 'assets/sprites/ninja.png');
+    this.load.image('player_combo1', 'assets/sprites/ninja.png');
+    this.load.image('player_combo2', 'assets/sprites/ninja.png');
+    this.load.image('player_combo3', 'assets/sprites/ninja.png');
+    this.load.image('player_combo4', 'assets/sprites/ninja.png');
+    this.load.image('player_uppercut', 'assets/sprites/ninja.png');
+    this.load.image('player_defend', 'assets/sprites/ninja.png');
+    this.load.image('player_cast', 'assets/sprites/ninja.png');
     this.load.svg('player_wave', 'assets/sprites/player_wave.svg?v=2');
     
     this.load.svg('enemy_guard', 'assets/sprites/enemy_guard.svg?v=2');

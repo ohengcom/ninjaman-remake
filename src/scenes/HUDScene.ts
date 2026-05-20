@@ -38,12 +38,13 @@ export class HUDScene extends Phaser.Scene {
 
   private readonly onUpdateLevel = (level: number) => {
     this.currentLevel = level;
-    let levelName = 'CITY SECTOR';
-    if (level === 2) levelName = 'FOREST SECTOR';
-    if (level === 3) levelName = 'CORE SECTOR';
-    if (this.domSectorDisplay) {
-      this.domSectorDisplay.innerText = `SECTOR ${level}: ${levelName}`;
-    }
+    // @ts-ignore
+    import('../config/levels.js').then((module) => {
+        const levelCfg = module.getLevelConfig(level);
+        if (this.domSectorDisplay) {
+          this.domSectorDisplay.innerText = `SECTOR ${level}: ${levelCfg.name}`;
+        }
+    });
   };
 
   private readonly onUpdateStyle = (style: string) => {
