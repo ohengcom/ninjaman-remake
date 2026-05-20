@@ -362,15 +362,14 @@ export class GameScene extends Phaser.Scene {
       this.hitParticles.emitParticleAt(x, y, count);
   }
 
-  /** Freeze the game for a few frames to add weight to hits */
+  /** Freeze the physics world for a few frames to add weight to hits */
   public hitstop(durationMs: number = 60) {
     this.physics.world.pause();
-    // Use real-time setTimeout since scene timers are affected by timeScale
-    setTimeout(() => {
+    this.time.delayedCall(durationMs, () => {
       if (this.physics && this.physics.world) {
         this.physics.world.resume();
       }
-    }, durationMs);
+    });
   }
 
   public upgradePlayerHealth(maxHealth: number) {
