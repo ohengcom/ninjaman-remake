@@ -9,7 +9,11 @@ import { SoundManager } from '../managers/SoundManager.js';
 import { getLevelConfig, LevelConfig } from '../config/levels.js';
 import { COMBO_CONFIG, SCORE_CONFIG, PLAYER_ATTACKS, PROJECTILE_CONFIG, PLAYER_DEFENSE } from '../config/combat.js';
 import { BOSS_STATS } from '../config/enemies.js';
+import { GAME_EVENTS } from '../events.js';
 import { SeededRandom } from '../utils/SeededRandom.js';
+import { VfxManager } from '../managers/VfxManager.js';
+import { LevelBuilder } from '../utils/LevelBuilder.js';
+import { AnimationFactory } from '../animations/AnimationFactory.js';
 
 export class GameScene extends Phaser.Scene {
   private player!: Player;
@@ -32,6 +36,7 @@ export class GameScene extends Phaser.Scene {
   private isTransitioning: boolean = false;
 
   private combatManager!: CombatManager;
+  public vfxManager!: VfxManager;
   private readonly onPlayerAttack = (attacker: Player, type: string) => this.combatManager.resolvePlayerAttack(attacker, type, this.enemies, this.boss);
   private readonly onPlayerParry = (defender: Player) => this.handleParry(defender);
   private readonly onEnemyAttack = (attacker: Enemy, dmg: number, reach: number) => this.combatManager.resolveEnemyAttack(attacker, dmg, reach, this.player);
@@ -69,9 +74,9 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.fadeIn(800, 0, 0, 0);
     SoundManager.startBGM(this.currentLevel);
     this.combatManager = new CombatManager(this);
+    this.vfxManager = new VfxManager(this);
     this.comboCount = 0;
     this.currentStyle = '';
-    const w = this.cameras.main.width;
     const h = this.cameras.main.height;
     this.lastSafeX = 200;
     this.lastSafeY = h - 250;
@@ -84,45 +89,16 @@ export class GameScene extends Phaser.Scene {
     const farBg = this.levelCfg.farBg;
     this.mapWidth = this.levelCfg.mapTiles * this.levelCfg.tileSize;
 
-    // Create seamless mirrored parallax background
-    const bgTemp = this.textures.get(farBg).getSourceImage();
-    const bgWidth = (bgTemp && bgTemp.width) ? bgTemp.width : w;
-    const bgHeight = (bgTemp && bgTemp.height) ? bgTemp.height : h;
-    
-    const scale = h / bgHeight;
-    const scaledWidth = bgWidth * scale;
-    
-    // Calculate how many background panels we need based on scroll factor (0.2)
-    const requiredWidth = w + (this.mapWidth - w) * 0.2;
-    const numImages = Math.max(2, Math.ceil(requiredWidth / scaledWidth));
-    
-    for (let i = 0; i < numImages; i++) {
-        const bg = this.add.image(scaledWidth * i, 0, farBg).setOrigin(0, 0).setScrollFactor(0.2);
-        bg.displayHeight = h;
-        bg.displayWidth = scaledWidth;
-        // Mirror every alternate image to create a seamless infinite loop
-        if (i % 2 === 1) bg.setFlipX(true);
-    }
+    AnimationFactory.createPlayerAnimations(this.anims);
+
+    LevelBuilder.buildBackground(this, farBg, this.mapWidth);
 
     // Refresh HUD properly by stopping and re-launching it so events connect to the new GameScene instance
     this.scene.stop('HUDScene');
     this.scene.launch('HUDScene');
 
-    // Platforms
-    const platforms = this.physics.add.staticGroup();
-    const tiles = Math.floor(this.mapWidth / this.levelCfg.tileSize);
-    
-    for (let i = 0; i < tiles; i++) {
-      // Create a continuous, solid floor
-      platforms.create(i * this.levelCfg.tileSize + 32, h - 32, 'platform');
-      
-      if (this.levelCfg.hasPlatforms && i > this.levelCfg.platformStartTile && i % this.levelCfg.platformInterval === 0) {
-         platforms.create(i * this.levelCfg.tileSize + 32, h - 160 - this.rng.next() * 80, 'platform');
-      }
-    }
-
-    const leftWall = this.add.rectangle(-32, h/2, 64, h * 2).setOrigin(0.5);
-    this.physics.add.existing(leftWall, true);
+    const platforms = LevelBuilder.buildPlatforms(this, this.levelCfg, this.mapWidth, this.rng);
+    const leftWall = LevelBuilder.buildLeftWall(this);
 
     const saveData = SaveManager.load();
     this.player = new Player(this, this.lastSafeX, this.lastSafeY);
@@ -183,24 +159,8 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, this.mapWidth, h);
     this.physics.world.setBounds(0, 0, this.mapWidth, h * 2);
 
-    // PostFX: cyberpunk atmosphere
-    this.cameras.main.filters.internal.addGlow(0xe94560, 4, 0, 1, undefined, 4, 10);
-    this.cameras.main.filters.internal.addVignette(0.5, 0.5, 0.9, 0.4);
-
-    // Ambient floating particles (data motes)
-    this.add.particles(w / 2, h / 2, 'platform', {
-      x: { min: 0, max: this.mapWidth },
-      y: { min: 0, max: h },
-      scale: { start: 0.02, end: 0 },
-      alpha: { start: 0.6, end: 0 },
-      tint: [0x00ffff, 0xe94560, 0xffffff],
-      blendMode: 'ADD',
-      lifespan: { min: 3000, max: 6000 },
-      speed: { min: 10, max: 40 },
-      angle: { min: 250, max: 290 },
-      frequency: 200,
-      quantity: 1,
-    }).setScrollFactor(0.5);
+    this.vfxManager.initAtmosphere();
+    this.vfxManager.createAmbientMotes(this.mapWidth, h);
 
     this.events.on('player_attack', this.onPlayerAttack);
     this.events.on('player_parry', this.onPlayerParry);
@@ -222,7 +182,7 @@ export class GameScene extends Phaser.Scene {
             
             if (player.isBlocking && Math.sign(dir) !== (player.flipX ? -1 : 1)) {
                  player.health -= Math.floor(proj.damage * 0.2);
-                 this.events.emit('player_parry', player);
+                 this.events.emit(GAME_EVENTS.PLAYER_PARRY, player);
                  player.setVelocityX(dir * 50);
             } else {
                  player.takeDamage(proj.damage, dir);
@@ -396,10 +356,7 @@ export class GameScene extends Phaser.Scene {
   private handleParry(defender: Player) {
       SoundManager.playParry(this.getPan(defender.x));
       this.cameras.main.shake(100, 0.01);
-      const parryText = this.add.text(defender.x, defender.y - 40, 'PARRY!', {
-          fontFamily: 'Impact', fontSize: '24px', color: '#00ffff'
-      }).setOrigin(0.5);
-      this.tweens.add({ targets: parryText, y: defender.y - 80, alpha: 0, duration: 600, onComplete: () => parryText.destroy() });
+      this.vfxManager.showParryText(defender.x, defender.y);
       
       // Bonus points for parry
       this.addScore(SCORE_CONFIG.parryBonus);
@@ -421,13 +378,13 @@ export class GameScene extends Phaser.Scene {
   }
 
   private cleanup() {
-    this.events.off('player_attack', this.onPlayerAttack);
-    this.events.off('player_parry', this.onPlayerParry);
-    this.events.off('enemy_attack', this.onEnemyAttack);
-    this.events.off('boss_attack', this.onBossAttack);
-    this.events.off('player_dead', this.onPlayerDead);
-    this.events.off('enemy_shoot', this.onEnemyShoot);
-    this.events.off('player_cast_wave', this.onPlayerCastWave);
+    this.events.off(GAME_EVENTS.PLAYER_ATTACK, this.onPlayerAttack);
+    this.events.off(GAME_EVENTS.PLAYER_PARRY, this.onPlayerParry);
+    this.events.off(GAME_EVENTS.ENEMY_ATTACK, this.onEnemyAttack);
+    this.events.off(GAME_EVENTS.BOSS_ATTACK, this.onBossAttack);
+    this.events.off(GAME_EVENTS.PLAYER_DEAD, this.onPlayerDead);
+    this.events.off(GAME_EVENTS.ENEMY_SHOOT, this.onEnemyShoot);
+    this.events.off(GAME_EVENTS.PLAYER_CAST_WAVE, this.onPlayerCastWave);
     this.input.keyboard?.off('keydown-ESC', this.pauseGame, this);
 
     SoundManager.stopBGM();

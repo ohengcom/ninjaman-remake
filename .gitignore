@@ -4,3 +4,7 @@ dist
 *.log
 .env
 .agents
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/

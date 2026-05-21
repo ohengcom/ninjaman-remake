@@ -891,4 +891,37 @@ saveBgSvg('bg_core_mid.svg', `
   </g>
 `, 1280, 720);
 
+// ==========================================
+// 5. ANIMATION SPRITESHEETS (Placeholder)
+// ==========================================
+
+function saveSpriteSheet(filename, frames, cols, rows, frameWidth, frameHeight) {
+  const width = frameWidth * cols;
+  const height = frameHeight * rows;
+  let content = '';
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const frameIndex = r * cols + c;
+      if (frameIndex >= frames) break;
+      const x = c * frameWidth;
+      const y = r * frameHeight;
+      const rColor = 100 + (frameIndex * 10) % 155;
+      const gColor = 50 + (frameIndex * 20) % 200;
+      const bColor = 200 - (frameIndex * 5) % 100;
+      
+      content += `<rect x="${x}" y="${y}" width="${frameWidth}" height="${frameHeight}" fill="rgb(${rColor},${gColor},${bColor})" stroke="#fff" stroke-width="2"/>`;
+      content += `<text x="${x + 10}" y="${y + 30}" font-size="20" fill="#fff">F${frameIndex}</text>`;
+      content += `<circle cx="${x + frameWidth/2}" cy="${y + frameHeight/2 + Math.sin(frameIndex) * 10}" r="15" fill="#fff" opacity="0.5"/>`;
+    }
+  }
+
+  const fullContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+    ${content}
+  </svg>`;
+  fs.writeFileSync(path.join(outDir, filename), fullContent);
+}
+
+saveSpriteSheet('player_sheet.svg', 16, 4, 4, 120, 120);
+
 console.log('High-fidelity Calligraphic Ink-Wash / Cyber-Zen SVG graphics programmatically generated successfully!');

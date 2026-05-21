@@ -3,6 +3,7 @@ import { PROJECTILE_CONFIG } from '../config/combat.js';
 
 export class Projectile extends Phaser.Physics.Arcade.Sprite {
     public damage: number = 10;
+    private lifetimeTimer: Phaser.Time.TimerEvent | null = null;
     
     constructor(scene: Phaser.Scene, x: number, y: number) {
         super(scene, x, y, 'projectile');
@@ -33,12 +34,22 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
         this.setFlipX(dirX < 0);
         
         // Auto kill after lifetime expires
-        this.scene.time.delayedCall(PROJECTILE_CONFIG.lifetime, () => {
+        this.lifetimeTimer?.remove(false);
+        this.lifetimeTimer = this.scene.time.delayedCall(PROJECTILE_CONFIG.lifetime, () => {
+            this.lifetimeTimer = null;
             if (this.active) this.disableBody(true, true);
         });
     }
 
     public hit() {
+        this.lifetimeTimer?.remove(false);
+        this.lifetimeTimer = null;
         this.disableBody(true, true);
+    }
+
+    override destroy(fromScene?: boolean) {
+        this.lifetimeTimer?.remove(false);
+        this.lifetimeTimer = null;
+        super.destroy(fromScene);
     }
 }

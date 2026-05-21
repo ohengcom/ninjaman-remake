@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { manifest } from '../assets/manifest.js';
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -6,38 +7,20 @@ export class BootScene extends Phaser.Scene {
   }
 
   preload(): void {
-    // Load Player high-quality Ninja Sprite
-    this.load.image('ninja_sprite', 'assets/sprites/ninja.png');
-    // Map all player states to the high-quality sprite for now
-    this.load.image('player_idle', 'assets/sprites/ninja.png');
-    this.load.image('player_run', 'assets/sprites/ninja.png');
-    this.load.image('player_jump', 'assets/sprites/ninja.png');
-    this.load.image('player_dash', 'assets/sprites/ninja.png');
-    this.load.image('player_dive', 'assets/sprites/ninja.png');
-    this.load.image('player_attack', 'assets/sprites/ninja.png');
-    this.load.image('player_combo1', 'assets/sprites/ninja.png');
-    this.load.image('player_combo2', 'assets/sprites/ninja.png');
-    this.load.image('player_combo3', 'assets/sprites/ninja.png');
-    this.load.image('player_combo4', 'assets/sprites/ninja.png');
-    this.load.image('player_uppercut', 'assets/sprites/ninja.png');
-    this.load.image('player_defend', 'assets/sprites/ninja.png');
-    this.load.image('player_cast', 'assets/sprites/ninja.png');
-    this.load.svg('player_wave', 'assets/sprites/player_wave.svg?v=2');
+    // Load assets from centralized manifest
+    for (const img of manifest.images) {
+      this.load.image(img.key, img.url);
+    }
     
-    this.load.svg('enemy_guard', 'assets/sprites/enemy_guard.svg?v=2');
-    this.load.svg('enemy_axe', 'assets/sprites/enemy_axe.svg?v=2');
-    this.load.svg('enemy_ninja', 'assets/sprites/enemy_ninja.svg?v=2');
-    this.load.svg('enemy_sniper', 'assets/sprites/enemy_sniper.svg?v=2');
-    this.load.svg('projectile', 'assets/sprites/projectile.svg?v=2');
-    this.load.svg('boss_idle', 'assets/sprites/boss_idle.svg?v=2');
-    this.load.svg('boss_attack', 'assets/sprites/boss_attack.svg?v=2');
-    this.load.svg('boss_rush', 'assets/sprites/boss_rush.svg?v=2');
-    this.load.svg('boss_windup', 'assets/sprites/boss_windup.svg?v=2');
-    
-    this.load.image('bg_forest', 'assets/backgrounds/bg_forest.png');
-    this.load.image('bg_beach', 'assets/backgrounds/bg_beach.png');
-    this.load.image('bg_castle', 'assets/backgrounds/bg_castle.png');
-    this.load.svg('platform', 'assets/backgrounds/platform.svg?v=2');
+    for (const svg of manifest.svgs) {
+      this.load.svg(svg.key, svg.url, { width: svg.svgConfig.width, height: svg.svgConfig.height });
+    }
+
+    if ('spritesheets' in manifest) {
+      for (const sheet of manifest.spritesheets) {
+        this.load.spritesheet(sheet.key, sheet.url, sheet.frameConfig);
+      }
+    }
 
     const w = this.cameras.main.width;
     const h = this.cameras.main.height;

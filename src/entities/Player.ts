@@ -28,9 +28,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private inputBuffer: { key: string, time: number }[] = [];
   private static readonly BUFFER_TIMEOUT = PLAYER_MOVEMENT.motionBufferTimeout;
   private lastGroundedTime: number = 0;
+  private lastJumpInputTime: number = 0;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, 'player_idle');
+    super(scene, x, y, 'player_sheet');
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
@@ -160,15 +161,26 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       return true;
     }
     // Jump with independent Space key, allow single & double jumps
-    if (Phaser.Input.Keyboard.JustDown(p.cursors.space) || (p.pad && p.pad.A)) {
-      const now = p.scene.time.now;
+    if (Phaser.Input.Keyboard.JustDown(p.cursors.space) || (p.pad && p.pad.A && p.pad.A)) {
+       p.lastJumpInputTime = p.scene.time.now;
+    }
+    
+    const now = p.scene.time.now;
+    const hasJumpBuffer = (now - p.lastJumpInputTime < PLAYER_MOVEMENT.jumpBufferTime);
+
+    if (hasJumpBuffer) {
       const isGroundedOrCoyote = p.body!.touching.down || (now - p.lastGroundedTime < PLAYER_MOVEMENT.coyoteTime);
       if (isGroundedOrCoyote && p.jumpCount === 0) {
+        p.lastJumpInputTime = 0; // Consume jump buffer
         p.stateMachine.setState('jump');
         return true;
-      } else if (p.jumpCount < PLAYER_MOVEMENT.maxJumps) {
-        p.stateMachine.setState('jump');
-        return true;
+      } else if (p.jumpCount < PLAYER_MOVEMENT.maxJumps && !isGroundedOrCoyote) {
+        // Only allow double jump if we are not grounded to prevent consuming both jumps instantly
+        if (Phaser.Input.Keyboard.JustDown(p.cursors.space)) {
+           p.lastJumpInputTime = 0;
+           p.stateMachine.setState('jump');
+           return true;
+        }
       }
     }
     if (!p.body!.touching.down && p.body!.velocity.y > 0) {
@@ -378,9 +390,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           
           p.applySquash(0.6, 1.4, 150);
 
-          p.scene.time.delayedCall(PLAYER_ATTACKS.uppercut.recovery, () => {
+          p.stateMachine.addTimer(p.scene.time.delayedCall(PLAYER_ATTACKS.uppercut.recovery, () => {
             if (p.health > 0) p.stateMachine.setState('fall');
-          });
+          }));
         }
       })
       .addState({

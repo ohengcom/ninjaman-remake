@@ -126,7 +126,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         onEnter: (e) => {
           e.setVelocityX(0);
           e.setTint(0xffaa00);
-          
+
           // Show laser sight for sniper
           let laser: Phaser.GameObjects.Line | null = null;
           if (e.enemyType === 'sniper' && e.target) {
@@ -134,26 +134,35 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
              laser = e.scene.add.line(0, 0, e.x, e.y, e.x + (e.attackReach * dir), e.y, 0xff0055, 0.5).setOrigin(0);
           }
 
-          e.scene.time.delayedCall(e.attackWindup, () => {
-             if (laser) laser.destroy();
-             
+          (e as any)._currentLaser = laser; // store for cleanup
+
+          e.stateMachine.addTimer(e.scene.time.delayedCall(e.attackWindup, () => {
+             if (laser) {
+                 laser.destroy();
+                 (e as any)._currentLaser = null;
+             }
+
              if (e.active && e.health > 0) {
                  e.clearTint();
-                 
+
                  if (e.enemyType === 'sniper') {
                      e.scene.events.emit('enemy_shoot', e, e.baseDamage);
                  } else {
                      e.scene.events.emit('enemy_attack', e, e.baseDamage, e.attackReach);
                  }
 
-                 e.scene.time.delayedCall(e.attackCooldown, () => {
+                 e.stateMachine.addTimer(e.scene.time.delayedCall(e.attackCooldown, () => {
                      if (e.active && e.health > 0) e.stateMachine.setState('chase');
-                 });
+                 }));
              }
-          });
+          }));
         },
         onExit: (e) => {
             e.clearTint();
+            if ((e as any)._currentLaser) {
+                (e as any)._currentLaser.destroy();
+                (e as any)._currentLaser = null;
+            }
         }
       })
       .addState({
@@ -161,8 +170,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         onEnter: (e) => {
           e.setTint(0xffffff);
           e.isInvulnerable = true;
-          
-          e.scene.time.delayedCall(150, () => {
+
+          e.stateMachine.addTimer(e.scene.time.delayedCall(150, () => {
             if (!e.active) return;
             e.clearTint();
             e.isInvulnerable = false;
@@ -171,10 +180,9 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
             } else {
               e.disableBody(true, true);
             }
-          });
+          }));
         }
-      });
-  }
+      });  }
 
   public takeDamage(amount: number, dirX: number) {
     if (this.isInvulnerable || this.health <= 0 || !this.active) return;

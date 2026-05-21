@@ -1,3 +1,5 @@
+import Phaser from 'phaser';
+
 export interface StateConfig<T> {
   name: string;
   onEnter?: (context: T) => void;
@@ -9,6 +11,7 @@ export class StateMachine<T> {
   private states = new Map<string, StateConfig<T>>();
   private currentState?: StateConfig<T>;
   private context: T;
+  private stateTimers: Phaser.Time.TimerEvent[] = [];
 
   constructor(context: T) {
     this.context = context;
@@ -19,6 +22,17 @@ export class StateMachine<T> {
     return this;
   }
 
+  addTimer(timer: Phaser.Time.TimerEvent): void {
+      this.stateTimers.push(timer);
+  }
+
+  clearTimers(): void {
+      for (const t of this.stateTimers) {
+          t.remove();
+      }
+      this.stateTimers = [];
+  }
+
   setState(name: string): void {
     if (this.currentState?.name === name) {
       return;
@@ -27,6 +41,8 @@ export class StateMachine<T> {
     if (this.currentState?.onExit) {
       this.currentState.onExit(this.context);
     }
+    
+    this.clearTimers();
 
     const nextState = this.states.get(name);
     if (!nextState) {

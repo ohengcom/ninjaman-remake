@@ -63,7 +63,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
           b.setVelocityX(0);
           b.faceTarget(b);
           const delay = b.isEnraged ? BOSS_STATS.idleDelay * 0.4 : BOSS_STATS.idleDelay;
-          b.scene.time.delayedCall(delay, () => {
+          b.stateMachine.addTimer(b.scene.time.delayedCall(delay, () => {
             if (b.health <= 0 || !b.target) return;
             const dist = Phaser.Math.Distance.Between(b.x, b.y, b.target.x, b.target.y);
             // Always engage - Boss is aggressive
@@ -76,7 +76,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
             } else {
               b.stateMachine.setState('chase');
             }
-          });
+          }));
         }
       })
       .addState({
@@ -123,11 +123,11 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
             repeat: Math.floor(windup / 200),
           });
 
-          b.scene.time.delayedCall(windup, () => {
+          b.stateMachine.addTimer(b.scene.time.delayedCall(windup, () => {
             if (b.health > 0) {
               b.stateMachine.setState('attack');
             }
-          });
+          }));
         },
         onExit: (b) => {
           b.clearTint();
@@ -144,19 +144,19 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
 
           // Phase 2+: follow up with a second strike
           if (b.phase >= 2) {
-            b.scene.time.delayedCall(350, () => {
+            b.stateMachine.addTimer(b.scene.time.delayedCall(350, () => {
               if (b.health <= 0) return;
               b.scene.cameras.main.shake(250, 0.02);
               b.scene.events.emit('boss_attack', b);
-            });
+            }));
           }
 
           const cooldown = b.isEnraged ? BOSS_STATS.attackCooldown * 0.5 : BOSS_STATS.attackCooldown;
-          b.scene.time.delayedCall(cooldown, () => {
+          b.stateMachine.addTimer(b.scene.time.delayedCall(cooldown, () => {
             if (b.health > 0) {
               b.stateMachine.setState('idle');
             }
-          });
+          }));
         }
       })
       .addState({
@@ -169,25 +169,25 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
           b.setFlipX(dir < 0);
 
           // Brief telegraph before charging
-          b.scene.time.delayedCall(400, () => {
+          b.stateMachine.addTimer(b.scene.time.delayedCall(400, () => {
             if (b.health <= 0) return;
             b.clearTint();
             b.setVelocityX(dir * BOSS_STATS.moveSpeed * 4);
             b.scene.cameras.main.shake(200, 0.015);
 
             // Stop and slam after rush
-            b.scene.time.delayedCall(500, () => {
+            b.stateMachine.addTimer(b.scene.time.delayedCall(500, () => {
               if (b.health <= 0) return;
               b.setVelocityX(0);
               b.setTexture('boss_attack');
               b.scene.events.emit('boss_attack', b);
               b.scene.cameras.main.shake(400, 0.04);
 
-              b.scene.time.delayedCall(800, () => {
+              b.stateMachine.addTimer(b.scene.time.delayedCall(800, () => {
                 if (b.health > 0) b.stateMachine.setState('idle');
-              });
-            });
-          });
+              }));
+            }));
+          }));
         },
         onExit: (b) => {
           b.clearTint();

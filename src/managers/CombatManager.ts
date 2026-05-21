@@ -6,6 +6,7 @@ import { GameScene } from '../scenes/GameScene.js';
 import { SoundManager } from './SoundManager.js';
 import { PLAYER_ATTACKS, SCORE_CONFIG } from '../config/combat.js';
 import { BOSS_STATS } from '../config/enemies.js';
+import { GAME_EVENTS } from '../events.js';
 
 export class CombatManager {
   private scene: GameScene;
@@ -77,7 +78,7 @@ export class CombatManager {
     if (Phaser.Geom.Rectangle.Overlaps(attackRect, playerRect)) {
       this.scene.resetCombo();
       player.takeDamage(damage, dir);
-      this.scene.events.emit('update_health', player.health, player.maxHealth);
+      this.scene.events.emit(GAME_EVENTS.UPDATE_HEALTH, player.health, player.maxHealth);
       if (!player.isBlocking) {
         SoundManager.playDamage(this.scene.getPan(attacker.x));
         this.scene.emitHitParticle(player.x, player.y, 5);
@@ -98,7 +99,7 @@ export class CombatManager {
     if (Phaser.Geom.Rectangle.Overlaps(attackRect, playerRect)) {
       this.scene.resetCombo();
       player.takeDamage(BOSS_STATS.attackDamage, dir);
-      this.scene.events.emit('update_health', player.health, player.maxHealth);
+      this.scene.events.emit(GAME_EVENTS.UPDATE_HEALTH, player.health, player.maxHealth);
       if (!player.isBlocking) {
         SoundManager.playDamage(this.scene.getPan(attacker.x));
         this.scene.emitHitParticle(player.x, player.y, 20);

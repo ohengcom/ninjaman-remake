@@ -1,7 +1,7 @@
 {
   "name": "ninjaman-remake",
-  "version": "2.2.0",
-  "description": "Cyber Ninja Remake - A modern high-definition action-platformer built with Phaser 4 + TypeScript + Vite.",
+  "version": "3.0.0",
+  "description": "Ninja Man Remake - A modern high-definition action-platformer built with Phaser 4 + TypeScript + Vite, featuring a premium Catppuccin Mocha aesthetic.",
   "type": "module",
   "scripts": {
     "generate-assets": "node scripts/generate-assets.js",
@@ -13,7 +13,8 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:visual": "playwright test"
   },
   "keywords": [
     "game",
@@ -30,9 +31,10 @@
     "phaser": "^4.1.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "jimp": "^1.6.1",
-    "typescript": "^5.9.3",
-    "vite": "^8.0.10",
-    "vitest": "^3.2.4"
+    "typescript": "^6.0.3",
+    "vite": "^8.0.13",
+    "vitest": "^4.1.7"
   }
 }
