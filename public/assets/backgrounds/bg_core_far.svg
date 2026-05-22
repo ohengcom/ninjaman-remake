@@ -1,37 +1,28 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
     <defs>
       <filter id="bgGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="5.5" result="blur" />
-        <feMerge>
-          <feMergeNode in="blur" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
+        <feGaussianBlur stdDeviation="5.5" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
       </filter>
       <filter id="inkMistyBg" x="-30%" y="-30%" width="160%" height="160%">
-        <feGaussianBlur stdDeviation="8" />
+        <feGaussianBlur stdDeviation="8"/>
       </filter>
-      <!-- Traditional parchment rice-paper background pattern -->
       <linearGradient id="parchmentFade" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#fdfbf7"/>
-        <stop offset="40%" stop-color="#f5efe0"/>
-        <stop offset="85%" stop-color="#ede3cd"/>
-        <stop offset="100%" stop-color="#dfd2b5"/>
+        <stop offset="0%" stop-color="#fdfbf7"/><stop offset="40%" stop-color="#f5efe0"/><stop offset="85%" stop-color="#ede3cd"/><stop offset="100%" stop-color="#dfd2b5"/>
       </linearGradient>
       <linearGradient id="inkMistyFade" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#ede3cd"/>
-        <stop offset="50%" stop-color="#ccc1aa"/>
-        <stop offset="100%" stop-color="#a69b85"/>
+        <stop offset="0%" stop-color="#ede3cd"/><stop offset="50%" stop-color="#ccc1aa"/><stop offset="100%" stop-color="#a69b85"/>
+      </linearGradient>
+      <linearGradient id="spiritGold" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#cdd6f4"/><stop offset="35%" stop-color="#f9e2af"/><stop offset="75%" stop-color="#fab387"/><stop offset="100%" stop-color="#fab387"/>
       </linearGradient>
     </defs>
     
   <rect width="1280" height="720" fill="url(#parchmentFade)"/>
-  
-  <!-- Silhouette of massive traditional Torii Gates (神道鸟居) -->
   <g fill="url(#inkMistyFade)" filter="url(#inkMistyBg)" opacity="0.6">
-    <path d="M 200 720 L 200 240 L 1080 240 L 1080 720 L 980 720 L 980 340 L 300 340 L 300 720 Z" />
-    <path d="M 120 200 L 1160 200 L 1120 250 L 160 250 Z" />
-    <!-- Secondary header bar -->
-    <rect x="180" y="270" width="920" height="24" />
+    <path d="M 200 720 L 200 240 L 1080 240 L 1080 720 L 980 720 L 980 340 L 300 340 L 300 720 Z"/>
+    <path d="M 120 200 L 1160 200 L 1120 250 L 160 250 Z"/>
+    <rect x="180" y="270" width="920" height="24"/>
   </g>
 
   </svg>

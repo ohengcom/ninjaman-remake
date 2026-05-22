@@ -1,57 +1,29 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
     <defs>
       <filter id="bgGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="5.5" result="blur" />
-        <feMerge>
-          <feMergeNode in="blur" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
+        <feGaussianBlur stdDeviation="5.5" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
       </filter>
       <filter id="inkMistyBg" x="-30%" y="-30%" width="160%" height="160%">
-        <feGaussianBlur stdDeviation="8" />
+        <feGaussianBlur stdDeviation="8"/>
       </filter>
-      <!-- Traditional parchment rice-paper background pattern -->
       <linearGradient id="parchmentFade" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#fdfbf7"/>
-        <stop offset="40%" stop-color="#f5efe0"/>
-        <stop offset="85%" stop-color="#ede3cd"/>
-        <stop offset="100%" stop-color="#dfd2b5"/>
+        <stop offset="0%" stop-color="#fdfbf7"/><stop offset="40%" stop-color="#f5efe0"/><stop offset="85%" stop-color="#ede3cd"/><stop offset="100%" stop-color="#dfd2b5"/>
       </linearGradient>
       <linearGradient id="inkMistyFade" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#ede3cd"/>
-        <stop offset="50%" stop-color="#ccc1aa"/>
-        <stop offset="100%" stop-color="#a69b85"/>
+        <stop offset="0%" stop-color="#ede3cd"/><stop offset="50%" stop-color="#ccc1aa"/><stop offset="100%" stop-color="#a69b85"/>
+      </linearGradient>
+      <linearGradient id="spiritGold" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#cdd6f4"/><stop offset="35%" stop-color="#f9e2af"/><stop offset="75%" stop-color="#fab387"/><stop offset="100%" stop-color="#fab387"/>
       </linearGradient>
     </defs>
     
   <rect width="1280" height="720" fill="url(#parchmentFade)"/>
-  
-  <!-- Distant giant calligraphic gold-red moon -->
   <circle cx="1020" cy="190" r="105" fill="#fab387" filter="url(#bgGlow)" opacity="0.65"/>
   <circle cx="1020" cy="190" r="90" fill="url(#spiritGold)" opacity="0.85"/>
-  <!-- Traditional brush-stroke ink clouds slicing the golden moon -->
   <path d="M 820 180 Q 980 140 1140 180 Q 1020 200 820 180 Z" fill="#ccc1aa" opacity="0.9"/>
-  <path d="M 880 220 Q 1020 185 1160 220 Q 1000 240 880 220 Z" fill="#ede3cd" opacity="0.95"/>
-  <path d="M 850 140 Q 960 115 1070 140 Q 960 155 850 140 Z" fill="#ccc1aa" opacity="0.75"/>
-
-  <!-- High-fidelity flying paper-cranes silhouette (distant stars replacement) -->
-  <g fill="#cba6f7" opacity="0.65" filter="url(#bgGlow)">
-    <!-- Crane 1 -->
-    <polygon points="120,100 135,90 128,105 125,102" transform="rotate(-15 120 100)"/>
-    <!-- Crane 2 -->
-    <polygon points="280,140 292,132 286,144" transform="rotate(10 280 140)"/>
-    <!-- Crane 3 -->
-    <polygon points="530,90 540,82 535,93"/>
-    <!-- Crane 4 -->
-    <polygon points="780,110 795,100 788,115"/>
-  </g>
-
-  <!-- Majestic Calligraphic Misty Ink Mountains Skyline -->
-  <!-- Mountain Tier 1 (Farthest - very misty) -->
   <path d="M 0 540 C 200 480 300 380 450 480 C 600 580 800 360 1000 460 C 1150 540 1200 490 1280 540 L 1280 720 L 0 720 Z" fill="#ccc1aa" filter="url(#inkMistyBg)" opacity="0.75"/>
-  <!-- Mountain Tier 2 (Mid-distance - ink grey) -->
   <path d="M 0 570 C 150 500 250 440 380 520 C 500 600 720 400 920 500 C 1080 580 1180 480 1280 550 L 1280 720 L 0 720 Z" fill="#a69b85" filter="url(#inkMistyBg)" opacity="0.9"/>
-  <!-- Mountain Tier 3 (Closest - deep black brush stroke silhouette) -->
   <path d="M 0 600 L 150 530 L 280 590 L 450 460 L 620 560 L 820 410 L 980 520 L 1150 440 L 1280 520 L 1280 720 L 0 720 Z" fill="#2d281e" stroke="#1e1e2e" stroke-width="3"/>
 
   </svg>

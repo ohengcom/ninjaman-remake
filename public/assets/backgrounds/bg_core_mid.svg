@@ -1,56 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
     <defs>
       <filter id="bgGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="5.5" result="blur" />
-        <feMerge>
-          <feMergeNode in="blur" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
+        <feGaussianBlur stdDeviation="5.5" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
       </filter>
       <filter id="inkMistyBg" x="-30%" y="-30%" width="160%" height="160%">
-        <feGaussianBlur stdDeviation="8" />
+        <feGaussianBlur stdDeviation="8"/>
       </filter>
-      <!-- Traditional parchment rice-paper background pattern -->
       <linearGradient id="parchmentFade" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#fdfbf7"/>
-        <stop offset="40%" stop-color="#f5efe0"/>
-        <stop offset="85%" stop-color="#ede3cd"/>
-        <stop offset="100%" stop-color="#dfd2b5"/>
+        <stop offset="0%" stop-color="#fdfbf7"/><stop offset="40%" stop-color="#f5efe0"/><stop offset="85%" stop-color="#ede3cd"/><stop offset="100%" stop-color="#dfd2b5"/>
       </linearGradient>
       <linearGradient id="inkMistyFade" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#ede3cd"/>
-        <stop offset="50%" stop-color="#ccc1aa"/>
-        <stop offset="100%" stop-color="#a69b85"/>
+        <stop offset="0%" stop-color="#ede3cd"/><stop offset="50%" stop-color="#ccc1aa"/><stop offset="100%" stop-color="#a69b85"/>
+      </linearGradient>
+      <linearGradient id="spiritGold" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#cdd6f4"/><stop offset="35%" stop-color="#f9e2af"/><stop offset="75%" stop-color="#fab387"/><stop offset="100%" stop-color="#fab387"/>
       </linearGradient>
     </defs>
     
-  <!-- Sacred Temple Columns on sides -->
   <g fill="#1a140f" stroke="#cba6f7" stroke-width="3.5">
-    <rect x="220" y="0" width="100" height="720" />
-    <rect x="960" y="0" width="100" height="720" />
+    <rect x="220" y="0" width="100" height="720"/>
+    <rect x="960" y="0" width="100" height="720"/>
   </g>
-  
-  <!-- Colossal Golden Bagua Core Divine Furnace (太极八卦炉) -->
-  <!-- Outer bronze furnace container -->
   <circle cx="640" cy="360" r="210" fill="#15120d" stroke="#fab387" stroke-width="12"/>
-  
-  <!-- Glowing neon Bagua rings (rotating hazard replacement) -->
   <circle cx="640" cy="360" r="170" fill="none" stroke="#cba6f7" stroke-width="4.5" stroke-dasharray="20 12" filter="url(#bgGlow)"/>
-  
-  <!-- Blinding active golden spiritual plasma fire center -->
   <circle cx="640" cy="360" r="110" fill="url(#spiritGold)" filter="url(#bgGlow)" opacity="0.7"/>
-  
-  <!-- Pure white Yin-Yang swirling core -->
   <circle cx="640" cy="360" r="55" fill="#1e1e2e" stroke="#cdd6f4" stroke-width="2.5" filter="url(#bgGlow)"/>
   <path d="M 640 305 A 27.5 27.5 0 0 0 640 360 A 27.5 27.5 0 0 1 640 415 A 55 55 0 0 0 640 305 Z" fill="#fab387"/>
-
-  <!-- Golden sacred paper seals (符咒) hanging from temple beams -->
-  <g fill="#fab387" stroke="#cba6f7" stroke-width="1" filter="url(#bgGlow)">
-    <rect x="250" y="100" width="40" height="120" rx="3" fill="#f5efe0"/>
-    <text x="258" y="170" font-family="serif" font-weight="bold" font-size="28" fill="#181825">符</text>
-    
-    <rect x="990" y="150" width="40" height="120" rx="3" fill="#f5efe0"/>
-    <text x="998" y="220" font-family="serif" font-weight="bold" font-size="28" fill="#cba6f7">神</text>
-  </g>
 
   </svg>

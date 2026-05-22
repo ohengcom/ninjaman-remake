@@ -1,90 +1,50 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" width="60" height="60">
     <defs>
-      <!-- Premium Oriental Cyber-Zen Filters -->
-      <filter id="goldGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="4.5" result="blur" />
-        <feMerge>
-          <feMergeNode in="blur" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <filter id="heavyGoldGlow" x="-80%" y="-80%" width="260%" height="260%">
-        <feGaussianBlur stdDeviation="7" result="blur1" />
-        <feGaussianBlur stdDeviation="2.5" result="blur2" />
-        <feMerge>
-          <feMergeNode in="blur1" />
-          <feMergeNode in="blur2" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <filter id="sakuraGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="4" result="blur" />
-        <feMerge>
-          <feMergeNode in="blur" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-      <filter id="inkMisty" x="-30%" y="-30%" width="160%" height="160%">
-        <feGaussianBlur stdDeviation="1.8" />
-      </filter>
-      <filter id="redGlow" x="-40%" y="-40%" width="180%" height="180%">
-        <feGaussianBlur stdDeviation="3.5" result="blur" />
-        <feMerge>
-          <feMergeNode in="blur" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-
-      <!-- Advanced Cyber-Zen Gradients -->
-      <linearGradient id="inkWashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#313244"/>
-        <stop offset="60%" stop-color="#11111b"/>
-        <stop offset="100%" stop-color="#11111b"/>
-      </linearGradient>
-      <linearGradient id="inkWashLight" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#6c7086"/>
-        <stop offset="50%" stop-color="#45475a"/>
-        <stop offset="100%" stop-color="#1e1e2e"/>
-      </linearGradient>
-      <linearGradient id="spiritGold" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#cdd6f4"/>
-        <stop offset="35%" stop-color="#f9e2af"/>
-        <stop offset="75%" stop-color="#fab387"/>
-        <stop offset="100%" stop-color="#fab387"/>
-      </linearGradient>
-      <linearGradient id="sacredMaple" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#f38ba8"/>
-        <stop offset="50%" stop-color="#fab387"/>
-        <stop offset="100%" stop-color="#eba0ac"/>
-      </linearGradient>
-      <linearGradient id="sakuraBlade" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#cdd6f4"/>
-        <stop offset="40%" stop-color="#f2cdcd"/>
-        <stop offset="85%" stop-color="#f5c2e7"/>
-        <stop offset="100%" stop-color="#cba6f7"/>
-      </linearGradient>
-      <linearGradient id="crimsonGaze" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#f38ba8"/>
-        <stop offset="60%" stop-color="#eba0ac"/>
-        <stop offset="100%" stop-color="#1e1e2e"/>
-      </linearGradient>
-    </defs>
+  <filter id="goldGlow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="4.5" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="heavyGoldGlow" x="-80%" y="-80%" width="260%" height="260%">
+    <feGaussianBlur stdDeviation="7" result="blur1"/>
+    <feGaussianBlur stdDeviation="2.5" result="blur2"/>
+    <feMerge><feMergeNode in="blur1"/><feMergeNode in="blur2"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="sakuraGlow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="4" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="inkMisty" x="-30%" y="-30%" width="160%" height="160%">
+    <feGaussianBlur stdDeviation="1.8"/>
+  </filter>
+  <filter id="redGlow" x="-40%" y="-40%" width="180%" height="180%">
+    <feGaussianBlur stdDeviation="3.5" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <linearGradient id="inkWashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#313244"/><stop offset="60%" stop-color="#11111b"/><stop offset="100%" stop-color="#11111b"/>
+  </linearGradient>
+  <linearGradient id="inkWashLight" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#6c7086"/><stop offset="50%" stop-color="#45475a"/><stop offset="100%" stop-color="#1e1e2e"/>
+  </linearGradient>
+  <linearGradient id="spiritGold" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#cdd6f4"/><stop offset="35%" stop-color="#f9e2af"/><stop offset="75%" stop-color="#fab387"/><stop offset="100%" stop-color="#fab387"/>
+  </linearGradient>
+  <linearGradient id="sacredMaple" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#f38ba8"/><stop offset="50%" stop-color="#fab387"/><stop offset="100%" stop-color="#eba0ac"/>
+  </linearGradient>
+  <linearGradient id="sakuraBlade" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#cdd6f4"/><stop offset="40%" stop-color="#f2cdcd"/><stop offset="85%" stop-color="#f5c2e7"/><stop offset="100%" stop-color="#cba6f7"/>
+  </linearGradient>
+  <linearGradient id="crimsonGaze" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#f38ba8"/><stop offset="60%" stop-color="#eba0ac"/><stop offset="100%" stop-color="#1e1e2e"/>
+  </linearGradient>
+</defs>
     
   <g transform="translate(10, 10)">
-    <!-- Floating sacred paper scroll body -->
     <path d="M -5 10 L 25 0 Q 35 15 28 35 L -2 45 Z" fill="#cdd6f4" stroke="#fab387" stroke-width="2.5" filter="url(#goldGlow)"/>
-    
-    <!-- Red calligraphic talisman glyphs on the scroll -->
     <path d="M 5 15 C 8 20 12 18 10 32 M 5 22 L 15 18 M 8 28 C 14 28 12 34 16 34" fill="none" stroke="#cba6f7" stroke-width="2"/>
-    
-    <!-- Golden energy aura wings -->
     <path d="M 22 -12 A 32 32 0 0 1 22 52 A 20 20 0 0 0 10 20 Z" fill="url(#spiritGold)" filter="url(#heavyGoldGlow)" opacity="0.8"/>
-    <path d="M 20 -5 A 26 26 0 0 1 20 45 A 16 16 0 0 0 10 20 Z" fill="#cdd6f4" opacity="0.9"/>
-    
-    <!-- Swirling calligraphic ink brush stroke lines -->
     <path d="M 12 20 C -2 15 -14 25 -25 20" fill="none" stroke="#181825" stroke-width="5" stroke-linecap="round" filter="url(#inkMisty)"/>
-    <path d="M 10 10 C -4 8 -16 14 -28 12" fill="none" stroke="#f5c2e7" stroke-width="3" stroke-linecap="round" filter="url(#sakuraGlow)"/>
-    <path d="M 14 30 C 0 28 -12 34 -24 32" fill="none" stroke="#f5c2e7" stroke-width="3" stroke-linecap="round" filter="url(#sakuraGlow)"/>
   </g>
 
   </svg>
