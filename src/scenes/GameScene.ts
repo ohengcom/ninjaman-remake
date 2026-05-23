@@ -73,6 +73,11 @@ export class GameScene extends Phaser.Scene {
 
   create(): void {
     this.cameras.main.fadeIn(800, 0, 0, 0);
+
+    // Restore HUD header (hidden by MainMenuScene)
+    const hudHeader = document.querySelector('.hud-header') as HTMLElement;
+    if (hudHeader) hudHeader.style.display = '';
+
     SoundManager.startBGM(this.currentLevel);
     this.combatManager = new CombatManager(this);
     this.vfxManager = new VfxManager(this);

@@ -12,6 +12,9 @@ export class MainMenuScene extends Phaser.Scene {
 
     LevelBuilder.buildStaticBackground(this, 'bg_title', '');
 
+    const hudHeader = document.querySelector('.hud-header') as HTMLElement;
+    if (hudHeader) hudHeader.style.display = 'none';
+
     const title = this.add.text(w / 2, h / 2 - 100, 'CYBER NINJA', {
       fontFamily: 'Impact, sans-serif',
       fontSize: '80px',

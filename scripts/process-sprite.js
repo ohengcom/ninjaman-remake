@@ -2,7 +2,7 @@ import { Jimp } from 'jimp';
 
 async function process() {
   try {
-    const rawPath = 'C:\\Users\\lixia\\.gemini\\antigravity\\brain\\345659f6-904e-4498-8a3a-29ff8422aa8d\\ninja_sheet_raw_1779544392718.png';
+    const rawPath = 'C:\\Users\\lixia\\.gemini\\antigravity\\brain\\345659f6-904e-4498-8a3a-29ff8422aa8d\\ninja_single_raw_1779546540510.png';
     console.log('Loading image from', rawPath);
     
     // In jimp v1.x the default export might not be Jimp itself, but let's try read
