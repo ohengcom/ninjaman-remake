@@ -36,13 +36,32 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   private attackCooldown: number = 800;
 
   private currentVisualState: string = 'patrol';
+  private maskGraphics!: Phaser.GameObjects.Graphics;
+  private borderGraphics!: Phaser.GameObjects.Graphics;
 
   private applyEnemyRender() {
     const cfg = ENEMY_RENDER_CONFIGS[this.enemyType];
     this.setDisplaySize(cfg.displaySize, cfg.displaySize);
+    
+    // Set up circular mask for avatar
+    if (!this.maskGraphics) {
+      this.maskGraphics = this.scene.make.graphics({}, false);
+      this.maskGraphics.fillStyle(0xffffff);
+      this.maskGraphics.fillCircle(0, 0, cfg.displaySize * 0.44);
+      
+      const mask = this.maskGraphics.createGeometryMask();
+      this.setMask(mask);
+    }
+    
     this.body!.setSize(cfg.bodyWidth, cfg.bodyHeight);
     this.body!.setOffset(cfg.bodyOffsetX, cfg.bodyOffsetY);
     this.setTint(ENEMY_TINTS[this.enemyType]);
+  }
+
+  destroy(fromScene?: boolean) {
+    if (this.maskGraphics) this.maskGraphics.destroy();
+    if (this.borderGraphics) this.borderGraphics.destroy();
+    super.destroy(fromScene);
   }
 
   public play(key: any, ..._args: any[]): this {
@@ -62,6 +81,10 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.configureType(type);
     this.applyEnemyRender();
 
+    // Create glowing border graphics
+    this.borderGraphics = scene.add.graphics();
+    this.borderGraphics.setDepth(this.depth + 1);
+
     this.stateMachine = new StateMachine<Enemy>(this);
     this.setupStates();
     this.stateMachine.setState('patrol');
@@ -77,6 +100,9 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     
     this.configureType(type);
     this.applyEnemyRender();
+    if (this.borderGraphics) {
+      this.borderGraphics.setVisible(true);
+    }
     this.isInvulnerable = false;
     this.patrolDir = 1;
     this.stateMachine.setState('patrol');
@@ -308,6 +334,28 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
         this.setScale(baseScaleX * sx, baseScaleY * sy);
         this.setAngle(angle);
+
+        // Update circular mask & glowing border coordinates smoothly
+        if (this.maskGraphics) {
+          this.maskGraphics.setPosition(this.x, this.y);
+        }
+
+        if (this.borderGraphics) {
+          this.borderGraphics.clear();
+          if (this.active && this.health > 0) {
+            this.borderGraphics.setPosition(this.x, this.y);
+            
+            const color = ENEMY_TINTS[this.enemyType];
+            
+            // Outer colored ring
+            this.borderGraphics.lineStyle(2.5, color, 0.85);
+            this.borderGraphics.strokeCircle(0, 0, cfg.displaySize * 0.44);
+            
+            // Inner thin ring
+            this.borderGraphics.lineStyle(1.0, color, 0.4);
+            this.borderGraphics.strokeCircle(0, 0, cfg.displaySize * 0.40);
+          }
+        }
       }
     }
   }

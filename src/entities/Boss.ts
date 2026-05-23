@@ -11,9 +11,22 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
   private phase: number = 1;
 
   private currentVisualState: string = 'idle';
+  private maskGraphics!: Phaser.GameObjects.Graphics;
+  private borderGraphics!: Phaser.GameObjects.Graphics;
 
   private applyBossRender() {
     this.setDisplaySize(220, 220);
+    
+    // Circular mask
+    if (!this.maskGraphics) {
+      this.maskGraphics = this.scene.make.graphics({}, false);
+      this.maskGraphics.fillStyle(0xffffff);
+      this.maskGraphics.fillCircle(0, 0, 220 * 0.44);
+      
+      const mask = this.maskGraphics.createGeometryMask();
+      this.setMask(mask);
+    }
+
     this.body!.setSize(372, 558);
     this.body!.setOffset(325, 465);
     
@@ -25,6 +38,12 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     } else {
       this.setTint(0xffd43b); // Default glowing gold
     }
+  }
+
+  destroy(fromScene?: boolean) {
+    if (this.maskGraphics) this.maskGraphics.destroy();
+    if (this.borderGraphics) this.borderGraphics.destroy();
+    super.destroy(fromScene);
   }
 
   public play(key: any, ..._args: any[]): this {
@@ -44,6 +63,10 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     (this.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
 
     this.applyBossRender();
+
+    // Create glowing border graphics
+    this.borderGraphics = scene.add.graphics();
+    this.borderGraphics.setDepth(this.depth + 1);
 
     this.stateMachine = new StateMachine<Boss>(this);
     this.setupStates();
@@ -299,6 +322,29 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
 
       this.setScale(baseScaleX * sx, baseScaleY * sy);
       this.setAngle(angle);
+
+      // Update circular mask & glowing border coordinates smoothly
+      if (this.maskGraphics) {
+        this.maskGraphics.setPosition(this.x, this.y);
+      }
+
+      if (this.borderGraphics) {
+        this.borderGraphics.clear();
+        if (this.active && this.health > 0) {
+          this.borderGraphics.setPosition(this.x, this.y);
+          
+          // Massive glowing golden/red ring for Boss
+          const color = this.phase === 3 ? 0xff6b6b : 0xffd43b;
+          
+          // Thick outer ring
+          this.borderGraphics.lineStyle(4.0, color, 0.9);
+          this.borderGraphics.strokeCircle(0, 0, 220 * 0.44);
+          
+          // Second inner ring
+          this.borderGraphics.lineStyle(1.5, color, 0.5);
+          this.borderGraphics.strokeCircle(0, 0, 220 * 0.40);
+        }
+      }
     }
   }
 }

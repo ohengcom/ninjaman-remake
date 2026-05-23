@@ -14,6 +14,8 @@ const PLAYER_RENDER = {
 export class Player extends Phaser.Physics.Arcade.Sprite {
   public stateMachine: StateMachine<Player>;
   private currentVisualState: string = 'idle';
+  private maskGraphics!: Phaser.GameObjects.Graphics;
+  private borderGraphics!: Phaser.GameObjects.Graphics;
   public cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   public attackKey!: Phaser.Input.Keyboard.Key;
   public defendKey!: Phaser.Input.Keyboard.Key;
@@ -45,6 +47,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
 
     this.applyRenderSize();
+    
+    // Create glowing border graphics
+    this.borderGraphics = scene.add.graphics();
+    this.borderGraphics.setDepth(this.depth + 1);
+
     this.setCollideWorldBounds(true);
 
     // Set keys to A, S, D, W, SPACE
@@ -209,8 +216,25 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   private applyRenderSize() {
     this.setDisplaySize(PLAYER_RENDER.displaySize, PLAYER_RENDER.displaySize);
+    
+    // Set up circular mask for avatar
+    if (!this.maskGraphics) {
+      this.maskGraphics = this.scene.make.graphics({}, false);
+      this.maskGraphics.fillStyle(0xffffff);
+      this.maskGraphics.fillCircle(0, 0, PLAYER_RENDER.displaySize * 0.44);
+      
+      const mask = this.maskGraphics.createGeometryMask();
+      this.setMask(mask);
+    }
+    
     this.body!.setSize(PLAYER_RENDER.bodyWidth, PLAYER_RENDER.bodyHeight);
     this.body!.setOffset(PLAYER_RENDER.bodyOffsetX, PLAYER_RENDER.bodyOffsetY);
+  }
+
+  destroy(fromScene?: boolean) {
+    if (this.maskGraphics) this.maskGraphics.destroy();
+    if (this.borderGraphics) this.borderGraphics.destroy();
+    super.destroy(fromScene);
   }
 
   private setupStates() {
@@ -560,6 +584,29 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
       this.setScale(baseScaleX * sx, baseScaleY * sy);
       this.setAngle(angle);
+
+      // Update circular mask & glowing border coordinates smoothly
+      if (this.maskGraphics) {
+        this.maskGraphics.setPosition(this.x, this.y);
+      }
+
+      if (this.borderGraphics) {
+        this.borderGraphics.clear();
+        if (this.active && this.health > 0) {
+          this.borderGraphics.setPosition(this.x, this.y);
+          
+          // Dynamic glowing color depending on parry/invulnerability state
+          const color = this.isBlocking ? 0x4dadf7 : (this.isInvulnerable ? 0xff6b6b : 0xffffff);
+          
+          // Outer thin glowing ring
+          this.borderGraphics.lineStyle(2.5, color, 0.85);
+          this.borderGraphics.strokeCircle(0, 0, PLAYER_RENDER.displaySize * 0.44);
+          
+          // Inner delicate ring
+          this.borderGraphics.lineStyle(1.0, color, 0.4);
+          this.borderGraphics.strokeCircle(0, 0, PLAYER_RENDER.displaySize * 0.40);
+        }
+      }
     }
   }
 }
