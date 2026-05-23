@@ -10,16 +10,40 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
   private isInvulnerable = false;
   private phase: number = 1;
 
+  private currentVisualState: string = 'idle';
+
+  private applyBossRender() {
+    this.setDisplaySize(220, 220);
+    this.body!.setSize(372, 558);
+    this.body!.setOffset(325, 465);
+    
+    // Boss phases color feedback
+    if (this.phase === 2) {
+      this.setTint(0xffd43b); // Golden
+    } else if (this.phase === 3) {
+      this.setTint(0xff6b6b); // Red/Enraged
+    } else {
+      this.setTint(0xffd43b); // Default glowing gold
+    }
+  }
+
+  public play(key: any, ..._args: any[]): this {
+    const keyStr = typeof key === 'string' ? key : (key?.key || '');
+    this.currentVisualState = keyStr;
+    this.applyBossRender();
+    return this;
+  }
+
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, 'boss_idle_sheet');
+    super(scene, x, y, 'ninja_sprite');
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
     this.setCollideWorldBounds(true);
-    this.body!.setSize(80, 80);
-    this.body!.setOffset(20, 40);
     this.body!.immovable = true;
     (this.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+
+    this.applyBossRender();
 
     this.stateMachine = new StateMachine<Boss>(this);
     this.setupStates();
@@ -205,7 +229,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     this.isInvulnerable = true;
     
     this.scene.time.delayedCall(BOSS_STATS.invulnerabilityDuration, () => {
-      this.clearTint();
+      this.applyBossRender(); // Re-apply default golden/phase tint instead of clearing
       this.isInvulnerable = false;
       if (this.health <= 0) {
         // Death sequence
@@ -221,5 +245,60 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
   preUpdate(time: number, delta: number) {
     super.preUpdate(time, delta);
     this.stateMachine.update(delta);
+
+    // Procedural Animation System
+    const baseScaleX = 220 / 1024;
+    const baseScaleY = 220 / 1024;
+
+    if (this.health <= 0) {
+      this.setAngle(this.flipX ? -90 : 90);
+      this.setScale(baseScaleX, baseScaleY);
+    } else {
+      const anim = this.currentVisualState;
+      let sx = 1.0;
+      let sy = 1.0;
+      let angle = 0;
+
+      if (anim.includes('idle')) {
+        // Slow heavy breathing
+        const breathe = Math.sin(time * 0.006) * 0.04;
+        sx = 1.0 - breathe;
+        sy = 1.0 + breathe;
+      } else if (anim.includes('walk') || this.body!.velocity.x !== 0) {
+        // Giant heavy sway walk
+        const sway = Math.sin(time * 0.01) * 6;
+        angle = sway + (this.flipX ? 4 : -4);
+        
+        const bounce = Math.abs(Math.sin(time * 0.01)) * 0.06;
+        sx = 1.06 - bounce;
+        sy = 0.94 + bounce;
+      } else if (anim.includes('windup')) {
+        // Aggressive pulsing windup
+        const pulse = Math.sin(time * 0.04) * 0.09;
+        sx = 1.0 - pulse;
+        sy = 1.0 + pulse;
+        angle = Math.sin(time * 0.06) * 6;
+      } else if (anim.includes('rush')) {
+        // Aerodynamic charge lean
+        sx = 1.22;
+        sy = 0.82;
+        angle = this.flipX ? -25 : 25;
+      } else if (anim.includes('attack')) {
+        // Slam lunge stretch
+        sx = 1.15;
+        sy = 0.85;
+        angle = this.flipX ? -15 : 15;
+      }
+
+      // Flash gold/enraged tint on windup or phase changes
+      if (anim.includes('windup') && Math.floor(time / 100) % 2 === 0) {
+        this.setTint(0xffffff); // Telegraph flash
+      } else {
+        this.applyBossRender();
+      }
+
+      this.setScale(baseScaleX * sx, baseScaleY * sy);
+      this.setAngle(angle);
+    }
   }
 }

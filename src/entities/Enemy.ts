@@ -5,6 +5,20 @@ import { ENEMY_STATS } from '../config/enemies.js';
 export type EnemyType = 'guard' | 'axe' | 'ninja' | 'sniper';
 type TargetSprite = Phaser.Physics.Arcade.Sprite & { health?: number };
 
+const ENEMY_TINTS = {
+  guard: 0xd0bfff,
+  axe: 0xffc078,
+  ninja: 0xadb5bd,
+  sniper: 0x8ce99a,
+} as const;
+
+const ENEMY_RENDER_CONFIGS = {
+  guard: { displaySize: 100, bodyWidth: 328, bodyHeight: 500, bodyOffsetX: 348, bodyOffsetY: 480 },
+  axe: { displaySize: 125, bodyWidth: 400, bodyHeight: 600, bodyOffsetX: 312, bodyOffsetY: 424 },
+  ninja: { displaySize: 90, bodyWidth: 328, bodyHeight: 500, bodyOffsetX: 348, bodyOffsetY: 480 },
+  sniper: { displaySize: 100, bodyWidth: 328, bodyHeight: 500, bodyOffsetX: 348, bodyOffsetY: 480 },
+} as const;
+
 export class Enemy extends Phaser.Physics.Arcade.Sprite {
   public stateMachine: StateMachine<Enemy>;
   public enemyType: EnemyType;
@@ -21,17 +35,32 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   private attackWindup: number = 500;
   private attackCooldown: number = 800;
 
+  private currentVisualState: string = 'patrol';
+
+  private applyEnemyRender() {
+    const cfg = ENEMY_RENDER_CONFIGS[this.enemyType];
+    this.setDisplaySize(cfg.displaySize, cfg.displaySize);
+    this.body!.setSize(cfg.bodyWidth, cfg.bodyHeight);
+    this.body!.setOffset(cfg.bodyOffsetX, cfg.bodyOffsetY);
+    this.setTint(ENEMY_TINTS[this.enemyType]);
+  }
+
+  public play(key: any, ..._args: any[]): this {
+    const keyStr = typeof key === 'string' ? key : (key?.key || '');
+    this.currentVisualState = keyStr;
+    this.applyEnemyRender();
+    return this;
+  }
+
   constructor(scene: Phaser.Scene, x: number, y: number, type: EnemyType = 'guard') {
-    super(scene, x, y, `enemy_${type}_sheet`);
+    super(scene, x, y, 'ninja_sprite');
     this.enemyType = type;
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
     this.setCollideWorldBounds(true);
-    this.body!.setSize(40, 40);
-    this.body!.setOffset(20, 20);
-
     this.configureType(type);
+    this.applyEnemyRender();
 
     this.stateMachine = new StateMachine<Enemy>(this);
     this.setupStates();
@@ -40,13 +69,14 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   public spawn(x: number, y: number, type: EnemyType) {
     this.enemyType = type;
-    this.setTexture(`enemy_${type}_sheet`);
+    this.setTexture('ninja_sprite');
     this.setPosition(x, y);
     this.setActive(true);
     this.setVisible(true);
     this.enableBody(true, x, y, true, true);
     
     this.configureType(type);
+    this.applyEnemyRender();
     this.isInvulnerable = false;
     this.patrolDir = 1;
     this.stateMachine.setState('patrol');
@@ -227,6 +257,58 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     super.preUpdate(time, delta);
     if (this.active) {
       this.stateMachine.update(delta);
+
+      // Procedural Animation System
+      const cfg = ENEMY_RENDER_CONFIGS[this.enemyType];
+      const baseScaleX = cfg.displaySize / 1024;
+      const baseScaleY = cfg.displaySize / 1024;
+
+      if (this.health <= 0) {
+        this.setAngle(this.flipX ? -90 : 90);
+        this.setScale(baseScaleX, baseScaleY);
+      } else {
+        const stateName = this.stateMachine.getCurrentStateName();
+        let sx = 1.0;
+        let sy = 1.0;
+        let angle = 0;
+
+        if (stateName === 'hurt') {
+          // Hurt: flash red & severe shake
+          sx = 0.88;
+          sy = 1.15;
+          angle = Math.sin(time * 0.08) * 12;
+          this.x += Math.sin(time * 0.15) * 1.5;
+        } else if (stateName === 'attack') {
+          // Attack: lunge slash
+          sx = 1.12;
+          sy = 0.90;
+          angle = this.flipX ? -15 : 15;
+        } else if (this.currentVisualState.includes('walk') || this.currentVisualState.includes('run')) {
+          // Movement sway
+          const speedFactor = this.enemyType === 'ninja' ? 0.024 : 0.016;
+          const sway = Math.sin(time * speedFactor) * 7;
+          angle = sway + (this.flipX ? 4 : -4);
+          
+          const bounce = Math.abs(Math.sin(time * speedFactor)) * 0.05;
+          sx = 1.04 - bounce;
+          sy = 0.96 + bounce;
+        } else if (this.currentVisualState.includes('windup')) {
+          // Axe windup
+          const pulse = Math.sin(time * 0.03) * 0.08;
+          sx = 1.0 + pulse;
+          sy = 1.0 - pulse;
+          angle = Math.sin(time * 0.05) * 5;
+        } else {
+          // Idle breathing
+          const speedFactor = this.enemyType === 'ninja' ? 0.014 : 0.010;
+          const breathe = Math.sin(time * speedFactor) * 0.03;
+          sx = 1.0 - breathe;
+          sy = 1.0 + breathe;
+        }
+
+        this.setScale(baseScaleX * sx, baseScaleY * sy);
+        this.setAngle(angle);
+      }
     }
   }
 }

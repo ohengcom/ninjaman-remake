@@ -4,17 +4,16 @@ import { SoundManager } from '../managers/SoundManager.js';
 import { PLAYER_MOVEMENT, PLAYER_ATTACKS, PLAYER_DEFENSE } from '../config/combat.js';
 
 const PLAYER_RENDER = {
-  frameWidth: 120,
-  frameHeight: 120,
-  scale: 0.9,
-  bodyWidth: 32,
-  bodyHeight: 48,
-  bodyOffsetX: 44,
-  bodyOffsetY: 40,
+  displaySize: 100,
+  bodyWidth: 328,
+  bodyHeight: 500,
+  bodyOffsetX: 348,
+  bodyOffsetY: 480,
 } as const;
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
   public stateMachine: StateMachine<Player>;
+  private currentVisualState: string = 'idle';
   public cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   public attackKey!: Phaser.Input.Keyboard.Key;
   public defendKey!: Phaser.Input.Keyboard.Key;
@@ -41,7 +40,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private lastJumpInputTime: number = 0;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, 'player_idle_sheet');
+    super(scene, x, y, 'ninja_sprite');
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
@@ -200,31 +199,16 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   public applySquash(_sx: number, _sy: number, _dur: number) {
-      // Disabled due to Arcade Physics body scaling bug causing floor clipping
-      // this.scene.tweens.killTweensOf(this);
-      // this.setScale(1); // Reset to base scale before applying new squash
-      // this.scene.tweens.add({
-      //     targets: this,
-      //     scaleX: sx,
-      //     scaleY: sy,
-      //     duration: dur,
-      //     yoyo: true,
-      //     onComplete: () => this.setScale(1) // Guarantee it returns to normal
-      // });
+    // Visual squash is now driven procedurally in preUpdate
   }
 
   public playAnimation(animKey: string) {
-    if (this.anims.currentAnim?.key !== animKey) {
-      this.play(animKey);
-    }
+    this.currentVisualState = animKey;
     this.applyRenderSize();
   }
 
   private applyRenderSize() {
-    this.setDisplaySize(
-      PLAYER_RENDER.frameWidth * PLAYER_RENDER.scale,
-      PLAYER_RENDER.frameHeight * PLAYER_RENDER.scale,
-    );
+    this.setDisplaySize(PLAYER_RENDER.displaySize, PLAYER_RENDER.displaySize);
     this.body!.setSize(PLAYER_RENDER.bodyWidth, PLAYER_RENDER.bodyHeight);
     this.body!.setOffset(PLAYER_RENDER.bodyOffsetX, PLAYER_RENDER.bodyOffsetY);
   }
@@ -298,14 +282,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           p.playAnimation('player_jump_anim');
           p.setVelocityY(p.jumpCount === 0 ? PLAYER_MOVEMENT.jumpVelocity : PLAYER_MOVEMENT.doubleJumpVelocity);
           p.jumpCount++;
-          
-          p.applySquash(0.7, 1.3, 150);
         },
         onUpdate: (p) => {
           if (p.handleCommonTransitions(p)) return;
           p.handleAirMovement();
           if (p.body!.touching.down) {
-            p.applySquash(1.4, 0.6, 100);
             p.stateMachine.setState('idle');
           }
         }
@@ -317,7 +298,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           if (p.handleCommonTransitions(p)) return;
           p.handleAirMovement();
           if (p.body!.touching.down) {
-            p.applySquash(1.4, 0.6, 100);
             p.stateMachine.setState('idle');
           }
         }
@@ -325,25 +305,24 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'attack_combo',
         onEnter: (p) => {
-          // Each combo step has a distinct animation and feel
           const comboAnims = ['player_combo1_anim', 'player_combo2_anim', 'player_combo3_anim', 'player_combo4_anim'];
           const comboMomentum = [
-            PLAYER_ATTACKS.combo.forwardMomentum,       // step 0: quick jab forward
-            PLAYER_ATTACKS.combo.forwardMomentum * 0.5, // step 1: upward slash, less forward
-            PLAYER_ATTACKS.combo.forwardMomentum * 1.5, // step 2: spinning, more forward
-            PLAYER_ATTACKS.combo.forwardMomentum * 2,   // step 3: heavy slam, big lunge
+            PLAYER_ATTACKS.combo.forwardMomentum,
+            PLAYER_ATTACKS.combo.forwardMomentum * 0.5,
+            PLAYER_ATTACKS.combo.forwardMomentum * 1.5,
+            PLAYER_ATTACKS.combo.forwardMomentum * 2,
           ];
           const comboRecovery = [
-            PLAYER_ATTACKS.combo.recovery,         // step 0: fast
-            PLAYER_ATTACKS.combo.recovery,         // step 1: fast
-            PLAYER_ATTACKS.combo.recovery * 1.2,   // step 2: slightly slower
-            PLAYER_ATTACKS.combo.recovery * 1.8,   // step 3: heavy, slow recovery
+            PLAYER_ATTACKS.combo.recovery,
+            PLAYER_ATTACKS.combo.recovery,
+            PLAYER_ATTACKS.combo.recovery * 1.2,
+            PLAYER_ATTACKS.combo.recovery * 1.8,
           ];
           const comboShake: [number, number][] = [
-            [80, 0.004],   // step 0: light
-            [100, 0.006],  // step 1: medium
-            [120, 0.008],  // step 2: strong
-            [180, 0.015],  // step 3: heavy impact
+            [80, 0.004],
+            [100, 0.006],
+            [120, 0.008],
+            [180, 0.015],
           ];
 
           const step = p.comboStep;
@@ -355,7 +334,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           p.playAnimation(animKey);
           p.setVelocityX(p.flipX ? -momentum : momentum);
 
-          // Step 3 (heavy slam) also pushes down slightly for impact feel
           if (step === 3 && !p.body!.touching.down) {
             p.setVelocityY(200);
           }
@@ -368,7 +346,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           });
         },
         onUpdate: (p) => {
-          // Special Cancel: Allow canceling active combo hits into wave attack instantly
           if (Phaser.Input.Keyboard.JustDown(p.waveKey) || (p.pad && p.pad.X)) {
             const time = p.scene.time.now;
             if (time - p.lastWaveTime > PLAYER_ATTACKS.wave.cooldown) {
@@ -386,8 +363,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           p.scene.cameras.main.shake(100, 0.005);
           p.scene.events.emit('player_cast_wave', p);
           
-          p.applySquash(1.2, 0.9, 150);
-
           p.scene.time.delayedCall(300, () => {
              if (p.health > 0) p.stateMachine.setState(p.body!.touching.down ? 'idle' : 'fall');
           });
@@ -397,13 +372,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         name: 'attack_uppercut',
         onEnter: (p) => {
           p.playAnimation('player_uppercut_anim');
-          p.setVelocityY(PLAYER_ATTACKS.uppercut.launchVelocity); // Launcher
+          p.setVelocityY(PLAYER_ATTACKS.uppercut.launchVelocity);
           p.setVelocityX(0);
           p.scene.cameras.main.shake(150, 0.01);
           p.scene.events.emit('player_attack', p, 'uppercut');
           
-          p.applySquash(0.6, 1.4, 150);
-
           p.stateMachine.addTimer(p.scene.time.delayedCall(PLAYER_ATTACKS.uppercut.recovery, () => {
             if (p.health > 0) p.stateMachine.setState('fall');
           }));
@@ -413,19 +386,14 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         name: 'attack_dive',
         onEnter: (p) => {
           p.playAnimation('player_dive_anim');
-          p.setVelocityY(PLAYER_ATTACKS.dive.downVelocity); // Fast downward
+          p.setVelocityY(PLAYER_ATTACKS.dive.downVelocity);
           p.setVelocityX(p.flipX ? -PLAYER_ATTACKS.dive.forwardVelocity : PLAYER_ATTACKS.dive.forwardVelocity);
           p.scene.events.emit('player_attack', p, 'dive');
-          
-          p.applySquash(0.6, 1.4, 150);
         },
         onUpdate: (p) => {
            if (p.body!.touching.down) {
               p.scene.cameras.main.shake(200, 0.02);
               p.scene.events.emit('player_attack', p, 'dive_land');
-              
-              p.applySquash(1.5, 0.5, 100);
-
               p.stateMachine.setState('idle');
            }
         }
@@ -467,7 +435,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     }
   }
 
-  /** Gamepad-aware input helpers */
   private isLeftDown(): boolean {
     if (this.cursors.left.isDown) return true;
     if (this.pad && (this.pad.leftStick.x < -0.3 || this.pad.left)) return true;
@@ -507,12 +474,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   public takeDamage(amount: number, dirX: number) {
     if (this.isInvulnerable || this.health <= 0) return;
     
-    // Parry / Defend Logic
     if (this.isBlocking && Math.sign(dirX) !== (this.flipX ? -1 : 1)) {
-       // Successful block! Take reduced damage, no knockback, emit parry
        this.health -= Math.floor(amount * PLAYER_DEFENSE.blockDamageReduction);
        this.scene.events.emit('player_parry', this);
-       // Pushback slightly
        this.setVelocityX(dirX * PLAYER_DEFENSE.blockPushback);
        return;
     }
@@ -532,12 +496,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     super.preUpdate(time, delta);
     this.stateMachine.update(delta);
 
-    // Track last grounded time for coyote time
     if (this.body!.touching.down) {
       this.lastGroundedTime = time;
     }
     
-    // Record inputs for motion detection
     if (Phaser.Input.Keyboard.JustDown(this.cursors.down)) this.recordInput('down');
     if (Phaser.Input.Keyboard.JustDown(this.cursors.left)) this.recordInput('left');
     if (Phaser.Input.Keyboard.JustDown(this.cursors.right)) this.recordInput('right');
@@ -545,6 +507,59 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     if (this.isInvulnerable && this.stateMachine.getCurrentStateName() !== 'hurt') {
       this.setAlpha(time % 200 < 100 ? 0.5 : 1);
+    }
+
+    const baseScaleX = PLAYER_RENDER.displaySize / 1024;
+    const baseScaleY = PLAYER_RENDER.displaySize / 1024;
+
+    if (this.health <= 0) {
+      this.setAngle(this.flipX ? -90 : 90);
+      this.setScale(baseScaleX, baseScaleY);
+    } else {
+      const anim = this.currentVisualState;
+      let sx = 1.0;
+      let sy = 1.0;
+      let angle = 0;
+
+      if (anim.includes('idle')) {
+        const breathe = Math.sin(time * 0.012) * 0.04;
+        sx = 1.0 - breathe;
+        sy = 1.0 + breathe;
+      } else if (anim.includes('run')) {
+        const sway = Math.sin(time * 0.024) * 8;
+        angle = sway + (this.flipX ? 6 : -6);
+        const bounce = Math.abs(Math.sin(time * 0.024)) * 0.06;
+        sx = 1.05 - bounce;
+        sy = 0.95 + bounce;
+      } else if (anim.includes('jump')) {
+        sx = 0.86;
+        sy = 1.16;
+        angle = this.body!.velocity.x * 0.03;
+      } else if (anim.includes('fall')) {
+        sx = 1.10;
+        sy = 0.90;
+        angle = this.body!.velocity.x * 0.02 + Math.sin(time * 0.006) * 3;
+      } else if (anim.includes('dash')) {
+        sx = 1.25;
+        sy = 0.80;
+        angle = this.flipX ? -20 : 20;
+      } else if (anim.includes('defend')) {
+        sx = 1.18;
+        sy = 0.82;
+        angle = this.flipX ? 5 : -5;
+      } else if (anim.includes('attack') || anim.includes('combo') || anim.includes('uppercut') || anim.includes('dive') || anim.includes('wave')) {
+        sx = 1.12;
+        sy = 0.92;
+        angle = this.flipX ? -15 : 15;
+      } else if (anim.includes('hurt')) {
+        sx = 0.85;
+        sy = 1.20;
+        angle = Math.sin(time * 0.1) * 15;
+        this.x += Math.sin(time * 0.2) * 2;
+      }
+
+      this.setScale(baseScaleX * sx, baseScaleY * sy);
+      this.setAngle(angle);
     }
   }
 }
