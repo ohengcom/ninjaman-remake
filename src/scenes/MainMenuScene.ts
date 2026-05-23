@@ -10,7 +10,7 @@ export class MainMenuScene extends Phaser.Scene {
     const w = this.cameras.main.width;
     const h = this.cameras.main.height;
 
-    LevelBuilder.buildStaticBackground(this, 'bg_forest', '');
+    LevelBuilder.buildStaticBackground(this, 'bg_title', '');
 
     const title = this.add.text(w / 2, h / 2 - 100, 'CYBER NINJA', {
       fontFamily: 'Impact, sans-serif',

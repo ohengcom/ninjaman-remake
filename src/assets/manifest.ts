@@ -4,6 +4,7 @@ export const manifest = {
     { key: 'bg_forest', url: 'assets/backgrounds/bg_forest.png' },
     { key: 'bg_beach', url: 'assets/backgrounds/bg_beach.png' },
     { key: 'bg_castle', url: 'assets/backgrounds/bg_castle.png' },
+    { key: 'bg_title', url: 'assets/backgrounds/bg_title.png' },
   ],
   svgs: [
     { key: 'player_wave', url: 'assets/sprites/player_wave.svg', svgConfig: { width: 60, height: 60 } },
