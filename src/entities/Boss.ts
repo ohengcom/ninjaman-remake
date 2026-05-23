@@ -11,22 +11,10 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
   private phase: number = 1;
 
   private currentVisualState: string = 'idle';
-  private maskGraphics!: Phaser.GameObjects.Graphics;
-  private borderGraphics!: Phaser.GameObjects.Graphics;
+
 
   private applyBossRender() {
     this.setDisplaySize(220, 220);
-    
-    // Circular mask
-    if (!this.maskGraphics) {
-      this.maskGraphics = this.scene.make.graphics({}, false);
-      this.maskGraphics.fillStyle(0xffffff);
-      this.maskGraphics.fillCircle(0, 0, 220 * 0.44);
-      
-      const mask = this.maskGraphics.createGeometryMask();
-      this.setMask(mask);
-    }
-
     this.body!.setSize(372, 558);
     this.body!.setOffset(325, 465);
     
@@ -41,20 +29,23 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
   }
 
   destroy(fromScene?: boolean) {
-    if (this.maskGraphics) this.maskGraphics.destroy();
-    if (this.borderGraphics) this.borderGraphics.destroy();
     super.destroy(fromScene);
   }
 
   public play(key: any, ..._args: any[]): this {
     const keyStr = typeof key === 'string' ? key : (key?.key || '');
     this.currentVisualState = keyStr;
+    let keyToPlay = 'player_idle';
+    if (keyStr.includes('walk') || keyStr.includes('rush')) keyToPlay = 'player_run';
+    else if (keyStr.includes('attack') || keyStr.includes('windup')) keyToPlay = 'player_attack';
+    
+    super.play(keyToPlay, true);
     this.applyBossRender();
     return this;
   }
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, 'ninja_sprite');
+    super(scene, x, y, 'ninja_sheet');
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
@@ -64,9 +55,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
 
     this.applyBossRender();
 
-    // Create glowing border graphics
-    this.borderGraphics = scene.add.graphics();
-    this.borderGraphics.setDepth(this.depth + 1);
+
 
     this.stateMachine = new StateMachine<Boss>(this);
     this.setupStates();
@@ -269,81 +258,21 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     super.preUpdate(time, delta);
     this.stateMachine.update(delta);
 
-    // Procedural Animation System
-    const baseScaleX = 220 / 1024;
+    // Procedural Animation System Removed
+    const baseScaleX = 220 / 204;
     const baseScaleY = 220 / 1024;
 
     if (this.health <= 0) {
       this.setAngle(this.flipX ? -90 : 90);
-      this.setScale(baseScaleX, baseScaleY);
     } else {
+      this.setAngle(0);
+      
       const anim = this.currentVisualState;
-      let sx = 1.0;
-      let sy = 1.0;
-      let angle = 0;
-
-      if (anim.includes('idle')) {
-        // Slow heavy breathing
-        const breathe = Math.sin(time * 0.006) * 0.04;
-        sx = 1.0 - breathe;
-        sy = 1.0 + breathe;
-      } else if (anim.includes('walk') || this.body!.velocity.x !== 0) {
-        // Giant heavy sway walk
-        const sway = Math.sin(time * 0.01) * 6;
-        angle = sway + (this.flipX ? 4 : -4);
-        
-        const bounce = Math.abs(Math.sin(time * 0.01)) * 0.06;
-        sx = 1.06 - bounce;
-        sy = 0.94 + bounce;
-      } else if (anim.includes('windup')) {
-        // Aggressive pulsing windup
-        const pulse = Math.sin(time * 0.04) * 0.09;
-        sx = 1.0 - pulse;
-        sy = 1.0 + pulse;
-        angle = Math.sin(time * 0.06) * 6;
-      } else if (anim.includes('rush')) {
-        // Aerodynamic charge lean
-        sx = 1.22;
-        sy = 0.82;
-        angle = this.flipX ? -25 : 25;
-      } else if (anim.includes('attack')) {
-        // Slam lunge stretch
-        sx = 1.15;
-        sy = 0.85;
-        angle = this.flipX ? -15 : 15;
-      }
-
       // Flash gold/enraged tint on windup or phase changes
       if (anim.includes('windup') && Math.floor(time / 100) % 2 === 0) {
         this.setTint(0xffffff); // Telegraph flash
       } else {
         this.applyBossRender();
-      }
-
-      this.setScale(baseScaleX * sx, baseScaleY * sy);
-      this.setAngle(angle);
-
-      // Update circular mask & glowing border coordinates smoothly
-      if (this.maskGraphics) {
-        this.maskGraphics.setPosition(this.x, this.y);
-      }
-
-      if (this.borderGraphics) {
-        this.borderGraphics.clear();
-        if (this.active && this.health > 0) {
-          this.borderGraphics.setPosition(this.x, this.y);
-          
-          // Massive glowing golden/red ring for Boss
-          const color = this.phase === 3 ? 0xff6b6b : 0xffd43b;
-          
-          // Thick outer ring
-          this.borderGraphics.lineStyle(4.0, color, 0.9);
-          this.borderGraphics.strokeCircle(0, 0, 220 * 0.44);
-          
-          // Second inner ring
-          this.borderGraphics.lineStyle(1.5, color, 0.5);
-          this.borderGraphics.strokeCircle(0, 0, 220 * 0.40);
-        }
       }
     }
   }

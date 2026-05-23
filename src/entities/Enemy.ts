@@ -35,44 +35,33 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   private attackWindup: number = 500;
   private attackCooldown: number = 800;
 
-  private currentVisualState: string = 'patrol';
-  private maskGraphics!: Phaser.GameObjects.Graphics;
-  private borderGraphics!: Phaser.GameObjects.Graphics;
+
 
   private applyEnemyRender() {
     const cfg = ENEMY_RENDER_CONFIGS[this.enemyType];
     this.setDisplaySize(cfg.displaySize, cfg.displaySize);
-    
-    // Set up circular mask for avatar
-    if (!this.maskGraphics) {
-      this.maskGraphics = this.scene.make.graphics({}, false);
-      this.maskGraphics.fillStyle(0xffffff);
-      this.maskGraphics.fillCircle(0, 0, cfg.displaySize * 0.44);
-      
-      const mask = this.maskGraphics.createGeometryMask();
-      this.setMask(mask);
-    }
-    
     this.body!.setSize(cfg.bodyWidth, cfg.bodyHeight);
     this.body!.setOffset(cfg.bodyOffsetX, cfg.bodyOffsetY);
     this.setTint(ENEMY_TINTS[this.enemyType]);
   }
 
   destroy(fromScene?: boolean) {
-    if (this.maskGraphics) this.maskGraphics.destroy();
-    if (this.borderGraphics) this.borderGraphics.destroy();
     super.destroy(fromScene);
   }
 
   public play(key: any, ..._args: any[]): this {
     const keyStr = typeof key === 'string' ? key : (key?.key || '');
-    this.currentVisualState = keyStr;
+    let keyToPlay = 'player_idle';
+    if (keyStr.includes('walk') || keyStr.includes('run')) keyToPlay = 'player_run';
+    else if (keyStr.includes('attack') || keyStr.includes('windup') || keyStr.includes('shoot')) keyToPlay = 'player_attack';
+    
+    super.play(keyToPlay, true);
     this.applyEnemyRender();
     return this;
   }
 
   constructor(scene: Phaser.Scene, x: number, y: number, type: EnemyType = 'guard') {
-    super(scene, x, y, 'ninja_sprite');
+    super(scene, x, y, 'ninja_sheet');
     this.enemyType = type;
     scene.add.existing(this);
     scene.physics.add.existing(this);
@@ -81,10 +70,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.configureType(type);
     this.applyEnemyRender();
 
-    // Create glowing border graphics
-    this.borderGraphics = scene.add.graphics();
-    this.borderGraphics.setDepth(this.depth + 1);
-
     this.stateMachine = new StateMachine<Enemy>(this);
     this.setupStates();
     this.stateMachine.setState('patrol');
@@ -92,7 +77,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   public spawn(x: number, y: number, type: EnemyType) {
     this.enemyType = type;
-    this.setTexture('ninja_sprite');
+    this.setTexture('ninja_sheet');
     this.setPosition(x, y);
     this.setActive(true);
     this.setVisible(true);
@@ -100,9 +85,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     
     this.configureType(type);
     this.applyEnemyRender();
-    if (this.borderGraphics) {
-      this.borderGraphics.setVisible(true);
-    }
     this.isInvulnerable = false;
     this.patrolDir = 1;
     this.stateMachine.setState('patrol');
@@ -284,78 +266,15 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (this.active) {
       this.stateMachine.update(delta);
 
-      // Procedural Animation System
+      // Procedural Animation System Removed
       const cfg = ENEMY_RENDER_CONFIGS[this.enemyType];
-      const baseScaleX = cfg.displaySize / 1024;
+      const baseScaleX = cfg.displaySize / 204;
       const baseScaleY = cfg.displaySize / 1024;
 
       if (this.health <= 0) {
         this.setAngle(this.flipX ? -90 : 90);
-        this.setScale(baseScaleX, baseScaleY);
       } else {
-        const stateName = this.stateMachine.getCurrentStateName();
-        let sx = 1.0;
-        let sy = 1.0;
-        let angle = 0;
-
-        if (stateName === 'hurt') {
-          // Hurt: flash red & severe shake
-          sx = 0.88;
-          sy = 1.15;
-          angle = Math.sin(time * 0.08) * 12;
-          this.x += Math.sin(time * 0.15) * 1.5;
-        } else if (stateName === 'attack') {
-          // Attack: lunge slash
-          sx = 1.12;
-          sy = 0.90;
-          angle = this.flipX ? -15 : 15;
-        } else if (this.currentVisualState.includes('walk') || this.currentVisualState.includes('run')) {
-          // Movement sway
-          const speedFactor = this.enemyType === 'ninja' ? 0.024 : 0.016;
-          const sway = Math.sin(time * speedFactor) * 7;
-          angle = sway + (this.flipX ? 4 : -4);
-          
-          const bounce = Math.abs(Math.sin(time * speedFactor)) * 0.05;
-          sx = 1.04 - bounce;
-          sy = 0.96 + bounce;
-        } else if (this.currentVisualState.includes('windup')) {
-          // Axe windup
-          const pulse = Math.sin(time * 0.03) * 0.08;
-          sx = 1.0 + pulse;
-          sy = 1.0 - pulse;
-          angle = Math.sin(time * 0.05) * 5;
-        } else {
-          // Idle breathing
-          const speedFactor = this.enemyType === 'ninja' ? 0.014 : 0.010;
-          const breathe = Math.sin(time * speedFactor) * 0.03;
-          sx = 1.0 - breathe;
-          sy = 1.0 + breathe;
-        }
-
-        this.setScale(baseScaleX * sx, baseScaleY * sy);
-        this.setAngle(angle);
-
-        // Update circular mask & glowing border coordinates smoothly
-        if (this.maskGraphics) {
-          this.maskGraphics.setPosition(this.x, this.y);
-        }
-
-        if (this.borderGraphics) {
-          this.borderGraphics.clear();
-          if (this.active && this.health > 0) {
-            this.borderGraphics.setPosition(this.x, this.y);
-            
-            const color = ENEMY_TINTS[this.enemyType];
-            
-            // Outer colored ring
-            this.borderGraphics.lineStyle(2.5, color, 0.85);
-            this.borderGraphics.strokeCircle(0, 0, cfg.displaySize * 0.44);
-            
-            // Inner thin ring
-            this.borderGraphics.lineStyle(1.0, color, 0.4);
-            this.borderGraphics.strokeCircle(0, 0, cfg.displaySize * 0.40);
-          }
-        }
+        this.setAngle(0);
       }
     }
   }
