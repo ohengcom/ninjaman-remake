@@ -4,11 +4,11 @@ import { SoundManager } from '../managers/SoundManager.js';
 import { PLAYER_MOVEMENT, PLAYER_ATTACKS, PLAYER_DEFENSE } from '../config/combat.js';
 
 const PLAYER_RENDER = {
-  displaySize: 100,
-  bodyWidth: 328,
-  bodyHeight: 500,
-  bodyOffsetX: 348,
-  bodyOffsetY: 480,
+  displaySize: 80,
+  bodyWidth: 40,
+  bodyHeight: 60,
+  bodyOffsetX: 20,
+  bodyOffsetY: 15,
 } as const;
 
 export class Player extends Phaser.Physics.Arcade.Sprite {

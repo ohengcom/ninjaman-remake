@@ -13,10 +13,10 @@ const ENEMY_TINTS = {
 } as const;
 
 const ENEMY_RENDER_CONFIGS = {
-  guard: { displaySize: 100, bodyWidth: 328, bodyHeight: 500, bodyOffsetX: 348, bodyOffsetY: 480 },
-  axe: { displaySize: 125, bodyWidth: 400, bodyHeight: 600, bodyOffsetX: 312, bodyOffsetY: 424 },
-  ninja: { displaySize: 90, bodyWidth: 328, bodyHeight: 500, bodyOffsetX: 348, bodyOffsetY: 480 },
-  sniper: { displaySize: 100, bodyWidth: 328, bodyHeight: 500, bodyOffsetX: 348, bodyOffsetY: 480 },
+  guard: { displaySize: 70, bodyWidth: 35, bodyHeight: 55, bodyOffsetX: 18, bodyOffsetY: 12 },
+  axe: { displaySize: 85, bodyWidth: 42, bodyHeight: 65, bodyOffsetX: 22, bodyOffsetY: 15 },
+  ninja: { displaySize: 65, bodyWidth: 32, bodyHeight: 50, bodyOffsetX: 16, bodyOffsetY: 12 },
+  sniper: { displaySize: 70, bodyWidth: 35, bodyHeight: 55, bodyOffsetX: 18, bodyOffsetY: 12 },
 } as const;
 
 export class Enemy extends Phaser.Physics.Arcade.Sprite {

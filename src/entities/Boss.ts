@@ -14,9 +14,9 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
 
 
   private applyBossRender() {
-    this.setDisplaySize(220, 220);
-    this.body!.setSize(372, 558);
-    this.body!.setOffset(325, 465);
+    this.setDisplaySize(150, 150);
+    this.body!.setSize(70, 110);
+    this.body!.setOffset(40, 25);
     
     // Boss phases color feedback
     if (this.phase === 2) {
