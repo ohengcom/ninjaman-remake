@@ -16,12 +16,6 @@ export class BootScene extends Phaser.Scene {
       this.load.svg(svg.key, svg.url, { width: svg.svgConfig.width, height: svg.svgConfig.height });
     }
 
-    if ('spritesheets' in manifest) {
-      for (const sheet of manifest.spritesheets) {
-        this.load.spritesheet(sheet.key, sheet.url, sheet.frameConfig);
-      }
-    }
-
     const w = this.cameras.main.width;
     const h = this.cameras.main.height;
     

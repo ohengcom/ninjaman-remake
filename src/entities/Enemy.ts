@@ -34,9 +34,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   private attackReach: number = 60;
   private attackWindup: number = 500;
   private attackCooldown: number = 800;
-
-
-
+  protected currentVisualState: string = 'idle';
   private applyEnemyRender() {
     const cfg = ENEMY_RENDER_CONFIGS[this.enemyType];
     this.setDisplaySize(cfg.displaySize, cfg.displaySize);
