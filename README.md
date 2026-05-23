@@ -1,42 +1,34 @@
-# Cyber Ninja Remake
+# Ninja Man Remake
 
-A modern, high-definition action-platformer remake built with Phaser 4, TypeScript, and Vite. This project abandons legacy SWF assets in favor of programmatically generated, scalable vector graphics with a cyber-ninja aesthetic.
+A modern, high-definition action-platformer remake built with Phaser 4, TypeScript, and Vite. This project abandons legacy assets in favor of high-quality raster images powered by a state-of-the-art **Procedural Animation System** with a premium Macaron-aesthetic filter.
 
 ## Features
 
-- **Modern Vector Aesthetics**: Crisp, dynamic SVG graphics with neon glow effects generated procedurally via Canvas.
+- **Procedural Animation System**: Characters breathe, sway, squash, stretch, and react dynamically via code.
+- **Macaron Aesthetic & Visual Feedback**: Dynamic glowing masks, red flashes on hurt, blue on perfect block.
 - **Advanced Combat System**: 
   - **4-Hit Combos**: Timing-based combos with escalating damage.
-  - **Wave Attack**: Perform a motion input (`DOWN, FORWARD, SPACE`) to launch a long-range energy wave.
-  - **Directional Attacks**: Launcher/Uppercut (`UP + SPACE`) and Dive Attacks (`DOWN + SPACE` in the air).
-- **Fluid Movement**: Double jumping, Coyote time, and an invincible horizontal Dash/Roll. No more falling death—focus is on pure combat.
-- **Parry System**: Hold `DOWN` to defend. Perfect blocks mitigate 80% damage, prevent knockback, and award bonus points.
-- **Style Ranking**: Dynamic Devil May Cry-esque style rank (C, B, A, S, SSS) based on continuous combos.
-- **RPG Elements**: 
-  - Earn Skill Points (SP) via score milestones.
-  - Spend SP in the Cyber Enhancements menu (Press `K`) to upgrade your Integrity (Health).
+  - **Wave Attack**: Special single button energy wave.
+  - **Directional Attacks**: Launcher/Uppercut (`W + J`) and Dive Attacks (`S + J` in the air).
+- **Fluid Movement**: Double jumping, Coyote time, and an invincible horizontal Dash.
+- **Parry System**: Hold `K` to defend. Perfect blocks mitigate damage, prevent knockback, and award bonus points.
 - **Multi-stage Progression**:
-  - Sector 1: Cyber City
-  - Sector 2: Tech Forest
-  - Sector 3: Reactor Core (Boss Fight)
-- **Diverse Enemy AI**:
-  - **Guards**: Balanced patrollers.
-  - **Axe Brutes**: Slow, tanky, heavy hitters.
-  - **Ninjas**: Fragile but extremely fast.
-  - **Core Guardian (Boss)**: Massive mechanical enemy with full-screen sweeping blade attacks.
+  - Sector 1: Mystical Forest
+  - Sector 2: Beach Ruins
+  - Sector 3: Castle Courtyard (Boss Fight)
+- **Diverse Enemy AI**: Guards, Axe Brutes, Ninjas, and a massive Core Guardian Boss.
 
 ## Controls
 
-- `LEFT` / `RIGHT`: Run
-- `UP`: Jump / Double Jump
-- `DOWN` (hold): Defend/Block (Triggers Parry when hit)
-- `DOUBLE TAP LEFT/RIGHT`: Invincible Dash
-- `SPACE`: Attack (Spam for 4-hit combo)
-- `DOWN, FORWARD, SPACE`: Wave Attack (Hadouken motion)
-- `UP + SPACE` (on ground): Uppercut (Launcher)
-- `DOWN + SPACE` (in air): Dive Attack
-- `K`: Open/Close Skill Tree Menu
-- `M`: Toggle Sound
+- `A` / `D`: Run
+- `W`: Jump / Double Jump
+- `S` (tap): Crouch/Drop
+- `K` (hold): Defend/Block (Triggers Parry when hit)
+- `DOUBLE TAP A/D`: Invincible Dash
+- `J`: Attack (Spam for 4-hit combo)
+- `L`: Wave Attack
+- `W + J` (on ground): Uppercut (Launcher)
+- `S + J` (in air): Dive Attack
 
 ## Installation and Running
 
@@ -49,8 +41,6 @@ A modern, high-definition action-platformer remake built with Phaser 4, TypeScri
    ```bash
    npm run dev
    ```
-
-   The dev and build scripts generate the HD vector assets automatically.
 
 ## Build for Production
 
