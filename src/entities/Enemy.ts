@@ -51,17 +51,13 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   public play(key: any, ..._args: any[]): this {
     const keyStr = typeof key === 'string' ? key : (key?.key || '');
-    let keyToPlay = 'player_idle';
-    if (keyStr.includes('walk') || keyStr.includes('run')) keyToPlay = 'player_run';
-    else if (keyStr.includes('attack') || keyStr.includes('windup') || keyStr.includes('shoot')) keyToPlay = 'player_attack';
-    
-    super.play(keyToPlay, true);
+    this.currentVisualState = keyStr;
     this.applyEnemyRender();
     return this;
   }
 
   constructor(scene: Phaser.Scene, x: number, y: number, type: EnemyType = 'guard') {
-    super(scene, x, y, 'ninja_sheet');
+    super(scene, x, y, 'ninja_sprite');
     this.enemyType = type;
     scene.add.existing(this);
     scene.physics.add.existing(this);
@@ -77,7 +73,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   public spawn(x: number, y: number, type: EnemyType) {
     this.enemyType = type;
-    this.setTexture('ninja_sheet');
+    this.setTexture('ninja_sprite');
     this.setPosition(x, y);
     this.setActive(true);
     this.setVisible(true);
@@ -266,15 +262,56 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (this.active) {
       this.stateMachine.update(delta);
 
-      // Procedural Animation System Removed
+      // Procedural Animation System
       const cfg = ENEMY_RENDER_CONFIGS[this.enemyType];
-      const baseScaleX = cfg.displaySize / 204;
+      const baseScaleX = cfg.displaySize / 1024;
       const baseScaleY = cfg.displaySize / 1024;
 
       if (this.health <= 0) {
         this.setAngle(this.flipX ? -90 : 90);
+        this.setScale(baseScaleX, baseScaleY);
       } else {
-        this.setAngle(0);
+        const stateName = this.stateMachine.getCurrentStateName();
+        let sx = 1.0;
+        let sy = 1.0;
+        let angle = 0;
+
+        if (stateName === 'hurt') {
+          // Hurt: flash red & severe shake
+          sx = 0.88;
+          sy = 1.15;
+          angle = Math.sin(time * 0.08) * 12;
+          this.x += Math.sin(time * 0.15) * 1.5;
+        } else if (stateName === 'attack') {
+          // Attack: lunge slash
+          sx = 1.12;
+          sy = 0.90;
+          angle = this.flipX ? -15 : 15;
+        } else if (this.currentVisualState.includes('walk') || this.currentVisualState.includes('run')) {
+          // Movement sway
+          const speedFactor = this.enemyType === 'ninja' ? 0.024 : 0.016;
+          const sway = Math.sin(time * speedFactor) * 7;
+          angle = sway + (this.flipX ? 4 : -4);
+          
+          const bounce = Math.abs(Math.sin(time * speedFactor)) * 0.05;
+          sx = 1.04 - bounce;
+          sy = 0.96 + bounce;
+        } else if (this.currentVisualState.includes('windup')) {
+          // Axe windup
+          const pulse = Math.sin(time * 0.03) * 0.08;
+          sx = 1.0 + pulse;
+          sy = 1.0 - pulse;
+          angle = Math.sin(time * 0.05) * 5;
+        } else {
+          // Idle breathing
+          const speedFactor = this.enemyType === 'ninja' ? 0.014 : 0.010;
+          const breathe = Math.sin(time * speedFactor) * 0.03;
+          sx = 1.0 - breathe;
+          sy = 1.0 + breathe;
+        }
+
+        this.setScale(baseScaleX * sx, baseScaleY * sy);
+        this.setAngle(angle);
       }
     }
   }

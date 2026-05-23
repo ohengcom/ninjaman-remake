@@ -35,7 +35,7 @@ export class LevelBuilder {
       const scale = Math.max(requiredWidth / texture.width, h / texture.height);
       const scaledWidth = texture.width * scale;
       const scaledHeight = texture.height * scale;
-      const y = (h - scaledHeight) / 2;
+      const y = h - scaledHeight;
 
       scene.add.image(0, y, key)
         .setOrigin(0, 0)

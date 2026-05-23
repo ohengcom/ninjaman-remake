@@ -41,7 +41,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private lastJumpInputTime: number = 0;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, 'ninja_sheet');
+    super(scene, x, y, 'ninja_sprite');
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
@@ -205,17 +205,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   public playAnimation(animKey: string) {
-    if (!this.scene.anims.exists('player_idle')) {
-        this.scene.anims.create({ key: 'player_idle', frames: this.scene.anims.generateFrameNumbers('ninja_sheet', { frames: [4] }), frameRate: 8, repeat: -1 });
-        this.scene.anims.create({ key: 'player_run', frames: this.scene.anims.generateFrameNumbers('ninja_sheet', { frames: [0, 1, 2, 3] }), frameRate: 12, repeat: -1 });
-        this.scene.anims.create({ key: 'player_attack', frames: this.scene.anims.generateFrameNumbers('ninja_sheet', { frames: [3, 4] }), frameRate: 15, repeat: 0 });
-    }
-    let keyToPlay = 'player_idle';
-    if (animKey.includes('run')) keyToPlay = 'player_run';
-    else if (animKey.includes('attack') || animKey.includes('combo') || animKey.includes('dash') || animKey.includes('jump')) keyToPlay = 'player_attack';
-    
     this.currentVisualState = animKey;
-    this.anims.play(keyToPlay, true);
     this.applyRenderSize();
   }
 
@@ -525,13 +515,57 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       this.setAlpha(time % 200 < 100 ? 0.5 : 1);
     }
 
-    const baseScaleX = PLAYER_RENDER.displaySize / 204;
+    const baseScaleX = PLAYER_RENDER.displaySize / 1024;
     const baseScaleY = PLAYER_RENDER.displaySize / 1024;
 
     if (this.health <= 0) {
       this.setAngle(this.flipX ? -90 : 90);
+      this.setScale(baseScaleX, baseScaleY);
     } else {
-      this.setAngle(0);
+      const anim = this.currentVisualState;
+      let sx = 1.0;
+      let sy = 1.0;
+      let angle = 0;
+
+      if (anim.includes('idle')) {
+        const breathe = Math.sin(time * 0.012) * 0.04;
+        sx = 1.0 - breathe;
+        sy = 1.0 + breathe;
+      } else if (anim.includes('run')) {
+        const sway = Math.sin(time * 0.024) * 8;
+        angle = sway + (this.flipX ? 6 : -6);
+        const bounce = Math.abs(Math.sin(time * 0.024)) * 0.06;
+        sx = 1.05 - bounce;
+        sy = 0.95 + bounce;
+      } else if (anim.includes('jump')) {
+        sx = 0.86;
+        sy = 1.16;
+        angle = this.body!.velocity.x * 0.03;
+      } else if (anim.includes('fall')) {
+        sx = 1.10;
+        sy = 0.90;
+        angle = this.body!.velocity.x * 0.02 + Math.sin(time * 0.006) * 3;
+      } else if (anim.includes('dash')) {
+        sx = 1.25;
+        sy = 0.80;
+        angle = this.flipX ? -20 : 20;
+      } else if (anim.includes('defend')) {
+        sx = 1.18;
+        sy = 0.82;
+        angle = this.flipX ? 5 : -5;
+      } else if (anim.includes('attack') || anim.includes('combo') || anim.includes('uppercut') || anim.includes('dive') || anim.includes('wave')) {
+        sx = 1.12;
+        sy = 0.92;
+        angle = this.flipX ? -15 : 15;
+      } else if (anim.includes('hurt')) {
+        sx = 0.85;
+        sy = 1.20;
+        angle = Math.sin(time * 0.1) * 15;
+        this.x += Math.sin(time * 0.2) * 2;
+      }
+
+      this.setScale(baseScaleX * sx, baseScaleY * sy);
+      this.setAngle(angle);
     }
   }
 }

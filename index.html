@@ -596,15 +596,7 @@
           <span id="hud-style-letter" class="style-rank-letter rank-c">C</span>
         </div>
 
-        <!-- Footer HUD: Keyboard controllers & procedurally generated Sound switches -->
-        <footer class="hud-footer">
-          <div class="controls-guide">
-            Move <kbd>A</kbd>/<kbd>S</kbd>/<kbd>D</kbd>/<kbd>W</kbd> &nbsp;&middot;&nbsp; Jump <kbd>Space</kbd> &nbsp;&middot;&nbsp; Attack <kbd>J</kbd> &nbsp;&middot;&nbsp; Defend <kbd>K</kbd> &nbsp;&middot;&nbsp; Wave <kbd>L</kbd> &nbsp;&middot;&nbsp; Dash <kbd>Double-Tap</kbd>
-          </div>
-          <div id="hud-sound-toggle" class="sound-indicator interactive" onclick="window.toggleHUDGameSound()">
-            SOUND: <span id="hud-sound-status">OFF</span>
-          </div>
-        </footer>
+
 
       </div>
 
@@ -626,6 +618,16 @@
       </div>
 
     </main>
+
+    <!-- Footer HUD: Keyboard controllers & procedurally generated Sound switches -->
+    <footer class="hud-footer" style="width: min(calc(100vw - 32px), 1280px); flex: 0 0 auto;">
+      <div class="controls-guide">
+        Move <kbd>A</kbd>/<kbd>S</kbd>/<kbd>D</kbd>/<kbd>W</kbd> &nbsp;&middot;&nbsp; Jump <kbd>Space</kbd> &nbsp;&middot;&nbsp; Attack <kbd>J</kbd> &nbsp;&middot;&nbsp; Defend <kbd>K</kbd> &nbsp;&middot;&nbsp; Wave <kbd>L</kbd> &nbsp;&middot;&nbsp; Dash <kbd>Double-Tap</kbd>
+      </div>
+      <div id="hud-sound-toggle" class="sound-indicator interactive" onclick="window.toggleHUDGameSound()">
+        SOUND: <span id="hud-sound-status">OFF</span>
+      </div>
+    </footer>
 
     <!-- Phaser 4 script bootstrap -->
     <script type="module" src="/src/main.ts"></script>
