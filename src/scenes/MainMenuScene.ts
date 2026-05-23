@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { LevelBuilder } from '../utils/LevelBuilder.js';
 
 export class MainMenuScene extends Phaser.Scene {
   constructor() {
@@ -9,16 +10,15 @@ export class MainMenuScene extends Phaser.Scene {
     const w = this.cameras.main.width;
     const h = this.cameras.main.height;
 
-    this.add.image(w/2, h/2, 'bg_city_far').setScrollFactor(0);
-    this.add.image(w/2, h/2, 'bg_city_mid').setScrollFactor(0);
+    LevelBuilder.buildStaticBackground(this, 'bg_city_far', 'bg_city_mid');
 
     const title = this.add.text(w / 2, h / 2 - 100, 'CYBER NINJA', {
       fontFamily: 'Impact, sans-serif',
       fontSize: '80px',
-      color: '#e94560',
-      stroke: '#1a1a2e',
-      strokeThickness: 8,
-      shadow: { blur: 10, color: '#e94560', fill: true }
+      color: '#ff6b6b',
+      stroke: '#ffffff',
+      strokeThickness: 6,
+      shadow: { blur: 8, color: 'rgba(255, 107, 107, 0.4)', fill: true }
     }).setOrigin(0.5);
 
     this.tweens.add({
@@ -31,9 +31,10 @@ export class MainMenuScene extends Phaser.Scene {
     });
 
     const startText = this.add.text(w / 2, h / 2 + 100, 'PRESS SPACE TO START', {
-      fontFamily: 'Arial',
-      fontSize: '32px',
-      color: '#ffffff',
+      fontFamily: 'Inter, sans-serif',
+      fontSize: '28px',
+      color: '#495057',
+      fontStyle: 'bold'
     }).setOrigin(0.5);
 
     this.tweens.add({

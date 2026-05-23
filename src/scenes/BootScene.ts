@@ -27,18 +27,18 @@ export class BootScene extends Phaser.Scene {
     
     const bar = this.add.graphics();
     const box = this.add.graphics();
-    box.fillStyle(0x151515, 0.8);
-    box.lineStyle(2, 0xe5c158, 1);
+    box.fillStyle(0xe9ecef, 0.9);
+    box.lineStyle(1.5, 0x74c0fc, 1);
     box.fillRect(w / 2 - 160, h / 2 - 25, 320, 50);
     box.strokeRect(w / 2 - 160, h / 2 - 25, 320, 50);
     
-    const txt = this.add.text(w / 2, h / 2 - 50, 'Loading Sacred Ink...', {
-      fontFamily: 'serif', fontSize: '20px', color: '#e5c158', fontStyle: 'bold'
+    const txt = this.add.text(w / 2, h / 2 - 50, 'Synchronizing Core...', {
+      fontFamily: 'Inter, sans-serif', fontSize: '20px', color: '#495057', fontStyle: 'bold'
     }).setOrigin(0.5);
 
     this.load.on('progress', (v: number) => {
       bar.clear();
-      bar.fillStyle(0xe5c158, 1);
+      bar.fillStyle(0x74c0fc, 1);
       bar.fillRect(w / 2 - 150, h / 2 - 15, 300 * v, 30);
     });
 

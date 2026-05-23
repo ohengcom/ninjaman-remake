@@ -1,99 +1,99 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 120" width="480" height="120">
   <defs>
   <filter id="goldGlow" x="-50%" y="-50%" width="200%" height="200%">
-    <feGaussianBlur stdDeviation="4.5" result="blur"/>
+    <feGaussianBlur stdDeviation="3" result="blur"/>
     <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
   </filter>
   <filter id="heavyGoldGlow" x="-80%" y="-80%" width="260%" height="260%">
-    <feGaussianBlur stdDeviation="7" result="blur1"/>
-    <feGaussianBlur stdDeviation="2.5" result="blur2"/>
+    <feGaussianBlur stdDeviation="5" result="blur1"/>
+    <feGaussianBlur stdDeviation="1.5" result="blur2"/>
     <feMerge><feMergeNode in="blur1"/><feMergeNode in="blur2"/><feMergeNode in="SourceGraphic"/></feMerge>
   </filter>
   <filter id="sakuraGlow" x="-50%" y="-50%" width="200%" height="200%">
-    <feGaussianBlur stdDeviation="4" result="blur"/>
-    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-  </filter>
-  <filter id="inkMisty" x="-30%" y="-30%" width="160%" height="160%">
-    <feGaussianBlur stdDeviation="1.8"/>
-  </filter>
-  <filter id="redGlow" x="-40%" y="-40%" width="180%" height="180%">
     <feGaussianBlur stdDeviation="3.5" result="blur"/>
     <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
   </filter>
+  <filter id="inkMisty" x="-30%" y="-30%" width="160%" height="160%">
+    <feGaussianBlur stdDeviation="1.5"/>
+  </filter>
+  <filter id="redGlow" x="-40%" y="-40%" width="180%" height="180%">
+    <feGaussianBlur stdDeviation="3" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
   <linearGradient id="inkWashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-    <stop offset="0%" stop-color="#313244"/><stop offset="60%" stop-color="#11111b"/><stop offset="100%" stop-color="#11111b"/>
+    <stop offset="0%" stop-color="#e7f5ff"/><stop offset="60%" stop-color="#a5d8ff"/><stop offset="100%" stop-color="#74c0fc"/>
   </linearGradient>
   <linearGradient id="inkWashLight" x1="0%" y1="0%" x2="100%" y2="100%">
-    <stop offset="0%" stop-color="#6c7086"/><stop offset="50%" stop-color="#45475a"/><stop offset="100%" stop-color="#1e1e2e"/>
+    <stop offset="0%" stop-color="#f8f9fa"/><stop offset="50%" stop-color="#e9ecef"/><stop offset="100%" stop-color="#dee2e6"/>
   </linearGradient>
   <linearGradient id="spiritGold" x1="0%" y1="0%" x2="100%" y2="0%">
-    <stop offset="0%" stop-color="#cdd6f4"/><stop offset="35%" stop-color="#f9e2af"/><stop offset="75%" stop-color="#fab387"/><stop offset="100%" stop-color="#fab387"/>
+    <stop offset="0%" stop-color="#fff9db"/><stop offset="35%" stop-color="#ffe066"/><stop offset="75%" stop-color="#ffd43b"/><stop offset="100%" stop-color="#fab005"/>
   </linearGradient>
   <linearGradient id="sacredMaple" x1="0%" y1="0%" x2="100%" y2="100%">
-    <stop offset="0%" stop-color="#f38ba8"/><stop offset="50%" stop-color="#fab387"/><stop offset="100%" stop-color="#eba0ac"/>
+    <stop offset="0%" stop-color="#fff5f5"/><stop offset="50%" stop-color="#ffc9c9"/><stop offset="100%" stop-color="#ff8787"/>
   </linearGradient>
   <linearGradient id="sakuraBlade" x1="0%" y1="0%" x2="100%" y2="100%">
-    <stop offset="0%" stop-color="#cdd6f4"/><stop offset="40%" stop-color="#f2cdcd"/><stop offset="85%" stop-color="#f5c2e7"/><stop offset="100%" stop-color="#cba6f7"/>
+    <stop offset="0%" stop-color="#e3fafc"/><stop offset="40%" stop-color="#96f2d7"/><stop offset="85%" stop-color="#3bc9db"/><stop offset="100%" stop-color="#15aabf"/>
   </linearGradient>
   <linearGradient id="crimsonGaze" x1="0%" y1="0%" x2="100%" y2="100%">
-    <stop offset="0%" stop-color="#f38ba8"/><stop offset="60%" stop-color="#eba0ac"/><stop offset="100%" stop-color="#1e1e2e"/>
+    <stop offset="0%" stop-color="#ff8787"/><stop offset="60%" stop-color="#ff6b6b"/><stop offset="100%" stop-color="#495057"/>
   </linearGradient>
 </defs>
   <g transform="translate(0, 0)"><clipPath id="frame0"><rect x="0" y="0" width="120" height="120"/></clipPath><g clip-path="url(#frame0)"><path d="M 57.2 52 C 48 69 53 79 58 84 C 66 76 63.2 56 57.2 52" fill="url(#sacredMaple)" opacity="0.85" filter="url(#sakuraGlow)"/><g transform="rotate(-5 60 52)">
-    <path d="M 48 52 L 72 52 L 68 78.6 L 52 78.6 Z" fill="url(#inkWashGrad)" stroke="#fab387" stroke-width="1.2"/>
-    <circle cx="60" cy="62.64" r="5" fill="#fab387" filter="url(#goldGlow)"/>
+    <path d="M 48 52 L 72 52 L 68 78.6 L 52 78.6 Z" fill="url(#inkWashGrad)" stroke="#495057" stroke-width="1.2"/>
+    <circle cx="60" cy="62.64" r="5" fill="#74c0fc" filter="url(#goldGlow)"/>
   </g><line x1="54" y1="78" x2="51.77323038463895" y2="93.84428909986512" stroke="url(#inkWashLight)" stroke-width="5" stroke-linecap="round"/>
     <line x1="66" y1="78" x2="68.22676961536105" y2="93.84428909986512" stroke="url(#inkWashLight)" stroke-width="5" stroke-linecap="round"/>
-    <circle cx="51.77323038463895" cy="93.84428909986512" r="2.5" fill="#fab387"/>
-    <circle cx="68.22676961536105" cy="93.84428909986512" r="2.5" fill="#fab387"/><line x1="48" y1="56" x2="43.21171799344064" y2="42.84430330899728" stroke="url(#inkWashLight)" stroke-width="4" stroke-linecap="round"/>
-    <circle cx="43.21171799344064" cy="42.84430330899728" r="2.5" fill="#fab387" filter="url(#goldGlow)"/><line x1="70" y1="56" x2="70" y2="44" stroke="url(#inkWashLight)" stroke-width="4" stroke-linecap="round"/>
-    <circle cx="70" cy="44" r="2.5" fill="#fab387" filter="url(#goldGlow)"/><line x1="44" y1="60" x2="19.751288694035715" y2="46" stroke="url(#sakuraBlade)" stroke-width="3" stroke-linecap="round" filter="url(#sakuraGlow)"/>
-    <line x1="44" y1="60" x2="19.751288694035715" y2="46" stroke="#cdd6f4" stroke-width="1.2" stroke-linecap="round"/><g transform="rotate(3 60 42)">
-    <ellipse cx="60" cy="42" rx="22" ry="6" fill="url(#inkWashLight)" stroke="#fab387" stroke-width="1.8"/>
-    <path d="M 38 42 C 38 30 82 30 82 42 Z" fill="url(#inkWashGrad)" stroke="#fab387" stroke-width="1.2"/>
-    <line x1="60" y1="30" x2="60" y2="46" stroke="#fab387" stroke-width="0.8" opacity="0.6"/>
-  </g><path d="M 54 48 L 60 52 L 66 48" fill="none" stroke="#fab387" stroke-width="2.2" filter="url(#heavyGoldGlow)"/>
-    <polygon points="58.5,48 60,50.5 61.5,48" fill="#cdd6f4"/></g></g><g transform="translate(120, 0)"><clipPath id="frame1"><rect x="0" y="0" width="120" height="120"/></clipPath><g clip-path="url(#frame1)"><path d="M 50.00000000000001 34.01923788646684 A 30 30 0 0 1 80 34.01923788646684" fill="none" stroke="url(#sakuraBlade)" stroke-width="4" opacity="0.6" filter="url(#sakuraGlow)"/><path d="M 55.4 52 C 38 69 42 79 47 84 C 55 76 61.4 56 55.4 52" fill="url(#sacredMaple)" opacity="0.85" filter="url(#sakuraGlow)"/><g transform="rotate(-2 60 50)">
-    <path d="M 48 50 L 72 50 L 68 78 L 52 78 Z" fill="url(#inkWashGrad)" stroke="#fab387" stroke-width="1.2"/>
-    <circle cx="60" cy="61.2" r="5" fill="#fab387" filter="url(#goldGlow)"/>
+    <circle cx="51.77323038463895" cy="93.84428909986512" r="2.5" fill="#495057"/>
+    <circle cx="68.22676961536105" cy="93.84428909986512" r="2.5" fill="#495057"/><line x1="48" y1="56" x2="43.21171799344064" y2="42.84430330899728" stroke="url(#inkWashLight)" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="43.21171799344064" cy="42.84430330899728" r="2.5" fill="#74c0fc" filter="url(#goldGlow)"/><line x1="70" y1="56" x2="70" y2="44" stroke="url(#inkWashLight)" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="70" cy="44" r="2.5" fill="#74c0fc" filter="url(#goldGlow)"/><line x1="44" y1="60" x2="19.751288694035715" y2="46" stroke="url(#sakuraBlade)" stroke-width="3" stroke-linecap="round" filter="url(#sakuraGlow)"/>
+    <line x1="44" y1="60" x2="19.751288694035715" y2="46" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round"/><g transform="rotate(3 60 42)">
+    <ellipse cx="60" cy="42" rx="22" ry="6" fill="url(#inkWashLight)" stroke="#495057" stroke-width="1.8"/>
+    <path d="M 38 42 C 38 30 82 30 82 42 Z" fill="url(#inkWashGrad)" stroke="#495057" stroke-width="1.2"/>
+    <line x1="60" y1="30" x2="60" y2="46" stroke="#495057" stroke-width="0.8" opacity="0.6"/>
+  </g><path d="M 54 48 L 60 52 L 66 48" fill="none" stroke="#ff8787" stroke-width="2.2" filter="url(#heavyGoldGlow)"/>
+    <polygon points="58.5,48 60,50.5 61.5,48" fill="#ffffff"/></g></g><g transform="translate(120, 0)"><clipPath id="frame1"><rect x="0" y="0" width="120" height="120"/></clipPath><g clip-path="url(#frame1)"><path d="M 50.00000000000001 34.01923788646684 A 30 30 0 0 1 80 34.01923788646684" fill="none" stroke="url(#sakuraBlade)" stroke-width="4" opacity="0.6" filter="url(#sakuraGlow)"/><path d="M 55.4 52 C 38 69 42 79 47 84 C 55 76 61.4 56 55.4 52" fill="url(#sacredMaple)" opacity="0.85" filter="url(#sakuraGlow)"/><g transform="rotate(-2 60 50)">
+    <path d="M 48 50 L 72 50 L 68 78 L 52 78 Z" fill="url(#inkWashGrad)" stroke="#495057" stroke-width="1.2"/>
+    <circle cx="60" cy="61.2" r="5" fill="#74c0fc" filter="url(#goldGlow)"/>
   </g><line x1="54" y1="78" x2="52.51835237328981" y2="94.93530986755968" stroke="url(#inkWashLight)" stroke-width="5" stroke-linecap="round"/>
     <line x1="66" y1="78" x2="67.48164762671018" y2="94.93530986755968" stroke="url(#inkWashLight)" stroke-width="5" stroke-linecap="round"/>
-    <circle cx="52.51835237328981" cy="94.93530986755968" r="2.5" fill="#fab387"/>
-    <circle cx="67.48164762671018" cy="94.93530986755968" r="2.5" fill="#fab387"/><line x1="50" y1="54" x2="41.00097346438845" y2="43.27537779633431" stroke="url(#inkWashLight)" stroke-width="4" stroke-linecap="round"/>
-    <circle cx="41.00097346438845" cy="43.27537779633431" r="2.5" fill="#fab387" filter="url(#goldGlow)"/><line x1="72" y1="52" x2="82.28460175498464" y2="39.743288910096354" stroke="url(#inkWashLight)" stroke-width="4" stroke-linecap="round"/>
-    <circle cx="82.28460175498464" cy="39.743288910096354" r="2.5" fill="#fab387" filter="url(#goldGlow)"/><line x1="74" y1="36" x2="94.56920350996926" y2="11.486577820192704" stroke="url(#sakuraBlade)" stroke-width="3" stroke-linecap="round" filter="url(#sakuraGlow)"/>
-    <line x1="74" y1="36" x2="94.56920350996926" y2="11.486577820192704" stroke="#cdd6f4" stroke-width="1.2" stroke-linecap="round"/><g transform="rotate(-2 60 42)">
-    <ellipse cx="60" cy="42" rx="22" ry="6" fill="url(#inkWashLight)" stroke="#fab387" stroke-width="1.8"/>
-    <path d="M 38 42 C 38 30 82 30 82 42 Z" fill="url(#inkWashGrad)" stroke="#fab387" stroke-width="1.2"/>
-    <line x1="60" y1="30" x2="60" y2="46" stroke="#fab387" stroke-width="0.8" opacity="0.6"/>
-  </g><path d="M 54 48 L 60 52 L 66 48" fill="none" stroke="#fab387" stroke-width="2.2" filter="url(#heavyGoldGlow)"/>
-    <polygon points="58.5,48 60,50.5 61.5,48" fill="#cdd6f4"/></g></g><g transform="translate(240, 0)"><clipPath id="frame2"><rect x="0" y="0" width="120" height="120"/></clipPath><g clip-path="url(#frame2)"><path d="M 37.091034656191326 31.000000000000004 A 38 38 0 0 1 102.90896534380867 31.000000000000004" fill="none" stroke="url(#sakuraBlade)" stroke-width="4" opacity="0.9" filter="url(#sakuraGlow)"/><path d="M 54.2 52 C 30 71 34 81 39 86 C 47 78 60.2 56 54.2 52" fill="url(#sacredMaple)" opacity="0.85" filter="url(#sakuraGlow)"/><g transform="rotate(-8 60 48)">
-    <path d="M 48 48 L 72 48 L 68 77.4 L 52 77.4 Z" fill="url(#inkWashGrad)" stroke="#fab387" stroke-width="1.2"/>
-    <circle cx="60" cy="59.760000000000005" r="5" fill="#fab387" filter="url(#goldGlow)"/>
+    <circle cx="52.51835237328981" cy="94.93530986755968" r="2.5" fill="#495057"/>
+    <circle cx="67.48164762671018" cy="94.93530986755968" r="2.5" fill="#495057"/><line x1="50" y1="54" x2="41.00097346438845" y2="43.27537779633431" stroke="url(#inkWashLight)" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="41.00097346438845" cy="43.27537779633431" r="2.5" fill="#74c0fc" filter="url(#goldGlow)"/><line x1="72" y1="52" x2="82.28460175498464" y2="39.743288910096354" stroke="url(#inkWashLight)" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="82.28460175498464" cy="39.743288910096354" r="2.5" fill="#74c0fc" filter="url(#goldGlow)"/><line x1="74" y1="36" x2="94.56920350996926" y2="11.486577820192704" stroke="url(#sakuraBlade)" stroke-width="3" stroke-linecap="round" filter="url(#sakuraGlow)"/>
+    <line x1="74" y1="36" x2="94.56920350996926" y2="11.486577820192704" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round"/><g transform="rotate(-2 60 42)">
+    <ellipse cx="60" cy="42" rx="22" ry="6" fill="url(#inkWashLight)" stroke="#495057" stroke-width="1.8"/>
+    <path d="M 38 42 C 38 30 82 30 82 42 Z" fill="url(#inkWashGrad)" stroke="#495057" stroke-width="1.2"/>
+    <line x1="60" y1="30" x2="60" y2="46" stroke="#495057" stroke-width="0.8" opacity="0.6"/>
+  </g><path d="M 54 48 L 60 52 L 66 48" fill="none" stroke="#ff8787" stroke-width="2.2" filter="url(#heavyGoldGlow)"/>
+    <polygon points="58.5,48 60,50.5 61.5,48" fill="#ffffff"/></g></g><g transform="translate(240, 0)"><clipPath id="frame2"><rect x="0" y="0" width="120" height="120"/></clipPath><g clip-path="url(#frame2)"><path d="M 37.091034656191326 31.000000000000004 A 38 38 0 0 1 102.90896534380867 31.000000000000004" fill="none" stroke="url(#sakuraBlade)" stroke-width="4" opacity="0.9" filter="url(#sakuraGlow)"/><path d="M 54.2 52 C 30 71 34 81 39 86 C 47 78 60.2 56 54.2 52" fill="url(#sacredMaple)" opacity="0.85" filter="url(#sakuraGlow)"/><g transform="rotate(-8 60 48)">
+    <path d="M 48 48 L 72 48 L 68 77.4 L 52 77.4 Z" fill="url(#inkWashGrad)" stroke="#495057" stroke-width="1.2"/>
+    <circle cx="60" cy="59.760000000000005" r="5" fill="#74c0fc" filter="url(#goldGlow)"/>
   </g><line x1="54" y1="78" x2="53.11028874386996" y2="94.97670209082776" stroke="url(#inkWashLight)" stroke-width="5" stroke-linecap="round"/>
     <line x1="66" y1="78" x2="66.88971125613004" y2="94.97670209082776" stroke="url(#inkWashLight)" stroke-width="5" stroke-linecap="round"/>
-    <circle cx="53.11028874386996" cy="94.97670209082776" r="2.5" fill="#fab387"/>
-    <circle cx="66.88971125613004" cy="94.97670209082776" r="2.5" fill="#fab387"/><line x1="50" y1="52" x2="39.27537779633431" y2="43.00097346438845" stroke="url(#inkWashLight)" stroke-width="4" stroke-linecap="round"/>
-    <circle cx="39.27537779633431" cy="43.00097346438845" r="2.5" fill="#fab387" filter="url(#goldGlow)"/><line x1="74" y1="48" x2="77.12566719800475" y2="30.273460445780255" stroke="url(#inkWashLight)" stroke-width="4" stroke-linecap="round"/>
-    <circle cx="77.12566719800475" cy="30.273460445780255" r="2.5" fill="#fab387" filter="url(#goldGlow)"/><line x1="70" y1="26" x2="76.2513343960095" y2="-9.45307910843949" stroke="url(#sakuraBlade)" stroke-width="3" stroke-linecap="round" filter="url(#sakuraGlow)"/>
-    <line x1="70" y1="26" x2="76.2513343960095" y2="-9.45307910843949" stroke="#cdd6f4" stroke-width="1.2" stroke-linecap="round"/><g transform="rotate(-5 59 40)">
-    <ellipse cx="59" cy="40" rx="22" ry="6" fill="url(#inkWashLight)" stroke="#fab387" stroke-width="1.8"/>
-    <path d="M 37 40 C 37 28 81 28 81 40 Z" fill="url(#inkWashGrad)" stroke="#fab387" stroke-width="1.2"/>
-    <line x1="59" y1="28" x2="59" y2="44" stroke="#fab387" stroke-width="0.8" opacity="0.6"/>
-  </g><path d="M 53 46 L 59 50 L 65 46" fill="none" stroke="#fab387" stroke-width="2.2" filter="url(#heavyGoldGlow)"/>
-    <polygon points="57.5,46 59,48.5 60.5,46" fill="#cdd6f4"/></g></g><g transform="translate(360, 0)"><clipPath id="frame3"><rect x="0" y="0" width="120" height="120"/></clipPath><g clip-path="url(#frame3)"><path d="M 55.4 52 C 40 67 43 77 48 82 C 56 74 61.4 56 55.4 52" fill="url(#sacredMaple)" opacity="0.85" filter="url(#sakuraGlow)"/><g transform="rotate(-3 60 50)">
-    <path d="M 48 50 L 72 50 L 68 78 L 52 78 Z" fill="url(#inkWashGrad)" stroke="#fab387" stroke-width="1.2"/>
-    <circle cx="60" cy="61.2" r="5" fill="#fab387" filter="url(#goldGlow)"/>
+    <circle cx="53.11028874386996" cy="94.97670209082776" r="2.5" fill="#495057"/>
+    <circle cx="66.88971125613004" cy="94.97670209082776" r="2.5" fill="#495057"/><line x1="50" y1="52" x2="39.27537779633431" y2="43.00097346438845" stroke="url(#inkWashLight)" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="39.27537779633431" cy="43.00097346438845" r="2.5" fill="#74c0fc" filter="url(#goldGlow)"/><line x1="74" y1="48" x2="77.12566719800475" y2="30.273460445780255" stroke="url(#inkWashLight)" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="77.12566719800475" cy="30.273460445780255" r="2.5" fill="#74c0fc" filter="url(#goldGlow)"/><line x1="70" y1="26" x2="76.2513343960095" y2="-9.45307910843949" stroke="url(#sakuraBlade)" stroke-width="3" stroke-linecap="round" filter="url(#sakuraGlow)"/>
+    <line x1="70" y1="26" x2="76.2513343960095" y2="-9.45307910843949" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round"/><g transform="rotate(-5 59 40)">
+    <ellipse cx="59" cy="40" rx="22" ry="6" fill="url(#inkWashLight)" stroke="#495057" stroke-width="1.8"/>
+    <path d="M 37 40 C 37 28 81 28 81 40 Z" fill="url(#inkWashGrad)" stroke="#495057" stroke-width="1.2"/>
+    <line x1="59" y1="28" x2="59" y2="44" stroke="#495057" stroke-width="0.8" opacity="0.6"/>
+  </g><path d="M 53 46 L 59 50 L 65 46" fill="none" stroke="#ff8787" stroke-width="2.2" filter="url(#heavyGoldGlow)"/>
+    <polygon points="57.5,46 59,48.5 60.5,46" fill="#ffffff"/></g></g><g transform="translate(360, 0)"><clipPath id="frame3"><rect x="0" y="0" width="120" height="120"/></clipPath><g clip-path="url(#frame3)"><path d="M 55.4 52 C 40 67 43 77 48 82 C 56 74 61.4 56 55.4 52" fill="url(#sacredMaple)" opacity="0.85" filter="url(#sakuraGlow)"/><g transform="rotate(-3 60 50)">
+    <path d="M 48 50 L 72 50 L 68 78 L 52 78 Z" fill="url(#inkWashGrad)" stroke="#495057" stroke-width="1.2"/>
+    <circle cx="60" cy="61.2" r="5" fill="#74c0fc" filter="url(#goldGlow)"/>
   </g><line x1="54" y1="78" x2="52.81413994634987" y2="94.95858885441702" stroke="url(#inkWashLight)" stroke-width="5" stroke-linecap="round"/>
     <line x1="66" y1="78" x2="67.18586005365013" y2="94.95858885441702" stroke="url(#inkWashLight)" stroke-width="5" stroke-linecap="round"/>
-    <circle cx="52.81413994634987" cy="94.95858885441702" r="2.5" fill="#fab387"/>
-    <circle cx="67.18586005365013" cy="94.95858885441702" r="2.5" fill="#fab387"/><line x1="50" y1="54" x2="47.91622186799684" y2="42.182306963853506" stroke="url(#inkWashLight)" stroke-width="4" stroke-linecap="round"/>
-    <circle cx="47.91622186799684" cy="42.182306963853506" r="2.5" fill="#fab387" filter="url(#goldGlow)"/><line x1="72" y1="52" x2="76.78828200655937" y2="38.84430330899728" stroke="url(#inkWashLight)" stroke-width="4" stroke-linecap="round"/>
-    <circle cx="76.78828200655937" cy="38.84430330899728" r="2.5" fill="#fab387" filter="url(#goldGlow)"/><line x1="68" y1="34" x2="79.83331132873958" y2="8.623381962973802" stroke="url(#sakuraBlade)" stroke-width="3" stroke-linecap="round" filter="url(#sakuraGlow)"/>
-    <line x1="68" y1="34" x2="79.83331132873958" y2="8.623381962973802" stroke="#cdd6f4" stroke-width="1.2" stroke-linecap="round"/><g transform="rotate(-2 60 42)">
-    <ellipse cx="60" cy="42" rx="22" ry="6" fill="url(#inkWashLight)" stroke="#fab387" stroke-width="1.8"/>
-    <path d="M 38 42 C 38 30 82 30 82 42 Z" fill="url(#inkWashGrad)" stroke="#fab387" stroke-width="1.2"/>
-    <line x1="60" y1="30" x2="60" y2="46" stroke="#fab387" stroke-width="0.8" opacity="0.6"/>
-  </g><path d="M 54 48 L 60 52 L 66 48" fill="none" stroke="#fab387" stroke-width="2.2" filter="url(#heavyGoldGlow)"/>
-    <polygon points="58.5,48 60,50.5 61.5,48" fill="#cdd6f4"/></g></g>
+    <circle cx="52.81413994634987" cy="94.95858885441702" r="2.5" fill="#495057"/>
+    <circle cx="67.18586005365013" cy="94.95858885441702" r="2.5" fill="#495057"/><line x1="50" y1="54" x2="47.91622186799684" y2="42.182306963853506" stroke="url(#inkWashLight)" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="47.91622186799684" cy="42.182306963853506" r="2.5" fill="#74c0fc" filter="url(#goldGlow)"/><line x1="72" y1="52" x2="76.78828200655937" y2="38.84430330899728" stroke="url(#inkWashLight)" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="76.78828200655937" cy="38.84430330899728" r="2.5" fill="#74c0fc" filter="url(#goldGlow)"/><line x1="68" y1="34" x2="79.83331132873958" y2="8.623381962973802" stroke="url(#sakuraBlade)" stroke-width="3" stroke-linecap="round" filter="url(#sakuraGlow)"/>
+    <line x1="68" y1="34" x2="79.83331132873958" y2="8.623381962973802" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round"/><g transform="rotate(-2 60 42)">
+    <ellipse cx="60" cy="42" rx="22" ry="6" fill="url(#inkWashLight)" stroke="#495057" stroke-width="1.8"/>
+    <path d="M 38 42 C 38 30 82 30 82 42 Z" fill="url(#inkWashGrad)" stroke="#495057" stroke-width="1.2"/>
+    <line x1="60" y1="30" x2="60" y2="46" stroke="#495057" stroke-width="0.8" opacity="0.6"/>
+  </g><path d="M 54 48 L 60 52 L 66 48" fill="none" stroke="#ff8787" stroke-width="2.2" filter="url(#heavyGoldGlow)"/>
+    <polygon points="58.5,48 60,50.5 61.5,48" fill="#ffffff"/></g></g>
 </svg>

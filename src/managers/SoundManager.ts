@@ -267,39 +267,39 @@ export class SoundManager {
     }
 
     public static playDash(pan: number = 0) {
-        // Sleek plasma rush: noisy swoosh overlaid with metallic FM sweep
-        this.playNoise(0.24, 0.08, pan);
-        this.playFMSweep('sawtooth', 'square', 320, 100, 300, 0.22, 0.06, pan, { attack: 0.08, decay: 0.15, sustain: 0.4 });
+        // Soft wind-like dash swoosh
+        this.playNoise(0.2, 0.06, pan);
+        this.playFMSweep('sine', 'triangle', 250, 80, 150, 0.2, 0.04, pan, { attack: 0.1, decay: 0.1, sustain: 0.3 });
     }
 
     public static playSwing(pan: number = 0) {
-        // Saber swing sound: high-tech slash swoosh
-        this.playNoise(0.08, 0.03, pan);
-        this.playFMSweep('triangle', 'sawtooth', 720, 180, 400, 0.1, 0.05, pan, { attack: 0.05, decay: 0.15, sustain: 0.5 });
+        // Crisp wooden-slash swoosh
+        this.playNoise(0.06, 0.02, pan);
+        this.playFMSweep('sine', 'triangle', 440, 150, 180, 0.08, 0.03, pan, { attack: 0.03, decay: 0.05, sustain: 0.3 });
     }
 
     public static playHit(pan: number = 0) {
-        // Cyber slice hit impact: metal clashing shockwave
-        this.playNoise(0.12, 0.12, pan);
-        this.playFMSweep('sawtooth', 'square', 380, 750, 800, 0.18, 0.12, pan, { attack: 0.02, decay: 0.2, sustain: 0.3 });
+        // Crisp tactile wooden chop impact
+        this.playNoise(0.08, 0.05, pan);
+        this.playFMSweep('triangle', 'sine', 300, 600, 200, 0.12, 0.08, pan, { attack: 0.01, decay: 0.08, sustain: 0.2 });
     }
 
     public static playParry(pan: number = 0) {
-        // Energy shield deflection: high-pitched digital laser deflect
-        this.playFMSweep('sine', 'triangle', 1500, 2200, 1000, 0.16, 0.14, pan, { attack: 0.01, decay: 0.08, sustain: 0.6 });
-        this.playSweep('square', 800, 1600, 0.12, 0.05, pan, { attack: 0.02, decay: 0.1, sustain: 0.4 });
+        // Gorgeous pure crystal bell-like parry chime
+        this.playSweep('sine', 1600, 1600, 0.3, 0.12, pan, { attack: 0.005, decay: 0.2, sustain: 0.1, release: 0.2 });
+        this.playSweep('sine', 1200, 1200, 0.2, 0.06, pan, { attack: 0.005, decay: 0.15, sustain: 0.1, release: 0.15 });
     }
 
     public static playDamage(pan: number = 0) {
-        // Cybernetic frame disruption alert: glitchy digital warning
-        this.playNoise(0.28, 0.18, pan);
-        this.playFMSweep('square', 'sawtooth', 160, 44, 1000, 0.3, 0.16, pan, { attack: 0.04, decay: 0.18, sustain: 0.5 });
+        // Soft thud alert chime
+        this.playNoise(0.2, 0.08, pan);
+        this.playFMSweep('triangle', 'sine', 180, 90, 300, 0.25, 0.1, pan, { attack: 0.05, decay: 0.15, sustain: 0.4 });
     }
 
     public static playHadouken(pan: number = 0) {
-        // Plasma wave charge & release: growing sweep followed by electric release noise
-        this.playFMSweep('sawtooth', 'sine', 200, 600, 500, 0.36, 0.08, pan, { attack: 0.18, decay: 0.15, sustain: 0.6 });
-        this.playNoise(0.18, 0.06, pan);
+        // Breezy plasma wind release
+        this.playFMSweep('sine', 'sine', 220, 440, 200, 0.32, 0.06, pan, { attack: 0.12, decay: 0.1, sustain: 0.4 });
+        this.playNoise(0.2, 0.05, pan);
     }
 
     public static playMenuBlip() {

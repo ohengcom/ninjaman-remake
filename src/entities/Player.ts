@@ -3,6 +3,16 @@ import { StateMachine } from '../utils/StateMachine.js';
 import { SoundManager } from '../managers/SoundManager.js';
 import { PLAYER_MOVEMENT, PLAYER_ATTACKS, PLAYER_DEFENSE } from '../config/combat.js';
 
+const PLAYER_RENDER = {
+  frameWidth: 120,
+  frameHeight: 120,
+  scale: 0.9,
+  bodyWidth: 32,
+  bodyHeight: 48,
+  bodyOffsetX: 44,
+  bodyOffsetY: 40,
+} as const;
+
 export class Player extends Phaser.Physics.Arcade.Sprite {
   public stateMachine: StateMachine<Player>;
   public cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -35,10 +45,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
-    this.setDisplaySize(120, 120);
+    this.applyRenderSize();
     this.setCollideWorldBounds(true);
-    this.body!.setSize(30, 40);
-    this.body!.setOffset(this.width / 2 - 15, this.height / 2 - 20);
 
     // Set keys to A, S, D, W, SPACE
     this.cursors = scene.input.keyboard!.addKeys({
@@ -209,9 +217,16 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     if (this.anims.currentAnim?.key !== animKey) {
       this.play(animKey);
     }
-    this.setDisplaySize(120, 120);
-    this.body!.setSize(30, 40);
-    this.body!.setOffset(this.width / 2 - 15, this.height / 2 - 20);
+    this.applyRenderSize();
+  }
+
+  private applyRenderSize() {
+    this.setDisplaySize(
+      PLAYER_RENDER.frameWidth * PLAYER_RENDER.scale,
+      PLAYER_RENDER.frameHeight * PLAYER_RENDER.scale,
+    );
+    this.body!.setSize(PLAYER_RENDER.bodyWidth, PLAYER_RENDER.bodyHeight);
+    this.body!.setOffset(PLAYER_RENDER.bodyOffsetX, PLAYER_RENDER.bodyOffsetY);
   }
 
   private setupStates() {
@@ -419,7 +434,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         name: 'hurt',
         onEnter: (p) => {
           p.playAnimation('player_hurt_anim');
-          p.setTint(0xff0000);
+          p.setTint(0xff6b6b);
           p.isInvulnerable = true;
           p.isBlocking = false;
           p.scene.cameras.main.shake(200, 0.01);
@@ -506,7 +521,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.setVelocityX(dirX * PLAYER_DEFENSE.hurtKnockbackX);
     this.setVelocityY(PLAYER_DEFENSE.hurtKnockbackY);
     if (this.health <= 0) {
-      this.setTint(0x555555);
+      this.setTint(0x868e96);
       this.scene.events.emit('player_dead');
     } else {
       this.stateMachine.setState('hurt');

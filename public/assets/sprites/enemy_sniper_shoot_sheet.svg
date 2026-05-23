@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 20" width="40" height="20">
-    <defs>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 120" width="360" height="120">
+  <defs>
   <filter id="goldGlow" x="-50%" y="-50%" width="200%" height="200%">
     <feGaussianBlur stdDeviation="3" result="blur"/>
     <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
@@ -39,10 +39,26 @@
     <stop offset="0%" stop-color="#ff8787"/><stop offset="60%" stop-color="#ff6b6b"/><stop offset="100%" stop-color="#495057"/>
   </linearGradient>
 </defs>
-    
-  <line x1="4" y1="10" x2="32" y2="10" stroke="#ff8787" stroke-width="3" stroke-linecap="round" filter="url(#goldGlow)"/>
-  <polygon points="32,7 39,10 32,13" fill="#ffffff" filter="url(#goldGlow)"/>
-  <polygon points="4,10 -2,4 4,4" fill="#74c0fc"/>
-  <polygon points="4,10 -2,16 4,16" fill="#74c0fc"/>
-
-  </svg>
+  <g transform="translate(0, 0)"><clipPath id="enemy_sniper_shoot_sheet_frame0"><rect x="0" y="0" width="120" height="120"/></clipPath><g clip-path="url(#enemy_sniper_shoot_sheet_frame0)">
+  <line x1="48" y1="70" x2="45" y2="90" stroke="#495057" stroke-width="5"/>
+  <line x1="68" y1="70" x2="75" y2="90" stroke="#495057" stroke-width="5"/>
+  <rect x="42" y="45" width="30" height="25" rx="3" fill="url(#inkWashGrad)" stroke="#20c997" stroke-width="2"/>
+  <line x1="55" y1="55" x2="95" y2="55" stroke="#343a40" stroke-width="3"/>
+  <!-- Muzzle flash -->
+  <circle cx="100" cy="55" r="12" fill="#ff6b6b" filter="url(#redGlow)" opacity="0.8"/>
+  </g></g><g transform="translate(120, 0)"><clipPath id="enemy_sniper_shoot_sheet_frame1"><rect x="0" y="0" width="120" height="120"/></clipPath><g clip-path="url(#enemy_sniper_shoot_sheet_frame1)">
+  <line x1="48" y1="70" x2="45" y2="90" stroke="#495057" stroke-width="5"/>
+  <line x1="68" y1="70" x2="75" y2="90" stroke="#495057" stroke-width="5"/>
+  <rect x="42" y="45" width="30" height="25" rx="3" fill="url(#inkWashGrad)" stroke="#20c997" stroke-width="2"/>
+  <line x1="55" y1="55" x2="95" y2="55" stroke="#343a40" stroke-width="3"/>
+  <!-- Muzzle flash -->
+  <circle cx="100" cy="55" r="12" fill="#ff6b6b" filter="url(#redGlow)" opacity="0.8"/>
+  </g></g><g transform="translate(240, 0)"><clipPath id="enemy_sniper_shoot_sheet_frame2"><rect x="0" y="0" width="120" height="120"/></clipPath><g clip-path="url(#enemy_sniper_shoot_sheet_frame2)">
+  <line x1="48" y1="70" x2="45" y2="90" stroke="#495057" stroke-width="5"/>
+  <line x1="68" y1="70" x2="75" y2="90" stroke="#495057" stroke-width="5"/>
+  <rect x="42" y="45" width="30" height="25" rx="3" fill="url(#inkWashGrad)" stroke="#20c997" stroke-width="2"/>
+  <line x1="55" y1="55" x2="95" y2="55" stroke="#343a40" stroke-width="3"/>
+  <!-- Muzzle flash -->
+  
+  </g></g>
+</svg>

@@ -11,7 +11,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
   private phase: number = 1;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, 'boss_idle');
+    super(scene, x, y, 'boss_idle_sheet');
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
@@ -43,12 +43,12 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     const healthPercent = this.health / this.maxHealth;
     if (healthPercent <= 0.3 && this.phase < 3) {
       this.phase = 3;
-      this.setTint(0xff0000);
+      this.setTint(0xff6b6b);
       this.scene.cameras.main.shake(500, 0.03);
       this.scene.time.delayedCall(300, () => this.clearTint());
     } else if (healthPercent <= 0.5 && this.phase < 2) {
       this.phase = 2;
-      this.setTint(0xff5500);
+      this.setTint(0xffd43b);
       this.scene.cameras.main.shake(400, 0.025);
       this.scene.time.delayedCall(300, () => this.clearTint());
     }
@@ -59,7 +59,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'idle',
         onEnter: (b) => {
-          b.setTexture('boss_idle');
+          b.play({ key: 'boss_idle_anim', repeat: -1 }, true);
           b.setVelocityX(0);
           b.faceTarget(b);
           const delay = b.isEnraged ? BOSS_STATS.idleDelay * 0.4 : BOSS_STATS.idleDelay;
@@ -82,7 +82,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'chase',
         onEnter: (b) => {
-          b.setTexture('boss_idle');
+          b.play({ key: 'boss_walk_anim', repeat: -1 }, true);
           b.faceTarget(b);
         },
         onUpdate: (b) => {
@@ -109,12 +109,12 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
         name: 'windup',
         onEnter: (b) => {
           b.setVelocityX(0);
-          b.setTexture('boss_windup');
+          b.play('boss_windup_anim');
           b.faceTarget(b);
           const windup = b.isEnraged ? BOSS_STATS.attackWindup * 0.5 : BOSS_STATS.attackWindup;
           
           // Pulsing tint during windup for visual telegraph
-          b.setTint(0xffaa00);
+          b.setTint(0xffd43b);
           b.scene.tweens.add({
             targets: b,
             alpha: 0.7,
@@ -137,7 +137,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'attack',
         onEnter: (b) => {
-          b.setTexture('boss_attack');
+          b.play('boss_attack_anim');
           b.setVelocityX(0);
           b.scene.cameras.main.shake(300, 0.025);
           b.scene.events.emit('boss_attack', b);
@@ -163,8 +163,8 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
         name: 'rush',
         onEnter: (b) => {
           if (!b.target) { b.stateMachine.setState('idle'); return; }
-          b.setTexture('boss_rush');
-          b.setTint(0xff0000);
+          b.play({ key: 'boss_rush_anim', repeat: -1 }, true);
+          b.setTint(0xff6b6b);
           const dir = Math.sign(b.target.x - b.x);
           b.setFlipX(dir < 0);
 
@@ -179,7 +179,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
             b.stateMachine.addTimer(b.scene.time.delayedCall(500, () => {
               if (b.health <= 0) return;
               b.setVelocityX(0);
-              b.setTexture('boss_attack');
+              b.play('boss_attack_anim');
               b.scene.events.emit('boss_attack', b);
               b.scene.cameras.main.shake(400, 0.04);
 
@@ -209,7 +209,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
       this.isInvulnerable = false;
       if (this.health <= 0) {
         // Death sequence
-        this.setTint(0xff0000);
+        this.setTint(0xff6b6b);
         this.scene.cameras.main.shake(800, 0.05);
         this.scene.time.delayedCall(500, () => {
           this.destroy();

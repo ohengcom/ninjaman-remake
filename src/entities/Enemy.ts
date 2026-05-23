@@ -22,7 +22,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   private attackCooldown: number = 800;
 
   constructor(scene: Phaser.Scene, x: number, y: number, type: EnemyType = 'guard') {
-    super(scene, x, y, `enemy_${type}`);
+    super(scene, x, y, `enemy_${type}_sheet`);
     this.enemyType = type;
     scene.add.existing(this);
     scene.physics.add.existing(this);
@@ -40,7 +40,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   public spawn(x: number, y: number, type: EnemyType) {
     this.enemyType = type;
-    this.setTexture(`enemy_${type}`);
+    this.setTexture(`enemy_${type}_sheet`);
     this.setPosition(x, y);
     this.setActive(true);
     this.setVisible(true);
@@ -66,12 +66,29 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.target = target;
   }
 
+  private getWalkAnim() {
+    if (this.enemyType === 'ninja') return 'enemy_ninja_run_anim';
+    if (this.enemyType === 'sniper') return 'enemy_sniper_idle_anim';
+    return `enemy_${this.enemyType}_walk_anim`;
+  }
+
+  private getAttackAnim() {
+    if (this.enemyType === 'sniper') return 'enemy_sniper_shoot_anim';
+    return `enemy_${this.enemyType}_attack_anim`;
+  }
+
+  private getWindupAnim() {
+    if (this.enemyType === 'axe') return 'enemy_axe_windup_anim';
+    return null;
+  }
+
   private setupStates() {
     this.stateMachine
       .addState({
         name: 'patrol',
         onEnter: (e) => {
           e.patrolTimer = e.scene.time.now + 2000;
+          e.play({ key: e.getWalkAnim(), repeat: -1 }, true);
         },
         onUpdate: (e) => {
           if (!e.active) return;
@@ -98,6 +115,9 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       })
       .addState({
         name: 'chase',
+        onEnter: (e) => {
+           e.play({ key: e.getWalkAnim(), repeat: -1 }, true);
+        },
         onUpdate: (e) => {
           if (!e.active) return;
           if (!e.target || !e.target.active || (e.target.health ?? 1) <= 0) {
@@ -125,13 +145,21 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         name: 'attack',
         onEnter: (e) => {
           e.setVelocityX(0);
-          e.setTint(0xffaa00);
+
+          const windupAnim = e.getWindupAnim();
+          if (windupAnim) {
+            e.play(windupAnim);
+          } else {
+            // For others, if no distinct windup anim, we could tint or just play attack but wait.
+            // Let's just play attack animation directly or a specific frame
+            e.play(e.getAttackAnim());
+          }
 
           // Show laser sight for sniper
           let laser: Phaser.GameObjects.Line | null = null;
           if (e.enemyType === 'sniper' && e.target) {
              const dir = e.flipX ? -1 : 1;
-             laser = e.scene.add.line(0, 0, e.x, e.y, e.x + (e.attackReach * dir), e.y, 0xff0055, 0.5).setOrigin(0);
+             laser = e.scene.add.line(0, 0, e.x, e.y, e.x + (e.attackReach * dir), e.y, 0xff6b6b, 0.5).setOrigin(0);
           }
 
           (e as any)._currentLaser = laser; // store for cleanup
@@ -143,7 +171,9 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
              }
 
              if (e.active && e.health > 0) {
-                 e.clearTint();
+                 if (windupAnim) {
+                   e.play(e.getAttackAnim());
+                 }
 
                  if (e.enemyType === 'sniper') {
                      e.scene.events.emit('enemy_shoot', e, e.baseDamage);
@@ -158,7 +188,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
           }));
         },
         onExit: (e) => {
-            e.clearTint();
             if ((e as any)._currentLaser) {
                 (e as any)._currentLaser.destroy();
                 (e as any)._currentLaser = null;
@@ -168,7 +197,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'hurt',
         onEnter: (e) => {
-          e.setTint(0xffffff);
+          e.setTint(0xff0000);
           e.isInvulnerable = true;
 
           e.stateMachine.addTimer(e.scene.time.delayedCall(150, () => {

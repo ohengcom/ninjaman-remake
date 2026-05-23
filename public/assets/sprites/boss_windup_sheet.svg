@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 256" width="1024" height="256">
+  <defs>
+  <filter id="goldGlow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="3" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="heavyGoldGlow" x="-80%" y="-80%" width="260%" height="260%">
+    <feGaussianBlur stdDeviation="5" result="blur1"/>
+    <feGaussianBlur stdDeviation="1.5" result="blur2"/>
+    <feMerge><feMergeNode in="blur1"/><feMergeNode in="blur2"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="sakuraGlow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="3.5" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="inkMisty" x="-30%" y="-30%" width="160%" height="160%">
+    <feGaussianBlur stdDeviation="1.5"/>
+  </filter>
+  <filter id="redGlow" x="-40%" y="-40%" width="180%" height="180%">
+    <feGaussianBlur stdDeviation="3" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <linearGradient id="inkWashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#e7f5ff"/><stop offset="60%" stop-color="#a5d8ff"/><stop offset="100%" stop-color="#74c0fc"/>
+  </linearGradient>
+  <linearGradient id="inkWashLight" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#f8f9fa"/><stop offset="50%" stop-color="#e9ecef"/><stop offset="100%" stop-color="#dee2e6"/>
+  </linearGradient>
+  <linearGradient id="spiritGold" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#fff9db"/><stop offset="35%" stop-color="#ffe066"/><stop offset="75%" stop-color="#ffd43b"/><stop offset="100%" stop-color="#fab005"/>
+  </linearGradient>
+  <linearGradient id="sacredMaple" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#fff5f5"/><stop offset="50%" stop-color="#ffc9c9"/><stop offset="100%" stop-color="#ff8787"/>
+  </linearGradient>
+  <linearGradient id="sakuraBlade" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#e3fafc"/><stop offset="40%" stop-color="#96f2d7"/><stop offset="85%" stop-color="#3bc9db"/><stop offset="100%" stop-color="#15aabf"/>
+  </linearGradient>
+  <linearGradient id="crimsonGaze" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#ff8787"/><stop offset="60%" stop-color="#ff6b6b"/><stop offset="100%" stop-color="#495057"/>
+  </linearGradient>
+</defs>
+  <g transform="translate(0, 0)"><clipPath id="boss_windup_sheet_frame0"><rect x="0" y="0" width="256" height="256"/></clipPath><g clip-path="url(#boss_windup_sheet_frame0)">
+  <circle cx="128" cy="108" r="50" fill="none" stroke="#ff6b6b" stroke-width="5" stroke-dasharray="10 5" filter="url(#redGlow)"/>
+  <path d="M 68.57658224008293 48 L 188.57658224008293 48 L 208.57658224008293 148 L 48.57658224008293 148 Z" fill="url(#inkWashGrad)" stroke="#74c0fc" stroke-width="6"/>
+  <!-- Angry Eye -->
+  <circle cx="128.57658224008293" cy="98" r="25" fill="#f8f9fa" stroke="#ff6b6b" stroke-width="4" filter="url(#redGlow)"/>
+  <path d="M 128.57658224008293 78 L 113.57658224008293 98 L 143.57658224008293 98 Z" fill="#ff6b6b"/>
+  <rect x="18" y="58" width="40" height="80" rx="8" fill="#e8f4fd" stroke="#ff6b6b" stroke-width="4" transform="rotate(-15 38 98)"/>
+  <rect x="198" y="58" width="40" height="80" rx="8" fill="#e8f4fd" stroke="#ff6b6b" stroke-width="4" transform="rotate(15 218 98)"/>
+  <path d="M 58.57658224008293 148 L 198.57658224008293 148 L 168.57658224008293 228 L 88.57658224008293 228 Z" fill="#e9ecef" stroke="#ced4da" stroke-width="4"/>
+  </g></g><g transform="translate(256, 0)"><clipPath id="boss_windup_sheet_frame1"><rect x="0" y="0" width="256" height="256"/></clipPath><g clip-path="url(#boss_windup_sheet_frame1)">
+  <circle cx="128" cy="108" r="50" fill="none" stroke="#ff6b6b" stroke-width="5" stroke-dasharray="10 5" filter="url(#redGlow)"/>
+  <path d="M 67.3458576809029 48 L 187.3458576809029 48 L 207.3458576809029 148 L 47.34585768090289 148 Z" fill="url(#inkWashGrad)" stroke="#74c0fc" stroke-width="6"/>
+  <!-- Angry Eye -->
+  <circle cx="127.3458576809029" cy="98" r="25" fill="#f8f9fa" stroke="#ff6b6b" stroke-width="4" filter="url(#redGlow)"/>
+  <path d="M 127.3458576809029 78 L 112.3458576809029 98 L 142.3458576809029 98 Z" fill="#ff6b6b"/>
+  <rect x="18" y="58" width="40" height="80" rx="8" fill="#e8f4fd" stroke="#ff6b6b" stroke-width="4" transform="rotate(-15 38 98)"/>
+  <rect x="198" y="58" width="40" height="80" rx="8" fill="#e8f4fd" stroke="#ff6b6b" stroke-width="4" transform="rotate(15 218 98)"/>
+  <path d="M 57.34585768090289 148 L 197.3458576809029 148 L 167.3458576809029 228 L 87.3458576809029 228 Z" fill="#e9ecef" stroke="#ced4da" stroke-width="4"/>
+  </g></g><g transform="translate(512, 0)"><clipPath id="boss_windup_sheet_frame2"><rect x="0" y="0" width="256" height="256"/></clipPath><g clip-path="url(#boss_windup_sheet_frame2)">
+  <circle cx="128" cy="108" r="50" fill="none" stroke="#ff6b6b" stroke-width="5" stroke-dasharray="10 5" filter="url(#redGlow)"/>
+  <path d="M 66.41300054018808 48 L 186.41300054018808 48 L 206.41300054018808 148 L 46.41300054018807 148 Z" fill="url(#inkWashGrad)" stroke="#74c0fc" stroke-width="6"/>
+  <!-- Angry Eye -->
+  <circle cx="126.41300054018808" cy="98" r="25" fill="#f8f9fa" stroke="#ff6b6b" stroke-width="4" filter="url(#redGlow)"/>
+  <path d="M 126.41300054018808 78 L 111.41300054018808 98 L 141.41300054018808 98 Z" fill="#ff6b6b"/>
+  <rect x="18" y="58" width="40" height="80" rx="8" fill="#e8f4fd" stroke="#ff6b6b" stroke-width="4" transform="rotate(-15 38 98)"/>
+  <rect x="198" y="58" width="40" height="80" rx="8" fill="#e8f4fd" stroke="#ff6b6b" stroke-width="4" transform="rotate(15 218 98)"/>
+  <path d="M 56.41300054018807 148 L 196.41300054018808 148 L 166.41300054018808 228 L 86.41300054018808 228 Z" fill="#e9ecef" stroke="#ced4da" stroke-width="4"/>
+  </g></g><g transform="translate(768, 0)"><clipPath id="boss_windup_sheet_frame3"><rect x="0" y="0" width="256" height="256"/></clipPath><g clip-path="url(#boss_windup_sheet_frame3)">
+  <circle cx="128" cy="108" r="50" fill="none" stroke="#ff6b6b" stroke-width="5" stroke-dasharray="10 5" filter="url(#redGlow)"/>
+  <path d="M 66.35829608633063 48 L 186.35829608633063 48 L 206.35829608633063 148 L 46.358296086330625 148 Z" fill="url(#inkWashGrad)" stroke="#74c0fc" stroke-width="6"/>
+  <!-- Angry Eye -->
+  <circle cx="126.35829608633063" cy="98" r="25" fill="#f8f9fa" stroke="#ff6b6b" stroke-width="4" filter="url(#redGlow)"/>
+  <path d="M 126.35829608633063 78 L 111.35829608633063 98 L 141.35829608633063 98 Z" fill="#ff6b6b"/>
+  <rect x="18" y="58" width="40" height="80" rx="8" fill="#e8f4fd" stroke="#ff6b6b" stroke-width="4" transform="rotate(-15 38 98)"/>
+  <rect x="198" y="58" width="40" height="80" rx="8" fill="#e8f4fd" stroke="#ff6b6b" stroke-width="4" transform="rotate(15 218 98)"/>
+  <path d="M 56.358296086330625 148 L 196.35829608633063 148 L 166.35829608633063 228 L 86.35829608633063 228 Z" fill="#e9ecef" stroke="#ced4da" stroke-width="4"/>
+  </g></g>
+</svg>

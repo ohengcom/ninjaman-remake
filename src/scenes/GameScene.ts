@@ -26,7 +26,7 @@ export class GameScene extends Phaser.Scene {
   private comboTimer: Phaser.Time.TimerEvent | null = null;
   private currentStyle: string = '';
   
-  private hitParticles!: Phaser.GameObjects.Particles.ParticleEmitter;
+
   private lastSafeX: number = 200;
   private lastSafeY: number = 0;
   private currentLevel: number = 1;
@@ -46,6 +46,7 @@ export class GameScene extends Phaser.Scene {
     const p = this.projectiles.get(attacker.x, attacker.y) as Projectile;
     if (p) {
       const dir = attacker.flipX ? -1 : 1;
+      this.vfxManager.emitHitParticle(attacker.x + (attacker.flipX ? -30 : 30), attacker.y, 8, 'hit');
       p.fire(attacker.x + (20 * dir), attacker.y, dir, PROJECTILE_CONFIG.enemyBulletSpeed, damage, 'projectile');
       SoundManager.playSwing(this.getPan(attacker.x));
     }
@@ -87,11 +88,14 @@ export class GameScene extends Phaser.Scene {
     this.levelCfg = getLevelConfig(this.currentLevel);
     this.rng = new SeededRandom(this.currentLevel * 12345);
     const farBg = this.levelCfg.farBg;
+    const midBg = this.levelCfg.midBg;
     this.mapWidth = this.levelCfg.mapTiles * this.levelCfg.tileSize;
 
     AnimationFactory.createPlayerAnimations(this.anims);
+    AnimationFactory.createEnemyAnimations(this.anims);
+    AnimationFactory.createBossAnimations(this.anims);
 
-    LevelBuilder.buildBackground(this, farBg, this.mapWidth);
+    LevelBuilder.buildBackground(this, farBg, midBg, this.mapWidth);
 
     // Refresh HUD properly by stopping and re-launching it so events connect to the new GameScene instance
     this.scene.stop('HUDScene');
@@ -143,17 +147,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.physics.add.collider(this.enemies, platforms);
-
-    this.hitParticles = this.add.particles(0, 0, 'platform', {
-      speed: { min: -200, max: 200 },
-      angle: { min: 0, max: 360 },
-      scale: { start: 0.1, end: 0 },
-      tint: [ 0xffffff, 0x00ffff, 0xe94560 ],
-      blendMode: 'ADD',
-      lifespan: 400,
-      gravityY: 500,
-      emitting: false
-    });
+    this.vfxManager.createHitParticles();
 
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
     this.cameras.main.setBounds(0, 0, this.mapWidth, h);
@@ -187,7 +181,7 @@ export class GameScene extends Phaser.Scene {
             } else {
                  player.takeDamage(proj.damage, dir);
                  SoundManager.playDamage(this.getPan(proj.x));
-                 this.emitHitParticle(player.x, player.y, 5);
+                 this.vfxManager.emitHitParticle(player.x, player.y, 5, 'hit');
                  this.cameras.main.shake(200, 0.02);
             }
             this.events.emit('update_health', player.health, player.maxHealth);
@@ -203,7 +197,7 @@ export class GameScene extends Phaser.Scene {
             const dir = proj.body!.velocity.x > 0 ? 1 : -1;
             enemy.takeDamage(proj.damage, dir);
             SoundManager.playHit(this.getPan(enemy.x));
-            this.emitHitParticle(enemy.x, enemy.y, 10);
+            this.vfxManager.emitHitParticle(enemy.x, enemy.y, 10, 'spark');
             proj.hit(); // Consume wave
             if (enemy.health <= 0) {
                this.addScore(SCORE_CONFIG.waveKill);
@@ -221,7 +215,7 @@ export class GameScene extends Phaser.Scene {
                 const dir = proj.body!.velocity.x > 0 ? 1 : -1;
                 boss.takeDamage(proj.damage * BOSS_STATS.damageMultiplier, dir);
                 SoundManager.playHit(this.getPan(boss.x));
-                this.emitHitParticle(boss.x, boss.y, 15);
+                this.vfxManager.emitHitParticle(boss.x, boss.y, 15, 'spark');
                 proj.hit();
                 this.incrementCombo();
             }
@@ -328,13 +322,13 @@ export class GameScene extends Phaser.Scene {
 
   public showComboPopup(x: number, y: number) {
       const popup = this.add.text(x, y, `${this.comboCount} HITS!`, {
-          fontFamily: 'Impact', fontSize: '20px', color: '#e94560'
+          fontFamily: 'Inter, sans-serif', fontSize: '20px', color: '#ff6b6b', fontStyle: 'bold'
       }).setOrigin(0.5);
       this.tweens.add({ targets: popup, y: y - 40, alpha: 0, duration: 600, onComplete: () => popup.destroy() });
   }
 
-  public emitHitParticle(x: number, y: number, count: number) {
-      this.hitParticles.emitParticleAt(x, y, count);
+  public emitHitParticle(x: number, y: number, count: number, type: 'hit' | 'spark' | 'dust' = 'hit') {
+      this.vfxManager.emitHitParticle(x, y, count, type as any);
   }
 
   /** Freeze the physics world for a few frames to add weight to hits */
@@ -394,6 +388,7 @@ export class GameScene extends Phaser.Scene {
       this.comboTimer = null;
     }
 
+    this.input.keyboard?.clearCaptures();
     this.time.removeAllEvents();
   }
 

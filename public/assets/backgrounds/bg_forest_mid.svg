@@ -18,20 +18,20 @@
       </linearGradient>
     </defs>
     
-  <g fill="#221e16" stroke="#fab387" stroke-width="2">
-    <rect x="180" y="80" width="70" height="640" rx="3"/>
-    <rect x="580" y="40" width="90" height="680" rx="4"/>
-    <rect x="880" y="120" width="65" height="600" rx="3"/>
-    <rect x="178" y="240" width="74" height="6" fill="#fab387"/>
-    <rect x="578" y="200" width="94" height="8" fill="#fab387"/>
-    <rect x="878" y="300" width="69" height="6" fill="#fab387"/>
-    <polygon points="120,180 200,90 280,180 200,140" fill="#cba6f7" stroke="#fab387" stroke-width="1.2"/>
-    <polygon points="480,130 625,30 770,130 625,90" fill="#2d281e" stroke="#fab387" stroke-width="1.2"/>
-    <polygon points="780,220 910,120 1040,220 910,180" fill="#cba6f7" stroke="#fab387" stroke-width="1.2"/>
+  <g fill="#e9ecef" stroke="#ced4da" stroke-width="2">
+    <rect x="180" y="80" width="70" height="640" rx="8"/>
+    <rect x="580" y="40" width="90" height="680" rx="10"/>
+    <rect x="880" y="120" width="65" height="600" rx="8"/>
+    <rect x="178" y="240" width="74" height="6" fill="#74c0fc"/>
+    <rect x="578" y="200" width="94" height="8" fill="#74c0fc"/>
+    <rect x="878" y="300" width="69" height="6" fill="#74c0fc"/>
+    <polygon points="120,180 200,90 280,180 200,140" fill="#63e6be" stroke="#51cf66" stroke-width="1.2"/>
+    <polygon points="480,130 625,30 770,130 625,90" fill="#e9ecef" stroke="#ced4da" stroke-width="1.2"/>
+    <polygon points="780,220 910,120 1040,220 910,180" fill="#63e6be" stroke="#51cf66" stroke-width="1.2"/>
   </g>
-  <g fill="#fab387" filter="url(#bgGlow)">
+  <g fill="#74c0fc" filter="url(#bgGlow)">
     <rect x="207" y="270" width="16" height="50" rx="4"/>
-    <rect x="612" y="220" width="26" height="80" rx="6" fill="#cdd6f4"/>
+    <rect x="612" y="220" width="26" height="80" rx="6" fill="#ffffff"/>
     <rect x="898" y="320" width="28" height="60" rx="5"/>
   </g>
 

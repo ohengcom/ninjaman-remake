@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 120" width="480" height="120">
+  <defs>
+  <filter id="goldGlow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="3" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="heavyGoldGlow" x="-80%" y="-80%" width="260%" height="260%">
+    <feGaussianBlur stdDeviation="5" result="blur1"/>
+    <feGaussianBlur stdDeviation="1.5" result="blur2"/>
+    <feMerge><feMergeNode in="blur1"/><feMergeNode in="blur2"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="sakuraGlow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="3.5" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="inkMisty" x="-30%" y="-30%" width="160%" height="160%">
+    <feGaussianBlur stdDeviation="1.5"/>
+  </filter>
+  <filter id="redGlow" x="-40%" y="-40%" width="180%" height="180%">
+    <feGaussianBlur stdDeviation="3" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <linearGradient id="inkWashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#e7f5ff"/><stop offset="60%" stop-color="#a5d8ff"/><stop offset="100%" stop-color="#74c0fc"/>
+  </linearGradient>
+  <linearGradient id="inkWashLight" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#f8f9fa"/><stop offset="50%" stop-color="#e9ecef"/><stop offset="100%" stop-color="#dee2e6"/>
+  </linearGradient>
+  <linearGradient id="spiritGold" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#fff9db"/><stop offset="35%" stop-color="#ffe066"/><stop offset="75%" stop-color="#ffd43b"/><stop offset="100%" stop-color="#fab005"/>
+  </linearGradient>
+  <linearGradient id="sacredMaple" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#fff5f5"/><stop offset="50%" stop-color="#ffc9c9"/><stop offset="100%" stop-color="#ff8787"/>
+  </linearGradient>
+  <linearGradient id="sakuraBlade" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#e3fafc"/><stop offset="40%" stop-color="#96f2d7"/><stop offset="85%" stop-color="#3bc9db"/><stop offset="100%" stop-color="#15aabf"/>
+  </linearGradient>
+  <linearGradient id="crimsonGaze" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#ff8787"/><stop offset="60%" stop-color="#ff6b6b"/><stop offset="100%" stop-color="#495057"/>
+  </linearGradient>
+</defs>
+  <g transform="translate(0, 0)"><clipPath id="enemy_guard_attack_sheet_frame0"><rect x="0" y="0" width="120" height="120"/></clipPath><g clip-path="url(#enemy_guard_attack_sheet_frame0)">
+  <!-- Legs -->
+  <line x1="52" y1="70" x2="50" y2="90" stroke="#495057" stroke-width="6" stroke-linecap="round"/>
+  <line x1="68" y1="70" x2="75" y2="90" stroke="#495057" stroke-width="6" stroke-linecap="round"/>
+  <!-- Body -->
+  <path d="M 45 45 L 80 40 L 85 75 L 45 75 Z" fill="url(#inkWashGrad)" stroke="#b197fc" stroke-width="2"/>
+  <circle cx="65" cy="55" r="5" fill="#74c0fc" filter="url(#goldGlow)"/>
+  <!-- Thrust -->
+  <line x1="50" y1="55" x2="90" y2="30" stroke="#b197fc" stroke-width="4"/>
+  <polygon points="90,30 110,30 95,35" fill="#ffffff" filter="url(#goldGlow)"/>
+  
+  </g></g><g transform="translate(120, 0)"><clipPath id="enemy_guard_attack_sheet_frame1"><rect x="0" y="0" width="120" height="120"/></clipPath><g clip-path="url(#enemy_guard_attack_sheet_frame1)">
+  <!-- Legs -->
+  <line x1="52" y1="70" x2="50" y2="90" stroke="#495057" stroke-width="6" stroke-linecap="round"/>
+  <line x1="68" y1="70" x2="75" y2="90" stroke="#495057" stroke-width="6" stroke-linecap="round"/>
+  <!-- Body -->
+  <path d="M 45 45 L 80 40 L 85 75 L 45 75 Z" fill="url(#inkWashGrad)" stroke="#b197fc" stroke-width="2"/>
+  <circle cx="65" cy="55" r="5" fill="#74c0fc" filter="url(#goldGlow)"/>
+  <!-- Thrust -->
+  <line x1="50" y1="55" x2="111.21320343559643" y2="35.85786437626905" stroke="#b197fc" stroke-width="4"/>
+  <polygon points="111.21320343559643,35.85786437626905 131.21320343559643,35.85786437626905 116.21320343559643,40.85786437626905" fill="#ffffff" filter="url(#goldGlow)"/>
+  
+  </g></g><g transform="translate(240, 0)"><clipPath id="enemy_guard_attack_sheet_frame2"><rect x="0" y="0" width="120" height="120"/></clipPath><g clip-path="url(#enemy_guard_attack_sheet_frame2)">
+  <!-- Legs -->
+  <line x1="52" y1="70" x2="50" y2="90" stroke="#495057" stroke-width="6" stroke-linecap="round"/>
+  <line x1="68" y1="70" x2="75" y2="90" stroke="#495057" stroke-width="6" stroke-linecap="round"/>
+  <!-- Body -->
+  <path d="M 45 45 L 80 40 L 85 75 L 45 75 Z" fill="url(#inkWashGrad)" stroke="#b197fc" stroke-width="2"/>
+  <circle cx="65" cy="55" r="5" fill="#74c0fc" filter="url(#goldGlow)"/>
+  <!-- Thrust -->
+  <line x1="50" y1="55" x2="120" y2="50" stroke="#b197fc" stroke-width="4"/>
+  <polygon points="120,50 140,50 125,55" fill="#ffffff" filter="url(#goldGlow)"/>
+  <path d="M 60 55 L 130 40" stroke="#74c0fc" stroke-width="1" opacity="0.5"/>
+  </g></g><g transform="translate(360, 0)"><clipPath id="enemy_guard_attack_sheet_frame3"><rect x="0" y="0" width="120" height="120"/></clipPath><g clip-path="url(#enemy_guard_attack_sheet_frame3)">
+  <!-- Legs -->
+  <line x1="52" y1="70" x2="50" y2="90" stroke="#495057" stroke-width="6" stroke-linecap="round"/>
+  <line x1="68" y1="70" x2="75" y2="90" stroke="#495057" stroke-width="6" stroke-linecap="round"/>
+  <!-- Body -->
+  <path d="M 45 45 L 80 40 L 85 75 L 45 75 Z" fill="url(#inkWashGrad)" stroke="#b197fc" stroke-width="2"/>
+  <circle cx="65" cy="55" r="5" fill="#74c0fc" filter="url(#goldGlow)"/>
+  <!-- Thrust -->
+  <line x1="50" y1="55" x2="111.21320343559643" y2="64.14213562373095" stroke="#b197fc" stroke-width="4"/>
+  <polygon points="111.21320343559643,64.14213562373095 131.21320343559643,64.14213562373095 116.21320343559643,69.14213562373095" fill="#ffffff" filter="url(#goldGlow)"/>
+  <path d="M 60 55 L 121.21320343559643 54.14213562373095" stroke="#74c0fc" stroke-width="1" opacity="0.5"/>
+  </g></g>
+</svg>

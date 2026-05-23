@@ -18,14 +18,14 @@
       </linearGradient>
     </defs>
     
-  <rect width="64" height="64" fill="url(#inkWashGrad)" stroke="#1e1e2e" stroke-width="2.5"/>
-  <path d="M 0 18 Q 32 12 64 18 M 0 34 Q 32 28 64 34 M 0 50 Q 32 44 64 50" stroke="#585b70" stroke-width="1.8"/>
-  <rect x="0" y="0" width="64" height="6.5" fill="#fab387" filter="url(#bgGlow)"/>
-  <rect x="0" y="0" width="64" height="2" fill="#cdd6f4"/>
-  <rect x="12" y="2.5" width="4" height="2" fill="#cba6f7"/>
-  <rect x="30" y="2.5" width="4" height="2" fill="#cba6f7"/>
-  <rect x="48" y="2.5" width="4" height="2" fill="#cba6f7"/>
-  <circle cx="8" cy="12" r="2.8" fill="#fab387" filter="url(#bgGlow)"/>
-  <circle cx="56" cy="12" r="2.8" fill="#fab387" filter="url(#bgGlow)"/>
+  <rect width="64" height="64" fill="url(#inkWashLight)" stroke="#ced4da" stroke-width="2.5"/>
+  <path d="M 0 18 Q 32 12 64 18 M 0 34 Q 32 28 64 34 M 0 50 Q 32 44 64 50" stroke="#dee2e6" stroke-width="1.8"/>
+  <rect x="0" y="0" width="64" height="6.5" fill="#74c0fc" filter="url(#bgGlow)"/>
+  <rect x="0" y="0" width="64" height="2" fill="#ffffff"/>
+  <rect x="12" y="2.5" width="4" height="2" fill="#3bc9db"/>
+  <rect x="30" y="2.5" width="4" height="2" fill="#3bc9db"/>
+  <rect x="48" y="2.5" width="4" height="2" fill="#3bc9db"/>
+  <circle cx="8" cy="12" r="2.8" fill="#74c0fc" filter="url(#bgGlow)"/>
+  <circle cx="56" cy="12" r="2.8" fill="#74c0fc" filter="url(#bgGlow)"/>
 
   </svg>

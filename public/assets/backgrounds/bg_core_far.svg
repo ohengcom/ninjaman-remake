@@ -19,7 +19,7 @@
     </defs>
     
   <rect width="1280" height="720" fill="url(#parchmentFade)"/>
-  <g fill="url(#inkMistyFade)" filter="url(#inkMistyBg)" opacity="0.6">
+  <g fill="url(#inkMistyFade)" filter="url(#inkMistyBg)" opacity="0.4">
     <path d="M 200 720 L 200 240 L 1080 240 L 1080 720 L 980 720 L 980 340 L 300 340 L 300 720 Z"/>
     <path d="M 120 200 L 1160 200 L 1120 250 L 160 250 Z"/>
     <rect x="180" y="270" width="920" height="24"/>

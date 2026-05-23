@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 120" width="720" height="120">
+  <defs>
+  <filter id="goldGlow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="3" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="heavyGoldGlow" x="-80%" y="-80%" width="260%" height="260%">
+    <feGaussianBlur stdDeviation="5" result="blur1"/>
+    <feGaussianBlur stdDeviation="1.5" result="blur2"/>
+    <feMerge><feMergeNode in="blur1"/><feMergeNode in="blur2"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="sakuraGlow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="3.5" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="inkMisty" x="-30%" y="-30%" width="160%" height="160%">
+    <feGaussianBlur stdDeviation="1.5"/>
+  </filter>
+  <filter id="redGlow" x="-40%" y="-40%" width="180%" height="180%">
+    <feGaussianBlur stdDeviation="3" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <linearGradient id="inkWashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#e7f5ff"/><stop offset="60%" stop-color="#a5d8ff"/><stop offset="100%" stop-color="#74c0fc"/>
+  </linearGradient>
+  <linearGradient id="inkWashLight" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#f8f9fa"/><stop offset="50%" stop-color="#e9ecef"/><stop offset="100%" stop-color="#dee2e6"/>
+  </linearGradient>
+  <linearGradient id="spiritGold" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#fff9db"/><stop offset="35%" stop-color="#ffe066"/><stop offset="75%" stop-color="#ffd43b"/><stop offset="100%" stop-color="#fab005"/>
+  </linearGradient>
+  <linearGradient id="sacredMaple" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#fff5f5"/><stop offset="50%" stop-color="#ffc9c9"/><stop offset="100%" stop-color="#ff8787"/>
+  </linearGradient>
+  <linearGradient id="sakuraBlade" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#e3fafc"/><stop offset="40%" stop-color="#96f2d7"/><stop offset="85%" stop-color="#3bc9db"/><stop offset="100%" stop-color="#15aabf"/>
+  </linearGradient>
+  <linearGradient id="crimsonGaze" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#ff8787"/><stop offset="60%" stop-color="#ff6b6b"/><stop offset="100%" stop-color="#495057"/>
+  </linearGradient>
+</defs>
+  <g transform="translate(0, 0)"><clipPath id="enemy_guard_sheet_frame0"><rect x="0" y="0" width="120" height="120"/></clipPath><g clip-path="url(#enemy_guard_sheet_frame0)">
+  <!-- Legs -->
+  <line x1="55" y1="70" x2="55" y2="90" stroke="#495057" stroke-width="6" stroke-linecap="round"/>
+  <line x1="65" y1="70" x2="65" y2="90" stroke="#495057" stroke-width="6" stroke-linecap="round"/>
+  <!-- Body -->
+  <path d="M 45 40 L 75 40 L 80 75 L 40 75 Z" fill="url(#inkWashGrad)" stroke="#b197fc" stroke-width="2"/>
+  <circle cx="60" cy="50" r="5" fill="#74c0fc" filter="url(#goldGlow)"/>
+  <!-- Weapon (Spear) -->
+  <line x1="40" y1="60" x2="100" y2="30" stroke="#b197fc" stroke-width="3"/>
+  <polygon points="100,30 115,22 105,35" fill="#ffffff" filter="url(#goldGlow)"/>
+  </g></g><g transform="translate(120, 0)"><clipPath id="enemy_guard_sheet_frame1"><rect x="0" y="0" width="120" height="120"/></clipPath><g clip-path="url(#enemy_guard_sheet_frame1)">
+  <!-- Legs -->
+  <line x1="55" y1="71.73205080756887" x2="67.99038105676658" y2="91.73205080756887" stroke="#495057" stroke-width="6" stroke-linecap="round"/>
+  <line x1="65" y1="71.73205080756887" x2="52.00961894323342" y2="91.73205080756887" stroke="#495057" stroke-width="6" stroke-linecap="round"/>
+  <!-- Body -->
+  <path d="M 45 41.732050807568875 L 75 41.732050807568875 L 80 76.73205080756887 L 40 76.73205080756887 Z" fill="url(#inkWashGrad)" stroke="#b197fc" stroke-width="2"/>
+  <circle cx="60" cy="51.732050807568875" r="5" fill="#74c0fc" filter="url(#goldGlow)"/>
+  <!-- Weapon (Spear) -->
+  <line x1="40" y1="61.732050807568875" x2="100" y2="31.732050807568875" stroke="#b197fc" stroke-width="3"/>
+  <polygon points="100,31.732050807568875 115,23.732050807568875 105,36.732050807568875" fill="#ffffff" filter="url(#goldGlow)"/>
+  </g></g><g transform="translate(240, 0)"><clipPath id="enemy_guard_sheet_frame2"><rect x="0" y="0" width="120" height="120"/></clipPath><g clip-path="url(#enemy_guard_sheet_frame2)">
+  <!-- Legs -->
+  <line x1="55" y1="68.26794919243113" x2="67.99038105676658" y2="88.26794919243113" stroke="#495057" stroke-width="6" stroke-linecap="round"/>
+  <line x1="65" y1="68.26794919243113" x2="52.00961894323341" y2="88.26794919243113" stroke="#495057" stroke-width="6" stroke-linecap="round"/>
+  <!-- Body -->
+  <path d="M 45 38.267949192431125 L 75 38.267949192431125 L 80 73.26794919243113 L 40 73.26794919243113 Z" fill="url(#inkWashGrad)" stroke="#b197fc" stroke-width="2"/>
+  <circle cx="60" cy="48.267949192431125" r="5" fill="#74c0fc" filter="url(#goldGlow)"/>
+  <!-- Weapon (Spear) -->
+  <line x1="40" y1="58.267949192431125" x2="100" y2="28.267949192431125" stroke="#b197fc" stroke-width="3"/>
+  <polygon points="100,28.267949192431125 115,20.267949192431125 105,33.267949192431125" fill="#ffffff" filter="url(#goldGlow)"/>
+  </g></g><g transform="translate(360, 0)"><clipPath id="enemy_guard_sheet_frame3"><rect x="0" y="0" width="120" height="120"/></clipPath><g clip-path="url(#enemy_guard_sheet_frame3)">
+  <!-- Legs -->
+  <line x1="55" y1="70" x2="55" y2="90" stroke="#495057" stroke-width="6" stroke-linecap="round"/>
+  <line x1="65" y1="70" x2="65" y2="90" stroke="#495057" stroke-width="6" stroke-linecap="round"/>
+  <!-- Body -->
+  <path d="M 45 40 L 75 40 L 80 75 L 40 75 Z" fill="url(#inkWashGrad)" stroke="#b197fc" stroke-width="2"/>
+  <circle cx="60" cy="50" r="5" fill="#74c0fc" filter="url(#goldGlow)"/>
+  <!-- Weapon (Spear) -->
+  <line x1="40" y1="60" x2="100" y2="30" stroke="#b197fc" stroke-width="3"/>
+  <polygon points="100,30 115,22 105,35" fill="#ffffff" filter="url(#goldGlow)"/>
+  </g></g><g transform="translate(480, 0)"><clipPath id="enemy_guard_sheet_frame4"><rect x="0" y="0" width="120" height="120"/></clipPath><g clip-path="url(#enemy_guard_sheet_frame4)">
+  <!-- Legs -->
+  <line x1="55" y1="71.73205080756887" x2="42.00961894323342" y2="91.73205080756887" stroke="#495057" stroke-width="6" stroke-linecap="round"/>
+  <line x1="65" y1="71.73205080756887" x2="77.99038105676658" y2="91.73205080756887" stroke="#495057" stroke-width="6" stroke-linecap="round"/>
+  <!-- Body -->
+  <path d="M 45 41.732050807568875 L 75 41.732050807568875 L 80 76.73205080756887 L 40 76.73205080756887 Z" fill="url(#inkWashGrad)" stroke="#b197fc" stroke-width="2"/>
+  <circle cx="60" cy="51.732050807568875" r="5" fill="#74c0fc" filter="url(#goldGlow)"/>
+  <!-- Weapon (Spear) -->
+  <line x1="40" y1="61.732050807568875" x2="100" y2="31.732050807568875" stroke="#b197fc" stroke-width="3"/>
+  <polygon points="100,31.732050807568875 115,23.732050807568875 105,36.732050807568875" fill="#ffffff" filter="url(#goldGlow)"/>
+  </g></g><g transform="translate(600, 0)"><clipPath id="enemy_guard_sheet_frame5"><rect x="0" y="0" width="120" height="120"/></clipPath><g clip-path="url(#enemy_guard_sheet_frame5)">
+  <!-- Legs -->
+  <line x1="55" y1="68.26794919243113" x2="42.00961894323342" y2="88.26794919243113" stroke="#495057" stroke-width="6" stroke-linecap="round"/>
+  <line x1="65" y1="68.26794919243113" x2="77.99038105676658" y2="88.26794919243113" stroke="#495057" stroke-width="6" stroke-linecap="round"/>
+  <!-- Body -->
+  <path d="M 45 38.267949192431125 L 75 38.267949192431125 L 80 73.26794919243113 L 40 73.26794919243113 Z" fill="url(#inkWashGrad)" stroke="#b197fc" stroke-width="2"/>
+  <circle cx="60" cy="48.267949192431125" r="5" fill="#74c0fc" filter="url(#goldGlow)"/>
+  <!-- Weapon (Spear) -->
+  <line x1="40" y1="58.267949192431125" x2="100" y2="28.267949192431125" stroke="#b197fc" stroke-width="3"/>
+  <polygon points="100,28.267949192431125 115,20.267949192431125 105,33.267949192431125" fill="#ffffff" filter="url(#goldGlow)"/>
+  </g></g>
+</svg>

@@ -14,7 +14,7 @@ export const gameConfig: Phaser.Types.Core.GameConfig = {
   width: GAME_CONFIG.WIDTH,
   height: GAME_CONFIG.HEIGHT,
   parent: 'phaser-game-canvas-container',
-  backgroundColor: '#1a1a2e',
+  backgroundColor: '#f5f7fa',
   pixelArt: false, // We use vector art now
   fps: {
     target: 60,

@@ -5,6 +5,7 @@ import { GameScene } from './GameScene.js';
 import { SCORE_CONFIG } from '../config/combat.js';
 import { calculateSPEarned } from '../utils/ScoreHelper.js';
 import { GAME_EVENTS } from '../events.js';
+import { getLevelConfig } from '../config/levels.js';
 
 export class HUDScene extends Phaser.Scene {
   private fpsText: Phaser.GameObjects.Text | null = null;
@@ -34,28 +35,43 @@ export class HUDScene extends Phaser.Scene {
     }).setOrigin(1, 0);
 
     // Grab DOM references
-    this.domHealthFill = document.getElementById('health-fill')!;
-    this.domHealthValue = document.getElementById('health-value')!;
-    this.domScoreValue = document.getElementById('score-value')!;
-    this.domLevelValue = document.getElementById('level-value')!;
-    this.domStyleContainer = document.getElementById('style-container')!;
-    this.domStyleText = document.getElementById('style-text')!;
+    this.domHealthFill = document.getElementById('hud-integrity-bar')!;
+    this.domHealthValue = document.getElementById('hud-hp-numeric')!;
+    this.domScoreValue = document.getElementById('hud-score-value')!;
+    this.domLevelValue = document.getElementById('hud-sector-display')!;
+    this.domStyleContainer = document.getElementById('hud-style-meter')!;
+    this.domStyleText = document.getElementById('hud-style-letter')!;
 
     // Initial resets
     if (this.domHealthFill) this.domHealthFill.style.width = '100%';
     if (this.domHealthValue) this.domHealthValue.innerText = '100 / 100';
     if (this.domScoreValue) this.domScoreValue.innerText = '0';
-    if (this.domLevelValue) this.domLevelValue.innerText = 'LEVEL 1';
+    if (this.domLevelValue) {
+      const cfg = getLevelConfig(this.currentLevel);
+      this.domLevelValue.innerText = `SECTOR ${this.currentLevel}: ${cfg ? cfg.name : 'MYSTICAL FOREST'}`;
+    }
     if (this.domStyleContainer) {
-      this.domStyleContainer.classList.remove('visible');
+      this.domStyleContainer.classList.remove('active');
       this.domStyleContainer.classList.remove('shake');
     }
 
     // Initialize global UI hooks (for Sound Toggle)
-    const btnSound = document.getElementById('btn-toggle-sound');
+    const btnSound = document.getElementById('hud-sound-toggle');
     if (btnSound) {
       (window as any).toggleHUDGameSound = () => this.onToggleSound();
       btnSound.setAttribute('onclick', 'window.toggleHUDGameSound()');
+      
+      // Initialize sound toggle display to match actual status on boot
+      const isEnabled = SoundManager.enabled;
+      const statusText = document.getElementById('hud-sound-status');
+      if (statusText) {
+        statusText.innerText = isEnabled ? 'ON' : 'OFF';
+      }
+      if (isEnabled) {
+        btnSound.classList.add('on');
+      } else {
+        btnSound.classList.remove('on');
+      }
     }
 
     this.gameScene = this.scene.get('GameScene') as GameScene;
@@ -77,10 +93,10 @@ export class HUDScene extends Phaser.Scene {
     this.domHealthValue.innerText = `${Math.ceil(this.currentHealth)} / ${this.maxHealth}`;
 
     if (pct < 30) {
-      this.domHealthFill.style.background = '#f38ba8'; // Catppuccin Mocha Red
+      this.domHealthFill.style.background = '#ff8787'; // Fresh pastel red
       this.domHealthFill.classList.add('pulse');
     } else {
-      this.domHealthFill.style.background = '#89b4fa'; // Catppuccin Mocha Blue
+      this.domHealthFill.style.background = '#51cf66'; // Fresh mint green
       this.domHealthFill.classList.remove('pulse');
     }
   }
@@ -109,7 +125,8 @@ export class HUDScene extends Phaser.Scene {
   private readonly onUpdateLevel = (level: number) => {
     this.currentLevel = level;
     if (this.domLevelValue) {
-      this.domLevelValue.innerText = `LEVEL ${this.currentLevel}`;
+      const cfg = getLevelConfig(this.currentLevel);
+      this.domLevelValue.innerText = `SECTOR ${this.currentLevel}: ${cfg ? cfg.name : 'UNKNOWN'}`;
     }
   };
 
@@ -117,40 +134,41 @@ export class HUDScene extends Phaser.Scene {
     if (!this.domStyleContainer || !this.domStyleText) return;
 
     if (!style) {
-      this.domStyleContainer.classList.remove('visible');
+      this.domStyleContainer.classList.remove('active');
       this.domStyleContainer.classList.remove('shake');
       return;
     }
 
     this.domStyleText.innerText = style;
-    this.domStyleContainer.classList.add('visible');
+    this.domStyleContainer.classList.add('active');
 
     // Trigger CSS animation reflow
     this.domStyleContainer.classList.remove('shake');
     void this.domStyleContainer.offsetWidth; // Force reflow
     this.domStyleContainer.classList.add('shake');
 
-    let color = '#cba6f7';
-    switch (style) {
-      case 'DEADLY': color = '#fab387'; break; // Yellow
-      case 'CRAZY': color = '#f9e2af'; break; // Peach
-      case 'BADASS': color = '#a6e3a1'; break; // Green
-      case 'APOCALYPTIC': color = '#f38ba8'; break; // Red
-      case 'SADISTIC': color = '#94e2d5'; break; // Teal
-      case 'SMOKIN SICK STYLE': color = '#f5c2e7'; break; // Pink
-    }
-    
-    this.domStyleText.style.color = color;
-    this.domStyleText.style.textShadow = `0 0 10px ${color}, 0 0 20px ${color}`;
+    // Reset inline styles so they don't override the CSS class styling
+    this.domStyleText.style.color = '';
+    this.domStyleText.style.textShadow = '';
+
+    // Apply the class for the rank to trigger neon glow and animation from index.html
+    this.domStyleText.className = 'style-rank-letter rank-' + style.toLowerCase();
   };
 
   private readonly onToggleSound = () => {
     SoundManager.toggle(this.currentLevel);
     const isEnabled = SoundManager.enabled;
-    const btnSound = document.getElementById('btn-toggle-sound');
+    const btnSound = document.getElementById('hud-sound-toggle');
+    const statusText = document.getElementById('hud-sound-status');
+    if (statusText) {
+      statusText.innerText = isEnabled ? 'ON' : 'OFF';
+    }
     if (btnSound) {
-      btnSound.innerText = isEnabled ? 'MUTE (Y)' : 'UNMUTE (Y)';
-      btnSound.style.color = isEnabled ? '#cba6f7' : '#6c7086';
+      if (isEnabled) {
+        btnSound.classList.add('on');
+      } else {
+        btnSound.classList.remove('on');
+      }
     }
   };
 

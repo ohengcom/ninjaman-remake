@@ -19,11 +19,11 @@
     </defs>
     
   <rect width="1280" height="720" fill="url(#parchmentFade)"/>
-  <circle cx="1020" cy="190" r="105" fill="#fab387" filter="url(#bgGlow)" opacity="0.65"/>
-  <circle cx="1020" cy="190" r="90" fill="url(#spiritGold)" opacity="0.85"/>
-  <path d="M 820 180 Q 980 140 1140 180 Q 1020 200 820 180 Z" fill="#ccc1aa" opacity="0.9"/>
-  <path d="M 0 540 C 200 480 300 380 450 480 C 600 580 800 360 1000 460 C 1150 540 1200 490 1280 540 L 1280 720 L 0 720 Z" fill="#ccc1aa" filter="url(#inkMistyBg)" opacity="0.75"/>
-  <path d="M 0 570 C 150 500 250 440 380 520 C 500 600 720 400 920 500 C 1080 580 1180 480 1280 550 L 1280 720 L 0 720 Z" fill="#a69b85" filter="url(#inkMistyBg)" opacity="0.9"/>
-  <path d="M 0 600 L 150 530 L 280 590 L 450 460 L 620 560 L 820 410 L 980 520 L 1150 440 L 1280 520 L 1280 720 L 0 720 Z" fill="#2d281e" stroke="#1e1e2e" stroke-width="3"/>
+  <circle cx="1020" cy="190" r="105" fill="#ffd43b" filter="url(#bgGlow)" opacity="0.45"/>
+  <circle cx="1020" cy="190" r="90" fill="url(#spiritGold)" opacity="0.75"/>
+  <path d="M 820 180 Q 980 140 1140 180 Q 1020 200 820 180 Z" fill="#d0ebff" opacity="0.8"/>
+  <path d="M 0 540 C 200 480 300 380 450 480 C 600 580 800 360 1000 460 C 1150 540 1200 490 1280 540 L 1280 720 L 0 720 Z" fill="#e7f5ff" filter="url(#inkMistyBg)" opacity="0.75"/>
+  <path d="M 0 570 C 150 500 250 440 380 520 C 500 600 720 400 920 500 C 1080 580 1180 480 1280 550 L 1280 720 L 0 720 Z" fill="#d0ebff" filter="url(#inkMistyBg)" opacity="0.85"/>
+  <path d="M 0 600 L 150 530 L 280 590 L 450 460 L 620 560 L 820 410 L 980 520 L 1150 440 L 1280 520 L 1280 720 L 0 720 Z" fill="#a5d8ff" stroke="#74c0fc" stroke-width="2"/>
 
   </svg>
