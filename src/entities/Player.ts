@@ -5,10 +5,10 @@ import { PLAYER_MOVEMENT, PLAYER_ATTACKS, PLAYER_DEFENSE } from '../config/comba
 
 const PLAYER_RENDER = {
   displaySize: 120,
-  bodyWidth: 350,
-  bodyHeight: 550,
-  bodyOffsetX: 340,
-  bodyOffsetY: 250,
+  bodyWidth: 20,
+  bodyHeight: 35,
+  bodyOffsetX: 14,
+  bodyOffsetY: 13,
 } as const;
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
@@ -41,7 +41,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private lastJumpInputTime: number = 0;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, 'ninja_sprite');
+    super(scene, x, y, 'player_sprite');
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
@@ -206,6 +206,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   public playAnimation(animKey: string) {
     this.currentVisualState = animKey;
+    this.play(animKey, true);
     this.applyRenderSize();
   }
 
@@ -224,7 +225,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'idle',
         onEnter: (p) => {
-          p.playAnimation('player_idle_anim');
+          p.playAnimation('player_idle');
           p.setVelocityX(0);
           p.jumpCount = 0;
           p.isBlocking = false;
@@ -239,7 +240,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'run',
         onEnter: (p) => {
-          p.playAnimation('player_run_anim');
+          p.playAnimation('player_run');
           p.jumpCount = 0;
         },
         onUpdate: (p) => {
@@ -257,7 +258,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         name: 'dash',
         onEnter: (p) => {
           SoundManager.playDash((p.scene as any).getPan?.(p.x) ?? 0);
-          p.playAnimation('player_dash_anim');
+          p.playAnimation('player_run');
           p.setVelocityX(p.dashDir * PLAYER_MOVEMENT.dashSpeed);
           
           // Dash grants invincibility frames by default now that upgrade menu is removed
@@ -272,7 +273,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'defend',
         onEnter: (p) => {
-          p.playAnimation('player_defend_anim');
+          p.playAnimation('player_idle');
           p.setVelocityX(0);
           p.isBlocking = true;
         },
@@ -285,7 +286,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         name: 'jump',
         onEnter: (p) => {
           SoundManager.playJump((p.scene as any).getPan?.(p.x) ?? 0);
-          p.playAnimation('player_jump_anim');
+          p.playAnimation('player_jump');
           p.setVelocityY(p.jumpCount === 0 ? PLAYER_MOVEMENT.jumpVelocity : PLAYER_MOVEMENT.doubleJumpVelocity);
           p.jumpCount++;
         },
@@ -299,7 +300,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       })
       .addState({
         name: 'fall',
-        onEnter: (p) => { p.playAnimation('player_fall_anim'); },
+        onEnter: (p) => { p.playAnimation('player_fall'); },
         onUpdate: (p) => {
           if (p.handleCommonTransitions(p)) return;
           p.handleAirMovement();
@@ -311,7 +312,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'attack_combo',
         onEnter: (p) => {
-          const comboAnims = ['player_combo1_anim', 'player_combo2_anim', 'player_combo3_anim', 'player_combo4_anim'];
+          const comboAnims = ['player_attack', 'player_kick', 'player_attack', 'player_kick'];
           const comboMomentum = [
             PLAYER_ATTACKS.combo.forwardMomentum,
             PLAYER_ATTACKS.combo.forwardMomentum * 0.5,
@@ -332,7 +333,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           ];
 
           const step = p.comboStep;
-          const animKey = comboAnims[step] ?? 'player_combo1_anim';
+          const animKey = comboAnims[step] ?? 'player_attack';
           const momentum = comboMomentum[step] ?? PLAYER_ATTACKS.combo.forwardMomentum;
           const recovery = comboRecovery[step] ?? PLAYER_ATTACKS.combo.recovery;
           const [shakeDur, shakeIntensity] = comboShake[step] ?? [100, 0.005];
@@ -364,7 +365,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'attack_wave',
         onEnter: (p) => {
-          p.playAnimation('player_wave_anim');
+          p.playAnimation('player_attack');
           p.setVelocityX(0);
           p.scene.cameras.main.shake(100, 0.005);
           p.scene.events.emit('player_cast_wave', p);
@@ -377,7 +378,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'attack_uppercut',
         onEnter: (p) => {
-          p.playAnimation('player_uppercut_anim');
+          p.playAnimation('player_jump');
           p.setVelocityY(PLAYER_ATTACKS.uppercut.launchVelocity);
           p.setVelocityX(0);
           p.scene.cameras.main.shake(150, 0.01);
@@ -391,7 +392,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'attack_dive',
         onEnter: (p) => {
-          p.playAnimation('player_dive_anim');
+          p.playAnimation('player_fall');
           p.setVelocityY(PLAYER_ATTACKS.dive.downVelocity);
           p.setVelocityX(p.flipX ? -PLAYER_ATTACKS.dive.forwardVelocity : PLAYER_ATTACKS.dive.forwardVelocity);
           p.scene.events.emit('player_attack', p, 'dive');
@@ -407,7 +408,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'hurt',
         onEnter: (p) => {
-          p.playAnimation('player_hurt_anim');
+          p.playAnimation('player_hurt');
           p.setTint(0xff6b6b);
           p.isInvulnerable = true;
           p.isBlocking = false;
@@ -515,57 +516,13 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       this.setAlpha(time % 200 < 100 ? 0.5 : 1);
     }
 
-    const baseScaleX = PLAYER_RENDER.displaySize / 1024;
-    const baseScaleY = PLAYER_RENDER.displaySize / 1024;
+    const baseScale = PLAYER_RENDER.displaySize / 48; // Frame size is 48x48
 
     if (this.health <= 0) {
-      this.setAngle(this.flipX ? -90 : 90);
-      this.setScale(baseScaleX, baseScaleY);
+      this.setScale(baseScale, baseScale);
     } else {
-      const anim = this.currentVisualState;
-      let sx = 1.0;
-      let sy = 1.0;
-      let angle = 0;
-
-      if (anim.includes('idle')) {
-        const breathe = Math.sin(time * 0.012) * 0.04;
-        sx = 1.0 - breathe;
-        sy = 1.0 + breathe;
-      } else if (anim.includes('run')) {
-        const sway = Math.sin(time * 0.024) * 8;
-        angle = sway + (this.flipX ? 6 : -6);
-        const bounce = Math.abs(Math.sin(time * 0.024)) * 0.06;
-        sx = 1.05 - bounce;
-        sy = 0.95 + bounce;
-      } else if (anim.includes('jump')) {
-        sx = 0.86;
-        sy = 1.16;
-        angle = this.body!.velocity.x * 0.03;
-      } else if (anim.includes('fall')) {
-        sx = 1.10;
-        sy = 0.90;
-        angle = this.body!.velocity.x * 0.02 + Math.sin(time * 0.006) * 3;
-      } else if (anim.includes('dash')) {
-        sx = 1.25;
-        sy = 0.80;
-        angle = this.flipX ? -20 : 20;
-      } else if (anim.includes('defend')) {
-        sx = 1.18;
-        sy = 0.82;
-        angle = this.flipX ? 5 : -5;
-      } else if (anim.includes('attack') || anim.includes('combo') || anim.includes('uppercut') || anim.includes('dive') || anim.includes('wave')) {
-        sx = 1.12;
-        sy = 0.92;
-        angle = this.flipX ? -15 : 15;
-      } else if (anim.includes('hurt')) {
-        sx = 0.85;
-        sy = 1.20;
-        angle = Math.sin(time * 0.1) * 15;
-        this.x += Math.sin(time * 0.2) * 2;
-      }
-
-      this.setScale(baseScaleX * sx, baseScaleY * sy);
-      this.setAngle(angle);
+      this.setScale(baseScale, baseScale);
+      this.setAngle(0);
     }
   }
 }

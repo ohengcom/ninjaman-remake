@@ -15,6 +15,12 @@ export class BootScene extends Phaser.Scene {
     for (const svg of manifest.svgs) {
       this.load.svg(svg.key, svg.url, { width: svg.svgConfig.width, height: svg.svgConfig.height });
     }
+    
+    if ('spritesheets' in manifest) {
+      for (const sheet of manifest.spritesheets) {
+        this.load.spritesheet(sheet.key, sheet.url, sheet.frameConfig);
+      }
+    }
 
     const w = this.cameras.main.width;
     const h = this.cameras.main.height;
@@ -44,6 +50,18 @@ export class BootScene extends Phaser.Scene {
   }
 
   create(): void {
+    // Player animations (brawler48x48)
+    this.anims.create({ key: 'player_idle', frames: this.anims.generateFrameNumbers('player_sprite', { start: 5, end: 8 }), frameRate: 8, repeat: -1 });
+    this.anims.create({ key: 'player_run', frames: this.anims.generateFrameNumbers('player_sprite', { start: 0, end: 3 }), frameRate: 10, repeat: -1 });
+    this.anims.create({ key: 'player_jump', frames: this.anims.generateFrameNumbers('player_sprite', { start: 20, end: 23 }), frameRate: 10, repeat: 0 });
+    this.anims.create({ key: 'player_fall', frames: this.anims.generateFrameNumbers('player_sprite', { start: 22, end: 23 }), frameRate: 10, repeat: -1 });
+    this.anims.create({ key: 'player_attack', frames: this.anims.generateFrameNumbers('player_sprite', { start: 11, end: 13 }), frameRate: 15, repeat: 0 });
+    this.anims.create({ key: 'player_kick', frames: this.anims.generateFrameNumbers('player_sprite', { start: 15, end: 17 }), frameRate: 15, repeat: 0 });
+    this.anims.create({ key: 'player_hurt', frames: this.anims.generateFrameNumbers('player_sprite', { start: 35, end: 37 }), frameRate: 10, repeat: 0 });
+
+    // Enemy animations (mummy37x45)
+    this.anims.create({ key: 'enemy_run', frames: this.anims.generateFrameNumbers('enemy_sprite', { start: 0, end: 17 }), frameRate: 12, repeat: -1 });
+
     this.scene.start('MainMenuScene');
   }
 }

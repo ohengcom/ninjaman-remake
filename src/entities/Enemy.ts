@@ -13,10 +13,10 @@ const ENEMY_TINTS = {
 } as const;
 
 const ENEMY_RENDER_CONFIGS = {
-  guard: { displaySize: 100, bodyWidth: 320, bodyHeight: 500, bodyOffsetX: 350, bodyOffsetY: 280 },
-  axe: { displaySize: 120, bodyWidth: 380, bodyHeight: 560, bodyOffsetX: 320, bodyOffsetY: 240 },
-  ninja: { displaySize: 90, bodyWidth: 300, bodyHeight: 480, bodyOffsetX: 360, bodyOffsetY: 300 },
-  sniper: { displaySize: 100, bodyWidth: 320, bodyHeight: 500, bodyOffsetX: 350, bodyOffsetY: 280 },
+  guard: { displaySize: 100, bodyWidth: 18, bodyHeight: 35, bodyOffsetX: 10, bodyOffsetY: 10 },
+  axe: { displaySize: 120, bodyWidth: 20, bodyHeight: 38, bodyOffsetX: 9, bodyOffsetY: 7 },
+  ninja: { displaySize: 90, bodyWidth: 16, bodyHeight: 32, bodyOffsetX: 10, bodyOffsetY: 13 },
+  sniper: { displaySize: 100, bodyWidth: 18, bodyHeight: 35, bodyOffsetX: 10, bodyOffsetY: 10 },
 } as const;
 
 export class Enemy extends Phaser.Physics.Arcade.Sprite {
@@ -47,15 +47,19 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     super.destroy(fromScene);
   }
 
-  public play(key: any, ..._args: any[]): this {
+  public play(key: any, ...args: any[]): this {
     const keyStr = typeof key === 'string' ? key : (key?.key || '');
     this.currentVisualState = keyStr;
+    
+    // We only have enemy_run right now, so map everything to it to prevent crash
+    super.play('enemy_run', true);
+    
     this.applyEnemyRender();
     return this;
   }
 
   constructor(scene: Phaser.Scene, x: number, y: number, type: EnemyType = 'guard') {
-    super(scene, x, y, 'ninja_sprite');
+    super(scene, x, y, 'enemy_sprite');
     this.enemyType = type;
     scene.add.existing(this);
     scene.physics.add.existing(this);
@@ -71,7 +75,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   public spawn(x: number, y: number, type: EnemyType) {
     this.enemyType = type;
-    this.setTexture('ninja_sprite');
+    this.setTexture('enemy_sprite');
     this.setPosition(x, y);
     this.setActive(true);
     this.setVisible(true);
@@ -260,56 +264,14 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (this.active) {
       this.stateMachine.update(delta);
 
-      // Procedural Animation System
       const cfg = ENEMY_RENDER_CONFIGS[this.enemyType];
-      const baseScaleX = cfg.displaySize / 1024;
-      const baseScaleY = cfg.displaySize / 1024;
+      const baseScale = cfg.displaySize / 37;
 
       if (this.health <= 0) {
-        this.setAngle(this.flipX ? -90 : 90);
-        this.setScale(baseScaleX, baseScaleY);
+        this.setScale(baseScale, baseScale);
       } else {
-        const stateName = this.stateMachine.getCurrentStateName();
-        let sx = 1.0;
-        let sy = 1.0;
-        let angle = 0;
-
-        if (stateName === 'hurt') {
-          // Hurt: flash red & severe shake
-          sx = 0.88;
-          sy = 1.15;
-          angle = Math.sin(time * 0.08) * 12;
-          this.x += Math.sin(time * 0.15) * 1.5;
-        } else if (stateName === 'attack') {
-          // Attack: lunge slash
-          sx = 1.12;
-          sy = 0.90;
-          angle = this.flipX ? -15 : 15;
-        } else if (this.currentVisualState.includes('walk') || this.currentVisualState.includes('run')) {
-          // Movement sway
-          const speedFactor = this.enemyType === 'ninja' ? 0.024 : 0.016;
-          const sway = Math.sin(time * speedFactor) * 7;
-          angle = sway + (this.flipX ? 4 : -4);
-          
-          const bounce = Math.abs(Math.sin(time * speedFactor)) * 0.05;
-          sx = 1.04 - bounce;
-          sy = 0.96 + bounce;
-        } else if (this.currentVisualState.includes('windup')) {
-          // Axe windup
-          const pulse = Math.sin(time * 0.03) * 0.08;
-          sx = 1.0 + pulse;
-          sy = 1.0 - pulse;
-          angle = Math.sin(time * 0.05) * 5;
-        } else {
-          // Idle breathing
-          const speedFactor = this.enemyType === 'ninja' ? 0.014 : 0.010;
-          const breathe = Math.sin(time * speedFactor) * 0.03;
-          sx = 1.0 - breathe;
-          sy = 1.0 + breathe;
-        }
-
-        this.setScale(baseScaleX * sx, baseScaleY * sy);
-        this.setAngle(angle);
+        this.setScale(baseScale, baseScale);
+        this.setAngle(0);
       }
     }
   }

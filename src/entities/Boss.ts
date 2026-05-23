@@ -14,9 +14,9 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
 
 
   private applyBossRender() {
-    this.setDisplaySize(180, 180);
-    this.body!.setSize(400, 600);
-    this.body!.setOffset(310, 220);
+    this.setDisplaySize(220, 220);
+    this.body!.setSize(30, 40);
+    this.body!.setOffset(4, 5);
     
     // Boss phases color feedback
     if (this.phase === 2) {
@@ -32,15 +32,19 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     super.destroy(fromScene);
   }
 
-  public play(key: any, ..._args: any[]): this {
+  public play(key: any, ...args: any[]): this {
     const keyStr = typeof key === 'string' ? key : (key?.key || '');
     this.currentVisualState = keyStr;
-    this.applyBossRender();
+    
+    // Fallback to enemy_run to prevent crash since Boss doesn't have its own anims yet
+    super.play('enemy_run', true);
+    
+    // We handle tinting locally, no need to call applyBossRender() here
     return this;
   }
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, 'ninja_sprite');
+    super(scene, x, y, 'enemy_sprite');
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
@@ -253,49 +257,13 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     super.preUpdate(time, delta);
     this.stateMachine.update(delta);
 
-    // Procedural Animation System
-    const baseScaleX = 220 / 1024;
-    const baseScaleY = 220 / 1024;
+    // Procedural Animation System removed in favor of real sprite animations
+    const baseScale = 220 / 37;
 
     if (this.health <= 0) {
-      this.setAngle(this.flipX ? -90 : 90);
-      this.setScale(baseScaleX, baseScaleY);
+      this.setScale(baseScale, baseScale);
     } else {
       const anim = this.currentVisualState;
-      let sx = 1.0;
-      let sy = 1.0;
-      let angle = 0;
-
-      if (anim.includes('idle')) {
-        // Slow heavy breathing
-        const breathe = Math.sin(time * 0.006) * 0.04;
-        sx = 1.0 - breathe;
-        sy = 1.0 + breathe;
-      } else if (anim.includes('walk') || this.body!.velocity.x !== 0) {
-        // Giant heavy sway walk
-        const sway = Math.sin(time * 0.01) * 6;
-        angle = sway + (this.flipX ? 4 : -4);
-        
-        const bounce = Math.abs(Math.sin(time * 0.01)) * 0.06;
-        sx = 1.06 - bounce;
-        sy = 0.94 + bounce;
-      } else if (anim.includes('windup')) {
-        // Aggressive pulsing windup
-        const pulse = Math.sin(time * 0.04) * 0.09;
-        sx = 1.0 - pulse;
-        sy = 1.0 + pulse;
-        angle = Math.sin(time * 0.06) * 6;
-      } else if (anim.includes('rush')) {
-        // Aerodynamic charge lean
-        sx = 1.22;
-        sy = 0.82;
-        angle = this.flipX ? -25 : 25;
-      } else if (anim.includes('attack')) {
-        // Slam lunge stretch
-        sx = 1.15;
-        sy = 0.85;
-        angle = this.flipX ? -15 : 15;
-      }
 
       // Flash gold/enraged tint on windup or phase changes
       if (anim.includes('windup') && Math.floor(time / 100) % 2 === 0) {
@@ -304,8 +272,8 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
         this.applyBossRender();
       }
 
-      this.setScale(baseScaleX * sx, baseScaleY * sy);
-      this.setAngle(angle);
+      this.setScale(baseScale, baseScale);
+      this.setAngle(0);
     }
   }
 }
