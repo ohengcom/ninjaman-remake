@@ -1,15 +1,11 @@
 {
   "name": "ninjaman-remake",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Ninja Man Remake - A modern high-definition action-platformer built with Phaser 4 + TypeScript + Vite, featuring a premium Catppuccin Mocha aesthetic.",
   "type": "module",
   "scripts": {
-    "generate-assets": "node scripts/generate-assets.js",
-    "predev": "npm run generate-assets",
     "dev": "vite",
-    "prebuild": "npm run generate-assets",
     "build": "vite build",
-    "prepreview": "npm run generate-assets",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

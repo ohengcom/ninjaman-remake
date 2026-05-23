@@ -13,7 +13,7 @@ import { GAME_EVENTS } from '../events.js';
 import { SeededRandom } from '../utils/SeededRandom.js';
 import { VfxManager } from '../managers/VfxManager.js';
 import { LevelBuilder } from '../utils/LevelBuilder.js';
-import { AnimationFactory } from '../animations/AnimationFactory.js';
+
 
 export class GameScene extends Phaser.Scene {
   private player!: Player;
@@ -91,9 +91,7 @@ export class GameScene extends Phaser.Scene {
     const midBg = this.levelCfg.midBg;
     this.mapWidth = this.levelCfg.mapTiles * this.levelCfg.tileSize;
 
-    AnimationFactory.createPlayerAnimations(this.anims);
-    AnimationFactory.createEnemyAnimations(this.anims);
-    AnimationFactory.createBossAnimations(this.anims);
+
 
     LevelBuilder.buildBackground(this, farBg, midBg, this.mapWidth);
 
