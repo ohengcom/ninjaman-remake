@@ -4,11 +4,11 @@ import { SoundManager } from '../managers/SoundManager.js';
 import { PLAYER_MOVEMENT, PLAYER_ATTACKS, PLAYER_DEFENSE } from '../config/combat.js';
 
 const PLAYER_RENDER = {
-  displaySize: 120,
+  displaySize: 200,
   bodyWidth: 20,
-  bodyHeight: 35,
-  bodyOffsetX: 14,
-  bodyOffsetY: 13,
+  bodyHeight: 40,
+  bodyOffsetX: 30,
+  bodyOffsetY: 23,
 } as const;
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
@@ -41,7 +41,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private lastJumpInputTime: number = 0;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, 'player_sprite');
+    super(scene, x, y, 'knight');
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
@@ -312,7 +312,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'attack_combo',
         onEnter: (p) => {
-          const comboAnims = ['player_attack', 'player_kick', 'player_attack', 'player_kick'];
+          const comboAnims = ['player_attack_A', 'player_attack_B', 'player_attack_C', 'player_attack_A'];
           const comboMomentum = [
             PLAYER_ATTACKS.combo.forwardMomentum,
             PLAYER_ATTACKS.combo.forwardMomentum * 0.5,
@@ -516,7 +516,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       this.setAlpha(time % 200 < 100 ? 0.5 : 1);
     }
 
-    const baseScale = PLAYER_RENDER.displaySize / 48; // Frame size is 48x48
+    const baseScale = PLAYER_RENDER.displaySize / 79; // Frame width is approx 79
 
     if (this.health <= 0) {
       this.setScale(baseScale, baseScale);

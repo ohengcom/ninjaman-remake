@@ -13,10 +13,10 @@ const ENEMY_TINTS = {
 } as const;
 
 const ENEMY_RENDER_CONFIGS = {
-  guard: { displaySize: 100, bodyWidth: 18, bodyHeight: 35, bodyOffsetX: 10, bodyOffsetY: 10 },
-  axe: { displaySize: 120, bodyWidth: 20, bodyHeight: 38, bodyOffsetX: 9, bodyOffsetY: 7 },
-  ninja: { displaySize: 90, bodyWidth: 16, bodyHeight: 32, bodyOffsetX: 10, bodyOffsetY: 13 },
-  sniper: { displaySize: 100, bodyWidth: 18, bodyHeight: 35, bodyOffsetX: 10, bodyOffsetY: 10 },
+  guard: { displaySize: 180, bodyWidth: 40, bodyHeight: 120, bodyOffsetX: 105, bodyOffsetY: 60 },
+  axe: { displaySize: 200, bodyWidth: 45, bodyHeight: 130, bodyOffsetX: 105, bodyOffsetY: 50 },
+  ninja: { displaySize: 160, bodyWidth: 35, bodyHeight: 110, bodyOffsetX: 105, bodyOffsetY: 70 },
+  sniper: { displaySize: 180, bodyWidth: 40, bodyHeight: 120, bodyOffsetX: 105, bodyOffsetY: 60 },
 } as const;
 
 export class Enemy extends Phaser.Physics.Arcade.Sprite {
@@ -59,7 +59,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   constructor(scene: Phaser.Scene, x: number, y: number, type: EnemyType = 'guard') {
-    super(scene, x, y, 'enemy_sprite');
+    super(scene, x, y, 'zombie');
     this.enemyType = type;
     scene.add.existing(this);
     scene.physics.add.existing(this);
@@ -75,7 +75,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   public spawn(x: number, y: number, type: EnemyType) {
     this.enemyType = type;
-    this.setTexture('enemy_sprite');
+    this.setTexture('zombie');
     this.setPosition(x, y);
     this.setActive(true);
     this.setVisible(true);
@@ -265,7 +265,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       this.stateMachine.update(delta);
 
       const cfg = ENEMY_RENDER_CONFIGS[this.enemyType];
-      const baseScale = cfg.displaySize / 37;
+      const baseScale = cfg.displaySize / 256;
 
       if (this.health <= 0) {
         this.setScale(baseScale, baseScale);

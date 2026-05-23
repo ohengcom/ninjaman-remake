@@ -14,9 +14,9 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
 
 
   private applyBossRender() {
-    this.setDisplaySize(220, 220);
-    this.body!.setSize(30, 40);
-    this.body!.setOffset(4, 5);
+    this.setDisplaySize(300, 300);
+    this.body!.setSize(60, 160);
+    this.body!.setOffset(100, 50);
     
     // Boss phases color feedback
     if (this.phase === 2) {
@@ -44,7 +44,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
   }
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, 'enemy_sprite');
+    super(scene, x, y, 'zombie');
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
@@ -258,7 +258,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     this.stateMachine.update(delta);
 
     // Procedural Animation System removed in favor of real sprite animations
-    const baseScale = 220 / 37;
+    const baseScale = 300 / 256;
 
     if (this.health <= 0) {
       this.setScale(baseScale, baseScale);

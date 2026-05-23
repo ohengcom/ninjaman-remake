@@ -21,6 +21,12 @@ export class BootScene extends Phaser.Scene {
         this.load.spritesheet(sheet.key, sheet.url, sheet.frameConfig);
       }
     }
+    
+    if ('atlases' in manifest) {
+      for (const atlas of manifest.atlases) {
+        this.load.atlas(atlas.key, atlas.image, atlas.atlas);
+      }
+    }
 
     const w = this.cameras.main.width;
     const h = this.cameras.main.height;
@@ -50,17 +56,19 @@ export class BootScene extends Phaser.Scene {
   }
 
   create(): void {
-    // Player animations (brawler48x48)
-    this.anims.create({ key: 'player_idle', frames: this.anims.generateFrameNumbers('player_sprite', { start: 5, end: 8 }), frameRate: 8, repeat: -1 });
-    this.anims.create({ key: 'player_run', frames: this.anims.generateFrameNumbers('player_sprite', { start: 0, end: 3 }), frameRate: 10, repeat: -1 });
-    this.anims.create({ key: 'player_jump', frames: this.anims.generateFrameNumbers('player_sprite', { start: 20, end: 23 }), frameRate: 10, repeat: 0 });
-    this.anims.create({ key: 'player_fall', frames: this.anims.generateFrameNumbers('player_sprite', { start: 22, end: 23 }), frameRate: 10, repeat: -1 });
-    this.anims.create({ key: 'player_attack', frames: this.anims.generateFrameNumbers('player_sprite', { start: 11, end: 13 }), frameRate: 15, repeat: 0 });
-    this.anims.create({ key: 'player_kick', frames: this.anims.generateFrameNumbers('player_sprite', { start: 15, end: 17 }), frameRate: 15, repeat: 0 });
-    this.anims.create({ key: 'player_hurt', frames: this.anims.generateFrameNumbers('player_sprite', { start: 35, end: 37 }), frameRate: 10, repeat: 0 });
+    // Player animations (knight atlas)
+    this.anims.create({ key: 'player_idle', frames: [{ key: 'knight', frame: 'guard/frame0001' }], frameRate: 1, repeat: 0 });
+    this.anims.create({ key: 'player_run', frames: this.anims.generateFrameNames('knight', { prefix: 'run/frame', start: 0, end: 7, zeroPad: 4 }), frameRate: 15, repeat: -1 });
+    this.anims.create({ key: 'player_jump', frames: this.anims.generateFrameNames('knight', { prefix: 'jump_loop/frame', start: 0, end: 1, zeroPad: 4 }), frameRate: 10, repeat: -1 });
+    this.anims.create({ key: 'player_fall', frames: this.anims.generateFrameNames('knight', { prefix: 'fall_loop/frame', start: 0, end: 1, zeroPad: 4 }), frameRate: 10, repeat: -1 });
+    this.anims.create({ key: 'player_attack_A', frames: this.anims.generateFrameNames('knight', { prefix: 'attack_A/frame', start: 0, end: 12, zeroPad: 4 }), frameRate: 20, repeat: 0 });
+    this.anims.create({ key: 'player_attack_B', frames: this.anims.generateFrameNames('knight', { prefix: 'attack_B/frame', start: 0, end: 9, zeroPad: 4 }), frameRate: 20, repeat: 0 });
+    this.anims.create({ key: 'player_attack_C', frames: this.anims.generateFrameNames('knight', { prefix: 'attack_C/frame', start: 0, end: 12, zeroPad: 4 }), frameRate: 20, repeat: 0 });
+    this.anims.create({ key: 'player_hurt', frames: [{ key: 'knight', frame: 'guard/frame0001' }], frameRate: 10, repeat: 0 });
 
-    // Enemy animations (mummy37x45)
-    this.anims.create({ key: 'enemy_run', frames: this.anims.generateFrameNumbers('enemy_sprite', { start: 0, end: 17 }), frameRate: 12, repeat: -1 });
+    // Enemy animations (zombie atlas)
+    this.anims.create({ key: 'enemy_run', frames: this.anims.generateFrameNames('zombie', { prefix: 'walk_', start: 0, end: 8, zeroPad: 3 }), frameRate: 12, repeat: -1 });
+    this.anims.create({ key: 'enemy_die', frames: this.anims.generateFrameNames('zombie', { prefix: 'Death_', start: 0, end: 5, zeroPad: 3 }), frameRate: 10, repeat: 0 });
 
     this.scene.start('MainMenuScene');
   }

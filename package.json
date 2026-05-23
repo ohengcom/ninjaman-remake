@@ -24,7 +24,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "phaser": "^4.1.0"
+    "phaser": "^4.1.0",
+    "puppeteer": "^25.0.4"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",
