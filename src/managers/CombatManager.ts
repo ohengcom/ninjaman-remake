@@ -37,6 +37,7 @@ export class CombatManager {
 
       if (Phaser.Geom.Rectangle.Overlaps(attackRect, enemyRect)) {
         enemy.takeDamage(baseDamage, dir);
+        this.scene.vfxManager.hitFlashFilter(enemy);
         hitAnything = true;
         lastHitX = enemy.x;
         this.scene.emitHitParticle(enemy.x, enemy.y, 15);
@@ -50,6 +51,7 @@ export class CombatManager {
       const bossRect = new Phaser.Geom.Rectangle(boss.body!.x, boss.body!.y, boss.body!.width, boss.body!.height);
       if (Phaser.Geom.Rectangle.Overlaps(attackRect, bossRect)) {
         boss.takeDamage(baseDamage * BOSS_STATS.damageMultiplier, dir);
+        this.scene.vfxManager.hitFlashFilter(boss);
         hitAnything = true;
         lastHitX = boss.x;
         this.scene.emitHitParticle(boss.x, boss.y, 25);
@@ -81,6 +83,7 @@ export class CombatManager {
       this.scene.events.emit(GAME_EVENTS.UPDATE_HEALTH, player.health, player.maxHealth);
       if (!player.isBlocking) {
         SoundManager.playDamage(this.scene.getPan(attacker.x));
+        this.scene.vfxManager.hitFlashFilter(player);
         this.scene.emitHitParticle(player.x, player.y, 5);
         this.scene.cameras.main.shake(200, 0.02);
       } else {
@@ -102,6 +105,7 @@ export class CombatManager {
       this.scene.events.emit(GAME_EVENTS.UPDATE_HEALTH, player.health, player.maxHealth);
       if (!player.isBlocking) {
         SoundManager.playDamage(this.scene.getPan(attacker.x));
+        this.scene.vfxManager.hitFlashFilter(player);
         this.scene.emitHitParticle(player.x, player.y, 20);
         this.scene.cameras.main.shake(300, 0.04);
       }

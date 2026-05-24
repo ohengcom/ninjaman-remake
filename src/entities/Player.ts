@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { StateMachine } from '../utils/StateMachine.js';
 import { SoundManager } from '../managers/SoundManager.js';
 import { PLAYER_MOVEMENT, PLAYER_ATTACKS, PLAYER_DEFENSE } from '../config/combat.js';
+import { GAME_EVENTS } from '../events.js';
 
 const PLAYER_RENDER = {
   displaySize: 200,
@@ -45,6 +46,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
 
     this.applyRenderSize();
+    this.setLighting(true);
 
     this.setCollideWorldBounds(true);
 
@@ -342,7 +344,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           }
 
           p.scene.cameras.main.shake(shakeDur, shakeIntensity);
-          p.scene.events.emit('player_attack', p, 'combo');
+          p.scene.events.emit(GAME_EVENTS.PLAYER_ATTACK, p, 'combo');
           
           p.scene.time.delayedCall(recovery, () => {
             if (p.health > 0) p.stateMachine.setState(p.body!.touching.down ? 'idle' : 'fall');
@@ -364,7 +366,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           p.playAnimation('player_attack');
           p.setVelocityX(0);
           p.scene.cameras.main.shake(100, 0.005);
-          p.scene.events.emit('player_cast_wave', p);
+          p.scene.events.emit(GAME_EVENTS.PLAYER_CAST_WAVE, p);
           
           p.scene.time.delayedCall(300, () => {
              if (p.health > 0) p.stateMachine.setState(p.body!.touching.down ? 'idle' : 'fall');
@@ -378,7 +380,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           p.setVelocityY(PLAYER_ATTACKS.uppercut.launchVelocity);
           p.setVelocityX(0);
           p.scene.cameras.main.shake(150, 0.01);
-          p.scene.events.emit('player_attack', p, 'uppercut');
+          p.scene.events.emit(GAME_EVENTS.PLAYER_ATTACK, p, 'uppercut');
           
           p.stateMachine.addTimer(p.scene.time.delayedCall(PLAYER_ATTACKS.uppercut.recovery, () => {
             if (p.health > 0) p.stateMachine.setState('fall');
@@ -391,12 +393,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           p.playAnimation('player_fall');
           p.setVelocityY(PLAYER_ATTACKS.dive.downVelocity);
           p.setVelocityX(p.flipX ? -PLAYER_ATTACKS.dive.forwardVelocity : PLAYER_ATTACKS.dive.forwardVelocity);
-          p.scene.events.emit('player_attack', p, 'dive');
+          p.scene.events.emit(GAME_EVENTS.PLAYER_ATTACK, p, 'dive');
         },
         onUpdate: (p) => {
            if (p.body!.touching.down) {
               p.scene.cameras.main.shake(200, 0.02);
-              p.scene.events.emit('player_attack', p, 'dive_land');
+              p.scene.events.emit(GAME_EVENTS.PLAYER_ATTACK, p, 'dive_land');
               p.stateMachine.setState('idle');
            }
         }
@@ -406,12 +408,14 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         onEnter: (p) => {
           p.playAnimation('player_hurt');
           p.setTint(0xff6b6b);
+          p.setTintMode(Phaser.TintModes.ADD);
           p.isInvulnerable = true;
           p.isBlocking = false;
           p.scene.cameras.main.shake(200, 0.01);
           
           p.scene.time.delayedCall(PLAYER_DEFENSE.hurtStunDuration, () => {
             p.clearTint();
+            p.setTintMode(Phaser.TintModes.MULTIPLY);
             p.stateMachine.setState(p.body!.touching.down ? 'idle' : 'fall');
           });
 
@@ -479,7 +483,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     
     if (this.isBlocking && Math.sign(dirX) !== (this.flipX ? -1 : 1)) {
        this.health -= Math.floor(amount * PLAYER_DEFENSE.blockDamageReduction);
-       this.scene.events.emit('player_parry', this);
+       this.scene.events.emit(GAME_EVENTS.PLAYER_PARRY, this);
        this.setVelocityX(dirX * PLAYER_DEFENSE.blockPushback);
        return;
     }
@@ -489,7 +493,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.setVelocityY(PLAYER_DEFENSE.hurtKnockbackY);
     if (this.health <= 0) {
       this.setTint(0x868e96);
-      this.scene.events.emit('player_dead');
+      this.setTintMode(Phaser.TintModes.MULTIPLY);
+      this.scene.events.emit(GAME_EVENTS.PLAYER_DEAD);
     } else {
       this.stateMachine.setState('hurt');
     }

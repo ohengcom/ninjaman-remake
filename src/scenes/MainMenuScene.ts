@@ -75,10 +75,38 @@ export class MainMenuScene extends Phaser.Scene {
 
     // Start on SPACE or click
     const startGame = () => {
-      this.cameras.main.fadeOut(800, 0, 0, 0);
-      this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-        this.scene.start('GameScene', { level: 1 });
-      });
+      this.input.keyboard?.off('keydown-SPACE', startGame);
+      this.input.off('pointerdown', startGame);
+
+      if (this.sys.game.config.renderType === Phaser.CANVAS) {
+        this.cameras.main.fadeOut(800, 0, 0, 0);
+        this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+          this.scene.start('GameScene', { level: 1 });
+        });
+      } else {
+        try {
+          const cam = this.cameras.main;
+          const wipe = cam.filters.external.addWipe(0.15, 0, 0);
+          wipe.setTopToBottom();
+          wipe.setWipeEffect();
+
+          this.tweens.add({
+            targets: wipe,
+            progress: 1,
+            duration: 800,
+            ease: 'Quad.easeIn',
+            onComplete: () => {
+              this.scene.start('GameScene', { level: 1 });
+            }
+          });
+        } catch (e) {
+          console.warn("Wipe filter failed on MainMenuScene, falling back to fade:", e);
+          this.cameras.main.fadeOut(800, 0, 0, 0);
+          this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+            this.scene.start('GameScene', { level: 1 });
+          });
+        }
+      }
     };
 
     this.input.keyboard!.once('keydown-SPACE', startGame);

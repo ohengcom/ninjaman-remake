@@ -27,10 +27,13 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     // Boss phases color feedback
     if (this.phase === 3) {
       this.setTint(0xff4444); // Red/Enraged
+      this.setTintMode(Phaser.TintModes.ADD);
     } else if (this.phase === 2) {
       this.setTint(0xffd43b); // Golden
+      this.setTintMode(Phaser.TintModes.SCREEN);
     } else {
       this.clearTint(); // Natural colors in phase 1
+      this.setTintMode(Phaser.TintModes.MULTIPLY);
     }
   }
 
@@ -40,6 +43,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
 
     this.setCollideWorldBounds(true);
+    this.setLighting(true);
     this.body!.immovable = true;
     (this.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
 
@@ -70,12 +74,23 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
 
   private checkPhaseTransition() {
     const healthPercent = this.health / this.maxHealth;
+    let transitionTriggered = false;
     if (healthPercent <= 0.3 && this.phase < 3) {
       this.phase = 3;
+      transitionTriggered = true;
       this.scene.cameras.main.shake(500, 0.03);
     } else if (healthPercent <= 0.5 && this.phase < 2) {
       this.phase = 2;
+      transitionTriggered = true;
       this.scene.cameras.main.shake(400, 0.025);
+    }
+
+    if (transitionTriggered) {
+      const gScene = this.scene as any;
+      if (gScene.vfxManager) {
+        gScene.vfxManager.bossPhaseTransition(this.phase);
+        gScene.vfxManager.bossPhaseParticleBurst(this.x, this.y, this.phase);
+      }
     }
   }
 
@@ -163,14 +178,14 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
           b.play({ key: 'boss_attack', repeat: 0 }, true);
           b.setVelocityX(0);
           b.scene.cameras.main.shake(300, 0.025);
-          b.scene.events.emit('boss_attack', b);
+          b.scene.events.emit(GAME_EVENTS.BOSS_ATTACK, b);
 
           // Phase 2+: follow up with a second strike
           if (b.phase >= 2) {
             b.stateMachine.addTimer(b.scene.time.delayedCall(350, () => {
               if (b.health <= 0) return;
               b.scene.cameras.main.shake(250, 0.02);
-              b.scene.events.emit('boss_attack', b);
+              b.scene.events.emit(GAME_EVENTS.BOSS_ATTACK, b);
             }));
           }
 
@@ -203,7 +218,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
               if (b.health <= 0) return;
               b.setVelocityX(0);
               b.play({ key: 'boss_attack', repeat: 0 }, true);
-              b.scene.events.emit('boss_attack', b);
+              b.scene.events.emit(GAME_EVENTS.BOSS_ATTACK, b);
               b.scene.cameras.main.shake(400, 0.04);
 
               b.stateMachine.addTimer(b.scene.time.delayedCall(800, () => {
@@ -226,6 +241,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     
     // Flash white on hit
     this.setTint(0xffffff);
+    this.setTintMode(Phaser.TintModes.FILL);
     this.isInvulnerable = true;
     
     this.scene.time.delayedCall(BOSS_STATS.invulnerabilityDuration, () => {

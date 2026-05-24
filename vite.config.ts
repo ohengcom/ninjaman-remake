@@ -9,6 +9,8 @@ export default defineConfig({
     sourcemap: false,
     minify: 'oxc',
     cssMinify: true,
+    cssCodeSplit: false,
+    assetsInlineLimit: 4096,
     chunkSizeWarningLimit: 2000,
     reportCompressedSize: false,
     rollupOptions: {

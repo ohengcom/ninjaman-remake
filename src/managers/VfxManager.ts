@@ -189,4 +189,179 @@ export class VfxManager {
       onComplete: () => dmgText.destroy()
     });
   }
+
+  /** 對精靈施加短暫的 Glow + ColorMatrix 受擊反饋，支持 Canvas 優雅降級 */
+  public hitFlashFilter(target: Phaser.GameObjects.Sprite, color: number = 0xff4444, duration: number = 150) {
+    if (this.scene.sys.game.config.renderType === Phaser.CANVAS) {
+      target.setTint(color);
+      this.scene.time.delayedCall(duration, () => {
+        if (target.active) target.clearTint();
+      });
+      return;
+    }
+
+    try {
+      if (!target.filters) target.enableFilters();
+      const filters = target.filters as any;
+      if (filters) {
+        const glow = filters.internal.addGlow(color, 8, 0, 1, false, 4, 6);
+        const cm = filters.internal.addColorMatrix();
+        if (cm && typeof (cm as any).brightness === 'function') {
+          (cm as any).brightness(1.5);
+        }
+
+        this.scene.tweens.add({
+          targets: glow,
+          outerStrength: 0,
+          duration: duration,
+          ease: 'Cubic.easeOut',
+          onComplete: () => {
+            if (target.active && target.filters) {
+              const currentFilters = target.filters as any;
+              currentFilters.internal.remove(glow);
+              currentFilters.internal.remove(cm);
+            }
+          }
+        });
+      }
+    } catch (e) {
+      console.warn("Filters not supported or failed to apply:", e);
+      target.setTint(color);
+      this.scene.time.delayedCall(duration, () => {
+        if (target.active) target.clearTint();
+      });
+    }
+  }
+
+  /** Boss 進入新階段時的視覺衝擊 */
+  public bossPhaseTransition(phase: number) {
+    if (this.scene.sys.game.config.renderType === Phaser.CANVAS) return;
+
+    try {
+      const cam = this.scene.cameras.main;
+      if (phase === 2) {
+        // 短暫 Bloom + 色偏
+        const bloom = cam.filters.external.addBlur(0, 2, 2, 1);
+        const cm = cam.filters.external.addColorMatrix();
+        if (cm && typeof (cm as any).brightness === 'function') {
+          (cm as any).brightness(1.3);
+        }
+        this.scene.time.delayedCall(600, () => {
+          cam.filters.external.remove(bloom);
+          cam.filters.external.remove(cm);
+        });
+      } else if (phase === 3) {
+        // 狂暴階段：紅色 Vignette
+        cam.filters.internal.addVignette(0.5, 0.5, 0.7, 0.4, 0xff2222);
+      }
+    } catch (e) {
+      console.warn("VfxManager bossPhaseTransition filters failed:", e);
+    }
+  }
+
+  /** 玩家死亡：全屏灰度 + 模糊 */
+  public deathFilter() {
+    if (this.scene.sys.game.config.renderType === Phaser.CANVAS) return;
+
+    try {
+      const cam = this.scene.cameras.main;
+      const cm = cam.filters.external.addColorMatrix();
+      const blur = cam.filters.external.addBlur(0, 0, 0, 0.5);
+
+      this.scene.tweens.addCounter({
+        from: 0, to: 1, duration: 1500,
+        onUpdate: (tween) => {
+          const v = (tween.getValue() as number) || 0;
+          if (cm && typeof (cm as any).grayscale === 'function') {
+            (cm as any).grayscale(v);
+          }
+          if (blur) {
+            (blur as any).strength = v * 2;
+          }
+        }
+      });
+    } catch (e) {
+      console.warn("VfxManager deathFilter failed:", e);
+    }
+  }
+
+  /** Parry 成功時的短暫扭曲效果 */
+  public parryImpact() {
+    if (this.scene.sys.game.config.renderType === Phaser.CANVAS) return;
+
+    try {
+      const cam = this.scene.cameras.main;
+      const barrel = cam.filters.external.addBarrel(1.04);
+
+      this.scene.tweens.add({
+        targets: barrel,
+        amount: 1.0,
+        duration: 200,
+        ease: 'Cubic.easeOut',
+        onComplete: () => {
+          try {
+            cam.filters.external.remove(barrel);
+          } catch(e) {}
+        }
+      });
+    } catch (e) {
+      console.warn("VfxManager parryImpact failed:", e);
+    }
+  }
+
+  /** Hitstop 期間增強視覺衝擊 */
+  public hitstopFilter(durationMs: number = 60) {
+    if (this.scene.sys.game.config.renderType === Phaser.CANVAS) return;
+
+    try {
+      const cam = this.scene.cameras.main;
+      const cm = cam.filters.external.addColorMatrix();
+      if (cm && typeof (cm as any).contrast === 'function') {
+        (cm as any).contrast(1.3);
+      }
+
+      this.scene.time.delayedCall(durationMs, () => {
+        try {
+          cam.filters.external.remove(cm);
+        } catch(e) {}
+      });
+    } catch (e) {
+      console.warn("VfxManager hitstopFilter failed:", e);
+    }
+  }
+
+  /** 跟隨玩家的攻擊拖尾粒子 */
+  public createAttackTrail(player: Phaser.Physics.Arcade.Sprite): Phaser.GameObjects.Particles.ParticleEmitter {
+    return this.scene.add.particles(0, 0, 'player_wave', {
+      follow: player,
+      followOffset: { x: 0, y: 0 },
+      speed: { min: 20, max: 80 },
+      scale: { start: 0.15, end: 0 },
+      alpha: { start: 0.8, end: 0 },
+      tint: [0x00d4ff, 0x00ff88, 0xffffff],
+      blendMode: 'ADD',
+      lifespan: 200,
+      frequency: 50,
+      emitting: false,
+    });
+  }
+
+  /** Boss 進入新階段的粒子爆發 */
+  public bossPhaseParticleBurst(x: number, y: number, phase: number) {
+    const colors = phase === 3 ? [0xff4444, 0xff8844] : [0xffd43b, 0xffaa00];
+
+    this.scene.add.particles(x, y, 'player_wave', {
+      speed: { min: 200, max: 600 },
+      angle: { min: 0, max: 360 },
+      scale: { start: 0.3, end: 0 },
+      tint: colors,
+      blendMode: 'ADD',
+      lifespan: 800,
+      gravityY: 200,
+      frequency: -1, // explode
+      quantity: 40,
+      emitting: false,
+    }).emitParticleAt(x, y, 40);
+  }
 }
+

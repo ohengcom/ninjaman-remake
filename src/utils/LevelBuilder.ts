@@ -150,7 +150,70 @@ export class LevelBuilder {
     return { platforms, floor };
   }
 
-  /** Add atmospheric decorations based on level theme */
+  /** Generate high-performance decoration texture atlas procedurally on startup */
+  public static generateDecoAtlas(scene: Phaser.Scene) {
+    if (scene.textures.exists('deco_atlas')) return;
+
+    // Create a RenderTexture to draw our assets
+    const rt = scene.make.renderTexture({ width: 512, height: 256 }, false);
+    const g = scene.make.graphics({ x: 0, y: 0 });
+
+    // Draw Tree (frame tree: x=0, y=0, w=100, h=200)
+    const treeH = 150;
+    g.fillStyle(0x4a3520, 1);
+    g.fillRect(50 - 8, 200 - treeH, 16, treeH);
+    g.fillStyle(0x2d5a1e, 0.8);
+    g.fillCircle(50, 200 - treeH - 20, 35);
+    g.fillStyle(0x3a7a28, 0.6);
+    g.fillCircle(50 - 15, 200 - treeH - 10, 25);
+    g.fillCircle(50 + 15, 200 - treeH - 5, 20);
+    rt.draw(g, 0, 0);
+    g.clear();
+
+    // Draw Mushroom (frame mushroom: x=120, y=0, w=40, h=40)
+    g.fillStyle(0x6a4fbf, 0.7);
+    g.fillCircle(140, 20, 8);
+    g.fillStyle(0x8b6fcf, 0.5);
+    g.fillCircle(140, 17, 5);
+    g.fillStyle(0x5a3520, 1);
+    g.fillRect(140 - 2, 24, 4, 16);
+    rt.draw(g, 0, 0);
+    g.clear();
+
+    // Draw Rock (frame rock: x=180, y=0, w=60, h=40)
+    g.fillStyle(0x8a7b6a, 0.7);
+    g.fillEllipse(210, 20, 40, 20);
+    rt.draw(g, 0, 0);
+    g.clear();
+
+    // Draw Pillar (frame pillar: x=260, y=0, w=50, h=200)
+    const pillarH = 150;
+    g.fillStyle(0x4a4a5a, 1);
+    g.fillRect(285 - 12, 200 - pillarH, 24, pillarH);
+    g.fillStyle(0x5a5a6a, 1);
+    g.fillRect(285 - 16, 200 - pillarH - 8, 32, 8);
+    g.fillRect(285 - 16, 200 - 8, 32, 8);
+    g.fillStyle(0xff8c00, 0.8);
+    g.fillCircle(285, 200 - pillarH - 16, 8);
+    g.fillStyle(0xffcc00, 0.5);
+    g.fillCircle(285, 200 - pillarH - 20, 5);
+    rt.draw(g, 0, 0);
+    g.clear();
+
+    g.destroy();
+
+    // Export RenderTexture to texture manager
+    const texture = scene.textures.addRenderTexture('deco_atlas', rt);
+    // Add frames
+    if (texture) {
+      texture.add('tree', 0, 0, 0, 100, 200);
+      texture.add('mushroom', 0, 120, 0, 40, 40);
+      texture.add('rock', 0, 180, 0, 60, 40);
+      texture.add('pillar', 0, 260, 0, 50, 200);
+    }
+  }
+
+  /** Add atmospheric decorations based on level theme using SpriteGPULayer */
   private static addDecorations(
     scene: Phaser.Scene,
     levelCfg: LevelConfig,
@@ -158,70 +221,89 @@ export class LevelBuilder {
     rng: SeededRandom,
     _theme: { groundColor: number; platformColor: number; groundTopColor: number; accentColor: number }
   ) {
+    LevelBuilder.generateDecoAtlas(scene);
+
     const h = scene.cameras.main.height;
     const groundTop = h - 48;
     const levelNum = levelCfg.levelNumber ?? 1;
 
+    // If WebGL, use SpriteGPULayer for maximum performance
+    const isWebGL = scene.sys.game.config.renderType !== Phaser.CANVAS;
+
+    if (isWebGL) {
+      try {
+        const decoLayer = (scene.add as any).spriteGPULayer('deco_atlas', 200);
+        decoLayer.setScrollFactor(0.95);
+        decoLayer.setDepth(-1);
+
+        for (let x = 100; x < mapWidth - 200; x += 200 + rng.next() * 300) {
+          const decoType = rng.next();
+          const member: any = { x: x, scaleX: 0.8 + rng.next() * 0.4, alpha: 0.85 };
+          member.scaleY = member.scaleX;
+
+          if (levelNum === 1) {
+            if (decoType < 0.4) {
+              member.frame = 'tree';
+              member.y = groundTop - 100; // Origin is center
+              decoLayer.addMember(member);
+            } else if (decoType < 0.7) {
+              member.frame = 'mushroom';
+              member.y = groundTop - 20;
+              decoLayer.addMember(member);
+            }
+          } else if (levelNum === 2) {
+            if (decoType < 0.4) {
+              member.frame = 'rock';
+              member.y = groundTop - 15;
+              decoLayer.addMember(member);
+            }
+          } else if (levelNum === 3) {
+            if (decoType < 0.35) {
+              member.frame = 'pillar';
+              member.y = groundTop - 100;
+              decoLayer.addMember(member);
+            }
+          }
+        }
+        return;
+      } catch (e) {
+        console.warn("Failed to use SpriteGPULayer, falling back to standard sprites:", e);
+      }
+    }
+
+    // Fallback: standard sprites using the deco_atlas (works on both Canvas and WebGL)
     for (let x = 100; x < mapWidth - 200; x += 200 + rng.next() * 300) {
       const decoType = rng.next();
-      
+      let frame = '';
+      let y = groundTop;
+
       if (levelNum === 1) {
-        // Forest: trees, bushes, mushrooms
-        if (decoType < 0.3) {
-          // Tree trunk
-          const treeH = 80 + rng.next() * 120;
-          const g = scene.add.graphics();
-          g.fillStyle(0x4a3520, 1);
-          g.fillRect(x - 8, groundTop - treeH, 16, treeH);
-          // Canopy
-          g.fillStyle(0x2d5a1e, 0.8);
-          g.fillCircle(x, groundTop - treeH - 20, 35 + rng.next() * 20);
-          g.fillStyle(0x3a7a28, 0.6);
-          g.fillCircle(x - 15, groundTop - treeH - 10, 25);
-          g.fillCircle(x + 15, groundTop - treeH - 5, 20);
-          g.setScrollFactor(0.95); // Slight parallax
-          g.setDepth(-1);
-        } else if (decoType < 0.5) {
-          // Glowing mushroom
-          const g = scene.add.graphics();
-          g.fillStyle(0x6a4fbf, 0.7);
-          g.fillCircle(x, groundTop - 12, 8 + rng.next() * 6);
-          g.fillStyle(0x8b6fcf, 0.5);
-          g.fillCircle(x, groundTop - 15, 5);
-          g.fillStyle(0x5a3520, 1);
-          g.fillRect(x - 2, groundTop - 6, 4, 6);
-          g.setDepth(-1);
+        if (decoType < 0.4) {
+          frame = 'tree';
+          y = groundTop - 200;
+        } else if (decoType < 0.7) {
+          frame = 'mushroom';
+          y = groundTop - 40;
         }
       } else if (levelNum === 2) {
-        // Beach: rocks, shells, driftwood
-        if (decoType < 0.3) {
-          const g = scene.add.graphics();
-          g.fillStyle(0x8a7b6a, 0.7);
-          const rockW = 20 + rng.next() * 30;
-          const rockH = 10 + rng.next() * 15;
-          g.fillEllipse(x, groundTop - rockH / 2, rockW, rockH);
-          g.setDepth(-1);
+        if (decoType < 0.4) {
+          frame = 'rock';
+          y = groundTop - 40;
         }
       } else if (levelNum === 3) {
-        // Castle: pillars, banners, torches
-        if (decoType < 0.25) {
-          // Stone pillar
-          const pillarH = 100 + rng.next() * 60;
-          const g = scene.add.graphics();
-          g.fillStyle(0x4a4a5a, 1);
-          g.fillRect(x - 12, groundTop - pillarH, 24, pillarH);
-          // Pillar cap
-          g.fillStyle(0x5a5a6a, 1);
-          g.fillRect(x - 16, groundTop - pillarH - 8, 32, 8);
-          g.fillRect(x - 16, groundTop, 32, 8);
-          // Torch flame at top
-          g.fillStyle(0xff8c00, 0.8);
-          g.fillCircle(x, groundTop - pillarH - 16, 8);
-          g.fillStyle(0xffcc00, 0.5);
-          g.fillCircle(x, groundTop - pillarH - 20, 5);
-          g.setScrollFactor(0.95);
-          g.setDepth(-1);
+        if (decoType < 0.35) {
+          frame = 'pillar';
+          y = groundTop - 200;
         }
+      }
+
+      if (frame) {
+        const sprite = scene.add.sprite(x, y, 'deco_atlas', frame).setOrigin(0, 0);
+        sprite.setScrollFactor(0.95);
+        sprite.setDepth(-1);
+        const scale = 0.8 + rng.next() * 0.4;
+        sprite.setScale(scale);
+        sprite.y = groundTop - (sprite.displayHeight);
       }
     }
   }

@@ -21,6 +21,7 @@ export class GameScene extends Phaser.Scene {
   private projectiles!: Phaser.Physics.Arcade.Group;
   private boss: Boss | null = null;
   private score: number = 0;
+  private playerLight!: Phaser.GameObjects.Light;
   
   private comboCount: number = 0;
   private comboTimer: Phaser.Time.TimerEvent | null = null;
@@ -37,7 +38,16 @@ export class GameScene extends Phaser.Scene {
 
   private combatManager!: CombatManager;
   public vfxManager!: VfxManager;
-  private readonly onPlayerAttack = (attacker: Player, type: string) => this.combatManager.resolvePlayerAttack(attacker, type, this.enemies, this.boss);
+  private attackTrail!: Phaser.GameObjects.Particles.ParticleEmitter;
+  private readonly onPlayerAttack = (attacker: Player, type: string) => {
+    this.combatManager.resolvePlayerAttack(attacker, type, this.enemies, this.boss);
+    if (this.attackTrail) {
+      this.attackTrail.start();
+      this.time.delayedCall(150, () => {
+        this.attackTrail.stop();
+      });
+    }
+  };
   private readonly onPlayerParry = (defender: Player) => this.handleParry(defender);
   private readonly onEnemyAttack = (attacker: Enemy, dmg: number, reach: number) => this.combatManager.resolveEnemyAttack(attacker, dmg, reach, this.player);
   private readonly onBossAttack = (attacker: Boss) => this.combatManager.resolveBossAttack(attacker, this.player);
@@ -111,6 +121,7 @@ export class GameScene extends Phaser.Scene {
     this.player = new Player(this, this.lastSafeX, this.lastSafeY);
     this.player.maxHealth = saveData.maxHealth;
     this.player.health = saveData.maxHealth;
+    this.attackTrail = this.vfxManager.createAttackTrail(this.player);
     
     this.physics.add.collider(this.player, platforms);
     this.physics.add.collider(this.player, floor);
@@ -167,13 +178,32 @@ export class GameScene extends Phaser.Scene {
     this.vfxManager.initAtmosphere();
     this.vfxManager.createAmbientMotes(this.mapWidth, h);
 
-    this.events.on('player_attack', this.onPlayerAttack);
-    this.events.on('player_parry', this.onPlayerParry);
-    this.events.on('enemy_attack', this.onEnemyAttack);
-    this.events.on('boss_attack', this.onBossAttack);
-    this.events.on('player_dead', this.onPlayerDead);
-    this.events.on('enemy_shoot', this.onEnemyShoot);
-    this.events.on('player_cast_wave', this.onPlayerCastWave);
+    // Enable dynamic 2D lighting pipeline
+    this.lights.enable();
+    this.lights.setAmbientColor(0x333333);
+
+    // Add ambient level lights
+    if (this.currentLevel === 1) {
+      this.lights.addLight(400, 200, 500, 0x00d4ff, 1.2);
+      this.lights.addLight(1200, 200, 500, 0x00ff88, 1.0);
+    } else if (this.currentLevel === 2) {
+      this.lights.addLight(600, 100, 600, 0xffaa00, 1.5);
+      this.lights.addLight(1800, 100, 600, 0xff4488, 1.2);
+    } else {
+      this.lights.addLight(400, 250, 400, 0xff3366, 1.6);
+      this.lights.addLight(800, 250, 400, 0x00d4ff, 1.6);
+    }
+
+    // High tech cyan light following the player
+    this.playerLight = this.lights.addLight(this.player.x, this.player.y, 250, 0x00ffff, 1.5);
+
+    this.events.on(GAME_EVENTS.PLAYER_ATTACK, this.onPlayerAttack);
+    this.events.on(GAME_EVENTS.PLAYER_PARRY, this.onPlayerParry);
+    this.events.on(GAME_EVENTS.ENEMY_ATTACK, this.onEnemyAttack);
+    this.events.on(GAME_EVENTS.BOSS_ATTACK, this.onBossAttack);
+    this.events.on(GAME_EVENTS.PLAYER_DEAD, this.onPlayerDead);
+    this.events.on(GAME_EVENTS.ENEMY_SHOOT, this.onEnemyShoot);
+    this.events.on(GAME_EVENTS.PLAYER_CAST_WAVE, this.onPlayerCastWave);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup, this);
 
     // Pause support
@@ -195,7 +225,7 @@ export class GameScene extends Phaser.Scene {
                  this.vfxManager.emitHitParticle(player.x, player.y, 5, 'hit');
                  this.cameras.main.shake(200, 0.02);
             }
-            this.events.emit('update_health', player.health, player.maxHealth);
+            this.events.emit(GAME_EVENTS.UPDATE_HEALTH, player.health, player.maxHealth);
             proj.hit();
         }
     });
@@ -235,13 +265,18 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.time.delayedCall(10, () => {
-      this.events.emit('update_health', this.player.health, this.player.maxHealth);
-      this.events.emit('update_score', this.score);
-      this.events.emit('update_level', this.currentLevel);
+      this.events.emit(GAME_EVENTS.UPDATE_HEALTH, this.player.health, this.player.maxHealth);
+      this.events.emit(GAME_EVENTS.UPDATE_SCORE, this.score);
+      this.events.emit(GAME_EVENTS.UPDATE_LEVEL, this.currentLevel);
     });
   }
 
   update(_time: number, _delta: number): void {
+    if (this.playerLight) {
+        this.playerLight.x = this.player.x;
+        this.playerLight.y = this.player.y;
+    }
+
     if (this.player.body!.touching.down && this.player.y < this.cameras.main.height - 50) {
         this.lastSafeX = this.player.x;
         this.lastSafeY = this.player.y;
@@ -250,7 +285,7 @@ export class GameScene extends Phaser.Scene {
     if (this.player.y > this.cameras.main.height + 100 && this.player.health > 0) {
       this.resetCombo();
       this.player.takeDamage(PLAYER_DEFENSE.fallDamage, 0);
-      this.events.emit('update_health', this.player.health, this.player.maxHealth);
+      this.events.emit(GAME_EVENTS.UPDATE_HEALTH, this.player.health, this.player.maxHealth);
       if (this.player.health > 0) {
           this.player.setPosition(this.lastSafeX, this.lastSafeY - 100);
           this.player.setVelocity(0, 0);
@@ -281,7 +316,25 @@ export class GameScene extends Phaser.Scene {
        ).setOrigin(0.5).setScrollFactor(0).setAlpha(0);
 
        this.tweens.add({ targets: transText, alpha: 1, duration: 400 });
-       this.cameras.main.fadeOut(1200, 0, 0, 0);
+
+       if (this.sys.game.config.renderType === Phaser.CANVAS) {
+         this.cameras.main.fadeOut(1200, 0, 0, 0);
+       } else {
+         try {
+           const cam = this.cameras.main;
+           const wipe = cam.filters.external.addWipe(0.1, 0, 0);
+           wipe.setLeftToRight();
+           this.tweens.add({
+             targets: wipe,
+             progress: 1,
+             duration: 1200,
+             ease: 'Cubic.easeInOut'
+           });
+         } catch (e) {
+           console.warn("Wipe filter failed, using fadeOut fallback:", e);
+           this.cameras.main.fadeOut(1200, 0, 0, 0);
+         }
+       }
        
        // Use a fallback timer in case fadeOut gets cancelled by a rogue camera effect
        this.time.delayedCall(1300, () => {
@@ -318,7 +371,7 @@ export class GameScene extends Phaser.Scene {
 
       if (style !== this.currentStyle) {
           this.currentStyle = style;
-          this.events.emit('update_style', style);
+          this.events.emit(GAME_EVENTS.UPDATE_STYLE, style);
       }
 
       const multiplier = 1 + (this.comboCount * COMBO_CONFIG.multiplierPerHit);
@@ -332,7 +385,7 @@ export class GameScene extends Phaser.Scene {
   public resetCombo() {
       this.comboCount = 0;
       this.currentStyle = '';
-      this.events.emit('update_style', '');
+      this.events.emit(GAME_EVENTS.UPDATE_STYLE, '');
   }
 
   public getComboCount() {
@@ -341,7 +394,7 @@ export class GameScene extends Phaser.Scene {
 
   public addScore(amount: number) {
       this.score += amount;
-      this.events.emit('update_score', this.score);
+      this.events.emit(GAME_EVENTS.UPDATE_SCORE, this.score);
   }
 
   public showComboPopup(x: number, y: number) {
@@ -358,6 +411,7 @@ export class GameScene extends Phaser.Scene {
   /** Freeze the physics world for a few frames to add weight to hits */
   public hitstop(durationMs: number = 60) {
     this.physics.world.pause();
+    this.vfxManager.hitstopFilter(durationMs);
     this.time.delayedCall(durationMs, () => {
       if (this.physics && this.physics.world) {
         this.physics.world.resume();
@@ -368,22 +422,24 @@ export class GameScene extends Phaser.Scene {
   public upgradePlayerHealth(maxHealth: number) {
       this.player.maxHealth = maxHealth;
       this.player.health = maxHealth;
-      this.events.emit('update_health', this.player.health, this.player.maxHealth);
+      this.events.emit(GAME_EVENTS.UPDATE_HEALTH, this.player.health, this.player.maxHealth);
   }
 
   private handleParry(defender: Player) {
       SoundManager.playParry(this.getPan(defender.x));
       this.cameras.main.shake(100, 0.01);
       this.vfxManager.showParryText(defender.x, defender.y);
+      this.vfxManager.parryImpact();
       
       // Bonus points for parry
       this.addScore(SCORE_CONFIG.parryBonus);
-      this.events.emit('update_health', this.player.health, this.player.maxHealth);
+      this.events.emit(GAME_EVENTS.UPDATE_HEALTH, this.player.health, this.player.maxHealth);
   }
 
   private handlePlayerDeath() {
     this.player.setVelocityX(0);
     this.cameras.main.shake(500, 0.03);
+    this.vfxManager.deathFilter();
     
     // Save current score up to death
     SaveManager.addSP(SCORE_CONFIG.deathSP);

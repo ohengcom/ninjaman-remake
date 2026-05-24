@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { StateMachine } from '../utils/StateMachine.js';
 import { ENEMY_STATS } from '../config/enemies.js';
+import { GAME_EVENTS } from '../events.js';
 
 export type EnemyType = 'guard' | 'axe' | 'ninja' | 'sniper';
 type TargetSprite = Phaser.Physics.Arcade.Sprite & { health?: number };
@@ -76,6 +77,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.setCollideWorldBounds(true);
     this.configureType(type);
     this.applyEnemyRender();
+    this.setLighting(true);
 
     this.stateMachine = new StateMachine<Enemy>(this);
     this.setupStates();
@@ -95,6 +97,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.isInvulnerable = false;
     this.patrolDir = 1;
     this.clearTint();
+    this.setTintMode(Phaser.TintModes.MULTIPLY);
     this.setAlpha(1);
     this.stateMachine.setState('patrol');
   }
@@ -213,7 +216,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
              if (e.active && e.health > 0) {
                   if (e.enemyType === 'sniper') {
-                      e.scene.events.emit('enemy_shoot', e, e.baseDamage);
+                       e.scene.events.emit(GAME_EVENTS.ENEMY_SHOOT, e, e.baseDamage);
                       
                       // Elastic recoil snap upon releasing the bowstring
                       e.scene.tweens.add({
@@ -233,7 +236,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
                          yoyo: true,
                          ease: 'Cubic.easeOut'
                       });
-                      e.scene.events.emit('enemy_attack', e, e.baseDamage, e.attackReach);
+                      e.scene.events.emit(GAME_EVENTS.ENEMY_ATTACK, e, e.baseDamage, e.attackReach);
                   } else if (e.enemyType === 'ninja') {
                       // Nimble Shadow Ninja strikes with a lightning-fast dash
                       const forwardDir = e.flipX ? -1 : 1;
@@ -244,11 +247,11 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
                          yoyo: true,
                          ease: 'Quart.easeOut'
                       });
-                      e.scene.events.emit('enemy_attack', e, e.baseDamage, e.attackReach);
+                      e.scene.events.emit(GAME_EVENTS.ENEMY_ATTACK, e, e.baseDamage, e.attackReach);
                   } else if (e.enemyType === 'axe') {
                       // Axe slam registers and shakes the camera on landing
                       e.scene.cameras.main.shake(120, 0.015);
-                      e.scene.events.emit('enemy_attack', e, e.baseDamage, e.attackReach);
+                      e.scene.events.emit(GAME_EVENTS.ENEMY_ATTACK, e, e.baseDamage, e.attackReach);
                   }
 
                   e.stateMachine.addTimer(e.scene.time.delayedCall(e.attackCooldown, () => {
@@ -266,12 +269,14 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         name: 'hurt',
         onEnter: (e) => {
           e.play({ key: e.animKey('hurt'), repeat: 0 }, true);
-          e.setTint(0xff4444);
+           e.setTint(0xff4444);
+          e.setTintMode(Phaser.TintModes.ADD);
           e.isInvulnerable = true;
 
           e.stateMachine.addTimer(e.scene.time.delayedCall(200, () => {
             if (!e.active) return;
-            e.clearTint();
+             e.clearTint();
+            e.setTintMode(Phaser.TintModes.MULTIPLY);
             e.isInvulnerable = false;
             if (e.health > 0) {
               e.stateMachine.setState('chase');

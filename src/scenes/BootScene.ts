@@ -36,6 +36,15 @@ export class BootScene extends Phaser.Scene {
       }
     }
 
+    // Load normal maps for character spritesheets and atlas to enable 2D dynamic lights
+    this.load.image('knight_n', 'assets/sprites/knight_n.png');
+    this.load.image('player_hero_n', 'assets/sprites/player_hero_n.png');
+    this.load.image('enemy_guard_sheet_n', 'assets/sprites/enemy_guard_n.png');
+    this.load.image('enemy_axe_sheet_n', 'assets/sprites/enemy_axe_n.png');
+    this.load.image('enemy_ninja_sheet_n', 'assets/sprites/enemy_ninja_n.png');
+    this.load.image('enemy_sniper_sheet_n', 'assets/sprites/enemy_sniper_n.png');
+    this.load.image('boss_oni_sheet_n', 'assets/sprites/boss_oni_n.png');
+
     // Loading screen
     const w = this.cameras.main.width;
     const h = this.cameras.main.height;
@@ -139,6 +148,21 @@ export class BootScene extends Phaser.Scene {
   create(): void {
     // Bind Phaser Sound Manager globally
     SoundManager.setSoundManager(this.sound);
+
+    // Attach normal maps to their corresponding textures
+    const textureKeys = ['knight', 'player_hero', 'enemy_guard_sheet', 'enemy_axe_sheet', 'enemy_ninja_sheet', 'enemy_sniper_sheet', 'boss_oni_sheet'];
+    for (const key of textureKeys) {
+      try {
+        const tex = this.textures.get(key);
+        const normKey = key === 'knight' ? 'knight_n' : (key === 'player_hero' ? 'player_hero_n' : `${key}_n`);
+        const normTex = this.textures.get(normKey);
+        if (tex && normTex) {
+          (tex as any).addNormalMap(normTex.getSourceImage());
+        }
+      } catch (e) {
+        console.warn(`Failed to attach normal map for texture: ${key}`, e);
+      }
+    }
 
     // Register all animations from centralized definitions
     registerAnimations(this);

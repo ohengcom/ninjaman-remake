@@ -37,7 +37,6 @@ export class SoundManager {
     // --- BGM Loops ---
 
     public static startBGM(level: number) {
-        this.stopBGM();
         if (!this.enabled || !this.soundManager) return;
 
         // Map sector/level to BGM keys
@@ -48,15 +47,55 @@ export class SoundManager {
             bgmKey = 'bgm_sector3';
         }
 
+        this.crossfadeBGM(bgmKey, 1000);
+    }
+
+    public static crossfadeBGM(newKey: string, duration: number = 1000) {
+        if (!this.enabled || !this.soundManager) return;
+
+        const oldBGM = this.activeBGM;
+        if (oldBGM && (oldBGM as any).key === newKey) return; // Already playing this track
+
         try {
-            // Play with a soft, cinematic background volume that loops perfectly
-            this.activeBGM = this.soundManager.add(bgmKey, {
-                loop: true,
-                volume: 0.2
-            });
-            this.activeBGM.play();
+            const newBGM = this.soundManager.add(newKey, { loop: true, volume: 0 });
+            newBGM.play();
+
+            // Find current active scene to run tweens on
+            const activeScene = (this.soundManager as any).game?.scene?.getScenes(true)[0];
+            if (activeScene && activeScene.tweens) {
+                // Tween in new BGM
+                activeScene.tweens.add({
+                    targets: newBGM,
+                    volume: 0.2,
+                    duration: duration,
+                });
+
+                // Tween out old BGM
+                if (oldBGM) {
+                    activeScene.tweens.add({
+                        targets: oldBGM,
+                        volume: 0,
+                        duration: duration,
+                        onComplete: () => {
+                            try {
+                                oldBGM.stop();
+                                oldBGM.destroy();
+                            } catch(e) {}
+                        }
+                    });
+                }
+            } else {
+                // Scene not ready, fall back to instant volume set
+                (newBGM as any).volume = 0.2;
+                if (oldBGM) {
+                    oldBGM.stop();
+                    oldBGM.destroy();
+                }
+            }
+
+            this.activeBGM = newBGM;
         } catch (e) {
-            console.error("Failed to play BGM:", bgmKey, e);
+            console.error('Failed to crossfade BGM:', e);
         }
     }
 
@@ -98,7 +137,9 @@ export class SoundManager {
     }
 
     public static playHit(pan: number = 0) {
-        this.playSFX('snd_hit', pan, 0.5);
+        // Subtle volume/pitch randomized micro-variations for high production value feel
+        const volumeOffset = (Math.random() - 0.5) * 0.1;
+        this.playSFX('snd_hit', pan, 0.5 + volumeOffset);
     }
 
     public static playParry(pan: number = 0) {
