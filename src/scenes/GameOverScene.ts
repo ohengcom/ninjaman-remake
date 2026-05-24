@@ -10,9 +10,10 @@ export class GameOverScene extends Phaser.Scene {
     super({ key: 'GameOverScene' });
   }
 
-  init(data: { score: number, win?: boolean }) {
+  init(data: { score: number, win?: boolean, level?: number }) {
     this.registry.set('score', data.score || 0);
     this.registry.set('win', data.win || false);
+    this.registry.set('level', data.level || 1);
   }
 
   create() {
@@ -63,7 +64,8 @@ export class GameOverScene extends Phaser.Scene {
     if (this.domGameOverOverlay) {
       this.domGameOverOverlay.style.display = 'none';
     }
-    this.scene.start('GameScene', { level: 1, score: 0 });
+    const level = this.registry.get('level') || 1;
+    this.scene.start('GameScene', { level: level, score: 0 });
   }
 
   private cleanup() {

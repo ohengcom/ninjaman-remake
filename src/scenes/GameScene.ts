@@ -214,10 +214,11 @@ export class GameScene extends Phaser.Scene {
 
     // Player wave hitting Boss
     if (this.boss) {
-        this.physics.add.overlap(this.projectiles, this.boss, (projObj, bossObj) => {
-            const proj = projObj as Projectile;
-            const boss = bossObj as Boss;
-            if (proj.active && boss.active && boss.health > 0 && proj.texture.key === 'player_wave') {
+        this.physics.add.overlap(this.projectiles, this.boss, (obj1, obj2) => {
+            const proj = (obj1 instanceof Projectile) ? obj1 : (obj2 as Projectile);
+            const boss = (obj1 instanceof Boss) ? obj1 : (obj2 as Boss);
+            
+            if (proj && boss && proj.active && boss.active && boss.health > 0 && proj.texture.key === 'player_wave') {
                 const dir = proj.body!.velocity.x > 0 ? 1 : -1;
                 boss.takeDamage(proj.damage * BOSS_STATS.damageMultiplier, dir);
                 SoundManager.playHit(this.getPan(boss.x));
@@ -297,7 +298,7 @@ export class GameScene extends Phaser.Scene {
        this.time.delayedCall(2000, () => {
           if (this.input.keyboard) this.input.keyboard.enabled = true;
           this.scene.stop('HUDScene');
-          this.scene.start('GameOverScene', { score: this.score, win: true });
+          this.scene.start('GameOverScene', { score: this.score, win: true, level: this.currentLevel });
        });
     }
   }
@@ -385,7 +386,7 @@ export class GameScene extends Phaser.Scene {
     
     this.time.delayedCall(2000, () => {
         this.scene.stop('HUDScene');
-        this.scene.start('GameOverScene', { score: this.score, win: false });
+        this.scene.start('GameOverScene', { score: this.score, win: false, level: this.currentLevel });
     });
   }
 
