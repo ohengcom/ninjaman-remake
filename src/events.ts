@@ -3,6 +3,7 @@ export const GAME_EVENTS = {
     UPDATE_SCORE: 'update_score',
     UPDATE_LEVEL: 'update_level',
     UPDATE_STYLE: 'update_style',
+    UPDATE_BOSS_HEALTH: 'update_boss_health',
     PLAYER_ATTACK: 'player_attack',
     PLAYER_PARRY: 'player_parry',
     ENEMY_ATTACK: 'enemy_attack',

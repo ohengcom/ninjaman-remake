@@ -24,6 +24,9 @@ export class HUDScene extends Phaser.Scene {
   private domStyleContainer!: HTMLElement;
   private domStyleText!: HTMLElement;
 
+  private domBossPanel!: HTMLElement;
+  private domBossFill!: HTMLElement;
+
   constructor() {
     super({ key: 'HUDScene' });
   }
@@ -41,6 +44,8 @@ export class HUDScene extends Phaser.Scene {
     this.domLevelValue = document.getElementById('hud-sector-display')!;
     this.domStyleContainer = document.getElementById('hud-style-meter')!;
     this.domStyleText = document.getElementById('hud-style-letter')!;
+    this.domBossPanel = document.getElementById('hud-boss-panel')!;
+    this.domBossFill = document.getElementById('hud-boss-bar-fill')!;
 
     // Initial resets
     if (this.domHealthFill) this.domHealthFill.style.width = '100%';
@@ -53,6 +58,9 @@ export class HUDScene extends Phaser.Scene {
     if (this.domStyleContainer) {
       this.domStyleContainer.classList.remove('active');
       this.domStyleContainer.classList.remove('shake');
+    }
+    if (this.domBossPanel) {
+      this.domBossPanel.classList.remove('active');
     }
 
     // Initialize global UI hooks (for Sound Toggle)
@@ -80,6 +88,7 @@ export class HUDScene extends Phaser.Scene {
     this.gameScene.events.on(GAME_EVENTS.UPDATE_SCORE, this.onUpdateScore);
     this.gameScene.events.on(GAME_EVENTS.UPDATE_LEVEL, this.onUpdateLevel);
     this.gameScene.events.on(GAME_EVENTS.UPDATE_STYLE, this.onUpdateStyle);
+    this.gameScene.events.on(GAME_EVENTS.UPDATE_BOSS_HEALTH, this.onUpdateBossHealth);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup, this);
 
     this.input.keyboard!.on('keydown-Y', this.onToggleSound);
@@ -155,6 +164,19 @@ export class HUDScene extends Phaser.Scene {
     this.domStyleText.className = 'style-rank-letter rank-' + style.toLowerCase();
   };
 
+  private readonly onUpdateBossHealth = (health: number, maxHealth: number) => {
+    if (!this.domBossPanel || !this.domBossFill) return;
+    
+    if (health <= 0) {
+      this.domBossPanel.classList.remove('active');
+      return;
+    }
+
+    this.domBossPanel.classList.add('active');
+    const pct = Math.max(0, Math.min(100, (health / maxHealth) * 100));
+    this.domBossFill.style.width = `${pct}%`;
+  };
+
   private readonly onToggleSound = () => {
     SoundManager.toggle(this.currentLevel);
     const isEnabled = SoundManager.enabled;
@@ -181,6 +203,7 @@ export class HUDScene extends Phaser.Scene {
     this.gameScene.events.off(GAME_EVENTS.UPDATE_SCORE, this.onUpdateScore);
     this.gameScene.events.off(GAME_EVENTS.UPDATE_LEVEL, this.onUpdateLevel);
     this.gameScene.events.off(GAME_EVENTS.UPDATE_STYLE, this.onUpdateStyle);
+    this.gameScene.events.off(GAME_EVENTS.UPDATE_BOSS_HEALTH, this.onUpdateBossHealth);
     this.input.keyboard?.off('keydown-Y', this.onToggleSound);
   }
 

@@ -204,6 +204,56 @@
         text-shadow: var(--glow-magenta);
       }
 
+      /* Boss Health Bar */
+      .boss-health-panel {
+        position: absolute;
+        top: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: none; /* Hidden by default */
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        width: 600px;
+        max-width: 80vw;
+        background: rgba(20, 20, 25, 0.85);
+        border: 1px solid rgba(255, 107, 107, 0.3);
+        border-radius: 4px;
+        padding: 8px 12px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 25px rgba(255, 107, 107, 0.15);
+      }
+
+      .boss-health-panel.active {
+        display: flex;
+        animation: panelZoomIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+
+      .boss-label {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 14px;
+        letter-spacing: 0.3em;
+        color: var(--accent);
+        text-shadow: 0 0 8px rgba(255, 107, 107, 0.4);
+        font-weight: 900;
+      }
+
+      .boss-bar-wrapper {
+        width: 100%;
+        height: 12px;
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 107, 107, 0.2);
+        overflow: hidden;
+      }
+
+      .boss-health-fill {
+        height: 100%;
+        width: 100%;
+        background: linear-gradient(90deg, #c92a2a 0%, #ff6b6b 100%);
+        box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2);
+        transition: width 0.15s linear;
+      }
+
       /* DMC Style Rank Display (Floating Hologram) */
       .style-meter-container {
         position: absolute;
@@ -596,7 +646,13 @@
           <span id="hud-style-letter" class="style-rank-letter rank-c">C</span>
         </div>
 
-
+        <!-- Boss Health Bar (Top Center) -->
+        <div id="hud-boss-panel" class="boss-health-panel">
+          <span class="boss-label">CORE GUARDIAN</span>
+          <div class="boss-bar-wrapper">
+            <div id="hud-boss-bar-fill" class="boss-health-fill"></div>
+          </div>
+        </div>
 
       </div>
 

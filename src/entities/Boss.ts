@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { StateMachine } from '../utils/StateMachine.js';
 import { BOSS_STATS } from '../config/enemies.js';
+import { GAME_EVENTS } from '../events.js';
 
 export class Boss extends Phaser.Physics.Arcade.Sprite {
   public stateMachine: StateMachine<Boss>;
@@ -59,6 +60,11 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     this.stateMachine = new StateMachine<Boss>(this);
     this.setupStates();
     this.stateMachine.setState('idle');
+
+    // Notify initial health
+    scene.time.delayedCall(100, () => {
+       scene.events.emit(GAME_EVENTS.UPDATE_BOSS_HEALTH, this.health, this.maxHealth);
+    });
   }
 
   public setTarget(target: Phaser.Physics.Arcade.Sprite) {
@@ -233,6 +239,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
   public takeDamage(amount: number, _dirX: number) {
     if (this.isInvulnerable || this.health <= 0) return;
     this.health -= amount;
+    this.scene.events.emit(GAME_EVENTS.UPDATE_BOSS_HEALTH, this.health, this.maxHealth);
     this.checkPhaseTransition();
     
     // Flash white on hit
