@@ -253,8 +253,9 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
-    if (!this.levelCfg.isBossLevel && this.player.x > this.mapWidth - 100 && !this.isTransitioning) {
+    if (!this.levelCfg.isBossLevel && this.player.x > this.mapWidth - 400 && !this.isTransitioning) {
        this.isTransitioning = true;
+       console.log('Transitioning to next level!');
        this.player.setVelocityX(0);
        SaveManager.updateLevel(this.currentLevel + 1);
        SaveManager.addSP(this.levelCfg.completionSP);
