@@ -104,7 +104,7 @@ export class GameScene extends Phaser.Scene {
     this.scene.stop('HUDScene');
     this.scene.launch('HUDScene');
 
-    const platforms = LevelBuilder.buildPlatforms(this, this.levelCfg, this.mapWidth, this.rng);
+    const { platforms, floor } = LevelBuilder.buildPlatforms(this, this.levelCfg, this.mapWidth, this.rng);
     const leftWall = LevelBuilder.buildLeftWall(this);
 
     const saveData = SaveManager.load();
@@ -113,6 +113,7 @@ export class GameScene extends Phaser.Scene {
     this.player.health = saveData.maxHealth;
     
     this.physics.add.collider(this.player, platforms);
+    this.physics.add.collider(this.player, floor);
     this.physics.add.collider(this.player, leftWall);
 
     this.enemies = this.physics.add.group({ classType: Enemy, maxSize: 30, runChildUpdate: true });
@@ -143,6 +144,7 @@ export class GameScene extends Phaser.Scene {
       this.boss = new Boss(this, bossX, bossY);
       this.boss.setTarget(this.player);
       this.physics.add.collider(this.boss, platforms);
+      this.physics.add.collider(this.boss, floor);
       
       this.add.text(bossX, 100, 'WARNING: CORE GUARDIAN', {
          fontFamily: 'Impact', fontSize: '48px', color: '#ff0055'
@@ -150,6 +152,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.physics.add.collider(this.enemies, platforms);
+    this.physics.add.collider(this.enemies, floor);
     this.vfxManager.createHitParticles();
 
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);

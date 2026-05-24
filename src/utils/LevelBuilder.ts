@@ -60,7 +60,7 @@ export class LevelBuilder {
     }
   }
 
-  public static buildPlatforms(scene: Phaser.Scene, levelCfg: LevelConfig, mapWidth: number, rng: SeededRandom): Phaser.Physics.Arcade.StaticGroup {
+  public static buildPlatforms(scene: Phaser.Scene, levelCfg: LevelConfig, mapWidth: number, rng: SeededRandom): { platforms: Phaser.Physics.Arcade.StaticGroup, floor: Phaser.GameObjects.Rectangle } {
     const h = scene.cameras.main.height;
     const platforms = scene.physics.add.staticGroup();
     const tiles = Math.floor(mapWidth / levelCfg.tileSize);
@@ -68,7 +68,8 @@ export class LevelBuilder {
     // Create a single continuous floor to prevent physics seam getting stuck
     const floor = scene.add.rectangle(mapWidth / 2, h - 16, mapWidth, 32, 0x000000, 0).setVisible(false);
     scene.physics.add.existing(floor, true);
-    platforms.add(floor);
+    // DO NOT add to platforms StaticGroup, as it might reset Rectangle's body size
+    
     
     for (let i = 0; i < tiles; i++) {
       if (levelCfg.hasPlatforms && i > levelCfg.platformStartTile && i % levelCfg.platformInterval === 0) {
@@ -76,7 +77,7 @@ export class LevelBuilder {
       }
     }
 
-    return platforms;
+    return { platforms, floor };
   }
 
   public static buildLeftWall(scene: Phaser.Scene): Phaser.GameObjects.Rectangle {
