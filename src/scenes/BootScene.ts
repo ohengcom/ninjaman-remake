@@ -41,30 +41,98 @@ export class BootScene extends Phaser.Scene {
     const h = this.cameras.main.height;
     
     // Dark background for premium feel
-    this.cameras.main.setBackgroundColor('#0a0a0f');
+    this.cameras.main.setBackgroundColor('#040408');
     
-    const box = this.add.graphics();
-    box.fillStyle(0x1a1a2e, 0.9);
-    box.lineStyle(2, 0x00d4ff, 1);
-    box.fillRoundedRect(w / 2 - 200, h / 2 - 30, 400, 60, 8);
-    box.strokeRoundedRect(w / 2 - 200, h / 2 - 30, 400, 60, 8);
+    // Gorgeous cybernetic grid background
+    const bgGrid = this.add.graphics();
+    bgGrid.lineStyle(1, 0x00d4ff, 0.06);
+    for (let x = 0; x < w; x += 40) {
+      bgGrid.lineBetween(x, 0, x, h);
+    }
+    for (let y = 0; y < h; y += 40) {
+      bgGrid.lineBetween(0, y, w, y);
+    }
+
+    // Interactive retro scanlines
+    const scanline = this.add.graphics();
+    scanline.lineStyle(1, 0x00d4ff, 0.08);
+    for (let y = 0; y < h; y += 4) {
+      scanline.lineBetween(0, y, w, y);
+    }
+
+    // Glassmorphic terminal panel
+    const panel = this.add.graphics();
+    panel.fillStyle(0x0a0a15, 0.85);
+    panel.lineStyle(2, 0x00d4ff, 0.8);
+    panel.fillRoundedRect(w / 2 - 250, h / 2 - 100, 500, 200, 16);
+    panel.strokeRoundedRect(w / 2 - 250, h / 2 - 100, 500, 200, 16);
     
-    const bar = this.add.graphics();
-    
-    const txt = this.add.text(w / 2, h / 2 - 60, 'INITIALIZING...', {
-      fontFamily: 'Orbitron, sans-serif', fontSize: '18px', color: '#00d4ff', fontStyle: 'bold'
-    }).setOrigin(0.5);
+    // Subtle pink secondary accent ring
+    panel.lineStyle(1, 0xff4488, 0.4);
+    panel.strokeRoundedRect(w / 2 - 244, h / 2 - 94, 488, 188, 12);
+
+    // Glowing Neon Title
+    const title = this.add.text(w / 2 - 200, h / 2 - 60, 'SYSTEM BOOT SEQUENCE', {
+      fontFamily: 'Orbitron, sans-serif', fontSize: '20px', color: '#00d4ff', fontStyle: 'bold',
+      shadow: { blur: 12, color: '#00d4ff', fill: true }
+    }).setOrigin(0, 0.5);
+
+    // Floating Glowing percentage counter
+    const pctText = this.add.text(w / 2 + 200, h / 2 - 60, '0%', {
+      fontFamily: 'Orbitron, sans-serif', fontSize: '20px', color: '#ff4488', fontStyle: 'bold',
+      shadow: { blur: 10, color: '#ff4488', fill: true }
+    }).setOrigin(1, 0.5);
+
+    // Micro-description dynamic tech message
+    const statusText = this.add.text(w / 2 - 200, h / 2 + 50, 'INITIALIZING CYBER LINK...', {
+      fontFamily: 'Orbitron, Inter, sans-serif', fontSize: '12px', color: '#6c7086'
+    }).setOrigin(0, 0.5);
+
+    // Sleek progress bar container
+    const barOutline = this.add.graphics();
+    barOutline.lineStyle(2, 0x00d4ff, 0.4);
+    barOutline.strokeRoundedRect(w / 2 - 200, h / 2 - 10, 400, 24, 6);
+
+    const barFill = this.add.graphics();
 
     this.load.on('progress', (v: number) => {
-      bar.clear();
-      bar.fillStyle(0x00d4ff, 1);
-      bar.fillRoundedRect(w / 2 - 190, h / 2 - 20, 380 * v, 40, 6);
+      barFill.clear();
+      
+      // Cyberpunk neon cyan bar fill
+      barFill.fillStyle(0x00d4ff, 0.9);
+      barFill.fillRoundedRect(w / 2 - 196, h / 2 - 6, 392 * v, 16, 4);
+      
+      // Add glowing neon pink slider node at current progress point
+      if (v > 0) {
+        barFill.fillStyle(0xff4488, 1);
+        barFill.fillCircle(w / 2 - 196 + 392 * v, h / 2 + 2, 8);
+      }
+      
+      pctText.setText(`${Math.floor(v * 100)}%`);
+      
+      // Update dynamic cyberpunk tech messages based on progress
+      if (v < 0.2) {
+        statusText.setText('PARSING MANIFEST NODES...');
+      } else if (v < 0.4) {
+        statusText.setText('DECOMPRESSING CYBER SPRITES...');
+      } else if (v < 0.6) {
+        statusText.setText('SYNCHRONIZING AUDIO CHANNELS...');
+      } else if (v < 0.8) {
+        statusText.setText('CONSTRUCTING SHADOW STAGES...');
+      } else {
+        statusText.setText('ESTABLISHING SECURE CONNECTION...');
+      }
     });
 
     this.load.on('complete', () => {
-      bar.destroy();
-      box.destroy();
-      txt.destroy();
+      bgGrid.destroy();
+      scanline.destroy();
+      panel.destroy();
+      title.destroy();
+      pctText.destroy();
+      statusText.destroy();
+      barOutline.destroy();
+      barFill.destroy();
     });
   }
 

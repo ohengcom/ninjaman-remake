@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 
 export class SoundManager {
-    public static enabled: boolean = true;
+    public static enabled: boolean = false;
     private static soundManager: Phaser.Sound.BaseSoundManager | null = null;
     private static activeBGM: Phaser.Sound.BaseSound | null = null;
 
