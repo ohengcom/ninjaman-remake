@@ -65,10 +65,12 @@ export class LevelBuilder {
     const platforms = scene.physics.add.staticGroup();
     const tiles = Math.floor(mapWidth / levelCfg.tileSize);
     
+    // Create a single continuous floor to prevent physics seam getting stuck
+    const floor = scene.add.rectangle(mapWidth / 2, h - 16, mapWidth, 32, 0x000000, 0).setVisible(false);
+    scene.physics.add.existing(floor, true);
+    platforms.add(floor);
+    
     for (let i = 0; i < tiles; i++) {
-      // Create a continuous, solid floor
-      platforms.create(i * levelCfg.tileSize + 32, h - 32, 'platform').setVisible(false);
-      
       if (levelCfg.hasPlatforms && i > levelCfg.platformStartTile && i % levelCfg.platformInterval === 0) {
          platforms.create(i * levelCfg.tileSize + 32, h - 160 - rng.next() * 80, 'platform').setVisible(false);
       }
