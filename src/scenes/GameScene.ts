@@ -256,7 +256,11 @@ export class GameScene extends Phaser.Scene {
     if (!this.levelCfg.isBossLevel && this.player.x > this.mapWidth - 400 && !this.isTransitioning) {
        this.isTransitioning = true;
        console.log('Transitioning to next level!');
-       this.player.setVelocityX(0);
+       
+       // Disable physics and input to prevent camera shakes from cancelling the fadeOut
+       this.physics.world.pause();
+       if (this.input.keyboard) this.input.keyboard.enabled = false;
+       this.player.setVelocity(0, 0);
        SaveManager.updateLevel(this.currentLevel + 1);
        SaveManager.addSP(this.levelCfg.completionSP);
        SaveManager.updateHighScore(this.score);
@@ -272,19 +276,26 @@ export class GameScene extends Phaser.Scene {
 
        this.tweens.add({ targets: transText, alpha: 1, duration: 400 });
        this.cameras.main.fadeOut(1200, 0, 0, 0);
-       this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+       
+       // Use a fallback timer in case fadeOut gets cancelled by a rogue camera effect
+       this.time.delayedCall(1300, () => {
+         if (this.input.keyboard) this.input.keyboard.enabled = true;
          this.scene.restart({ level: this.currentLevel + 1 });
        });
     }
 
     if (this.levelCfg.isBossLevel && this.boss && !this.boss.active) {
        this.boss = null;
+       this.physics.world.pause(); // Stop physics so boss doesn't hurt player after death
+       if (this.input.keyboard) this.input.keyboard.enabled = false;
+       
        this.addScore(SCORE_CONFIG.bossKill);
        SaveManager.addSP(this.levelCfg.completionSP);
        SaveManager.updateHighScore(this.score);
        this.cameras.main.shake(1000, 0.05);
        
        this.time.delayedCall(2000, () => {
+          if (this.input.keyboard) this.input.keyboard.enabled = true;
           this.scene.stop('HUDScene');
           this.scene.start('GameOverScene', { score: this.score, win: true });
        });
