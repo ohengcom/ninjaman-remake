@@ -13,7 +13,6 @@ const PLAYER_RENDER = {
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
   public stateMachine: StateMachine<Player>;
-  private currentVisualState: string = 'idle';
 
   public cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   public attackKey!: Phaser.Input.Keyboard.Key;
@@ -186,11 +185,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         return true;
       } else if (p.jumpCount < PLAYER_MOVEMENT.maxJumps && !isGroundedOrCoyote) {
         // Only allow double jump if we are not grounded to prevent consuming both jumps instantly
-        if (Phaser.Input.Keyboard.JustDown(p.cursors.space)) {
-           p.lastJumpInputTime = 0;
-           p.stateMachine.setState('jump');
-           return true;
-        }
+        p.lastJumpInputTime = 0;
+        p.stateMachine.setState('jump');
+        return true;
       }
     }
     if (!p.body!.touching.down && p.body!.velocity.y > 0) {
@@ -205,7 +202,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   public playAnimation(animKey: string) {
-    this.currentVisualState = animKey;
     this.play(animKey, true);
     this.applyRenderSize();
   }

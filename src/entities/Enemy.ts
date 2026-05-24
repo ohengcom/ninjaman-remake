@@ -5,18 +5,19 @@ import { ENEMY_STATS } from '../config/enemies.js';
 export type EnemyType = 'guard' | 'axe' | 'ninja' | 'sniper';
 type TargetSprite = Phaser.Physics.Arcade.Sprite & { health?: number };
 
-const ENEMY_TINTS = {
-  guard: 0xd0bfff,
-  axe: 0xffc078,
-  ninja: 0xadb5bd,
-  sniper: 0x8ce99a,
-} as const;
+/** Maps each enemy type to its sprite sheet texture key */
+const ENEMY_TEXTURES: Record<EnemyType, string> = {
+  guard: 'enemy_guard_sheet',
+  axe: 'enemy_axe_sheet',
+  ninja: 'enemy_ninja_sheet',
+  sniper: 'enemy_sniper_sheet',
+};
 
 const ENEMY_RENDER_CONFIGS = {
-  guard: { displaySize: 180, bodyWidth: 40, bodyHeight: 120, bodyOffsetX: 105, bodyOffsetY: 60 },
-  axe: { displaySize: 200, bodyWidth: 45, bodyHeight: 130, bodyOffsetX: 105, bodyOffsetY: 50 },
-  ninja: { displaySize: 160, bodyWidth: 35, bodyHeight: 110, bodyOffsetX: 105, bodyOffsetY: 70 },
-  sniper: { displaySize: 180, bodyWidth: 40, bodyHeight: 120, bodyOffsetX: 105, bodyOffsetY: 60 },
+  guard:  { displayWidth: 130, displayHeight: 190, bodyWidth: 50, bodyHeight: 230, bodyOffsetX: 145, bodyOffsetY: 250 },
+  axe:    { displayWidth: 140, displayHeight: 200, bodyWidth: 55, bodyHeight: 240, bodyOffsetX: 143, bodyOffsetY: 240 },
+  ninja:  { displayWidth: 130, displayHeight: 190, bodyWidth: 50, bodyHeight: 230, bodyOffsetX: 145, bodyOffsetY: 250 },
+  sniper: { displayWidth: 130, displayHeight: 190, bodyWidth: 50, bodyHeight: 230, bodyOffsetX: 145, bodyOffsetY: 250 },
 } as const;
 
 export class Enemy extends Phaser.Physics.Arcade.Sprite {
@@ -34,32 +35,40 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   private attackReach: number = 60;
   private attackWindup: number = 500;
   private attackCooldown: number = 800;
-  protected currentVisualState: string = 'idle';
-  private applyEnemyRender() {
+  private currentLaser: Phaser.GameObjects.Line | null = null;
+
+  public get baseScaleX(): number {
     const cfg = ENEMY_RENDER_CONFIGS[this.enemyType];
-    this.setDisplaySize(cfg.displaySize, cfg.displaySize);
+    return cfg.displayWidth / 340;
+  }
+
+  public get baseScaleY(): number {
+    const cfg = ENEMY_RENDER_CONFIGS[this.enemyType];
+    return cfg.displayHeight / 512;
+  }
+
+  private applyEnemyRender() {
+    this.setScale(this.baseScaleX, this.baseScaleY);
+    const cfg = ENEMY_RENDER_CONFIGS[this.enemyType];
     this.body!.setSize(cfg.bodyWidth, cfg.bodyHeight);
     this.body!.setOffset(cfg.bodyOffsetX, cfg.bodyOffsetY);
-    this.setTint(ENEMY_TINTS[this.enemyType]);
+  }
+
+  /** Get the animation key for this enemy type */
+  private animKey(action: 'idle' | 'walk' | 'attack' | 'hurt' | 'die'): string {
+    return `${this.enemyType}_${action}`;
   }
 
   destroy(fromScene?: boolean) {
+    if (this.currentLaser) {
+      this.currentLaser.destroy();
+      this.currentLaser = null;
+    }
     super.destroy(fromScene);
   }
 
-  public play(key: any, ...args: any[]): this {
-    const keyStr = typeof key === 'string' ? key : (key?.key || '');
-    this.currentVisualState = keyStr;
-    
-    // We only have enemy_run right now, so map everything to it to prevent crash
-    super.play('enemy_run', true);
-    
-    this.applyEnemyRender();
-    return this;
-  }
-
   constructor(scene: Phaser.Scene, x: number, y: number, type: EnemyType = 'guard') {
-    super(scene, x, y, 'zombie');
+    super(scene, x, y, ENEMY_TEXTURES[type]);
     this.enemyType = type;
     scene.add.existing(this);
     scene.physics.add.existing(this);
@@ -75,7 +84,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   public spawn(x: number, y: number, type: EnemyType) {
     this.enemyType = type;
-    this.setTexture('zombie');
+    this.setTexture(ENEMY_TEXTURES[type]);
     this.setPosition(x, y);
     this.setActive(true);
     this.setVisible(true);
@@ -85,6 +94,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.applyEnemyRender();
     this.isInvulnerable = false;
     this.patrolDir = 1;
+    this.clearTint();
+    this.setAlpha(1);
     this.stateMachine.setState('patrol');
   }
 
@@ -102,34 +113,19 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.target = target;
   }
 
-  private getWalkAnim() {
-    if (this.enemyType === 'ninja') return 'enemy_ninja_run_anim';
-    if (this.enemyType === 'sniper') return 'enemy_sniper_idle_anim';
-    return `enemy_${this.enemyType}_walk_anim`;
-  }
-
-  private getAttackAnim() {
-    if (this.enemyType === 'sniper') return 'enemy_sniper_shoot_anim';
-    return `enemy_${this.enemyType}_attack_anim`;
-  }
-
-  private getWindupAnim() {
-    if (this.enemyType === 'axe') return 'enemy_axe_windup_anim';
-    return null;
-  }
-
   private setupStates() {
     this.stateMachine
       .addState({
         name: 'patrol',
         onEnter: (e) => {
           e.patrolTimer = e.scene.time.now + 2000;
-          e.play({ key: e.getWalkAnim(), repeat: -1 }, true);
+          e.play({ key: e.animKey('walk'), repeat: -1 }, true);
         },
         onUpdate: (e) => {
           if (!e.active) return;
           if (e.enemyType === 'sniper') {
-             // Snipers don't patrol, just look for target
+             // Snipers don't patrol, play idle
+             e.play({ key: e.animKey('idle'), repeat: 0 }, true);
              if (e.target && e.target.active && Phaser.Math.Distance.Between(e.x, e.y, e.target.x, e.target.y) < e.attackReach) {
                e.stateMachine.setState('chase');
              }
@@ -152,7 +148,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'chase',
         onEnter: (e) => {
-           e.play({ key: e.getWalkAnim(), repeat: -1 }, true);
+           e.play({ key: e.animKey('walk'), repeat: -1 }, true);
         },
         onUpdate: (e) => {
           if (!e.active) return;
@@ -181,73 +177,130 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         name: 'attack',
         onEnter: (e) => {
           e.setVelocityX(0);
+          // Play attack animation
+          e.play({ key: e.animKey('attack'), repeat: 0 }, true);
 
-          const windupAnim = e.getWindupAnim();
-          if (windupAnim) {
-            e.play(windupAnim);
-          } else {
-            // For others, if no distinct windup anim, we could tint or just play attack but wait.
-            // Let's just play attack animation directly or a specific frame
-            e.play(e.getAttackAnim());
+          const backDir = e.flipX ? 1 : -1;
+          const originalX = e.x;
+          const originalY = e.y;
+
+          // ─── Archer/Sniper Bow Draw Tension Tween ───
+          if (e.enemyType === 'sniper') {
+             // Slowly scale Y up and pull back horizontally to simulate drawing the bowstring
+             e.scene.tweens.add({
+                targets: e,
+                scaleY: e.baseScaleY * 1.08,
+                x: originalX + (12 * backDir),
+                duration: e.attackWindup - 50,
+                ease: 'Quad.easeOut'
+             });
           }
 
-          // Show laser sight for sniper
-          let laser: Phaser.GameObjects.Line | null = null;
-          if (e.enemyType === 'sniper' && e.target) {
-             const dir = e.flipX ? -1 : 1;
-             laser = e.scene.add.line(0, 0, e.x, e.y, e.x + (e.attackReach * dir), e.y, 0xff6b6b, 0.5).setOrigin(0);
+          // ─── Axe Berserker Overhead Jump-Windup ───
+          if (e.enemyType === 'axe') {
+             // Leap slightly into the air to add momentum to the chop
+             e.scene.tweens.add({
+                targets: e,
+                y: originalY - 18,
+                duration: e.attackWindup,
+                yoyo: true,
+                ease: 'Quad.easeInOut'
+             });
           }
-
-          (e as any)._currentLaser = laser; // store for cleanup
 
           e.stateMachine.addTimer(e.scene.time.delayedCall(e.attackWindup, () => {
-             if (laser) {
-                 laser.destroy();
-                 (e as any)._currentLaser = null;
-             }
+             e.setAlpha(1); // Ensure opacity resets
 
              if (e.active && e.health > 0) {
-                 if (windupAnim) {
-                   e.play(e.getAttackAnim());
-                 }
+                  if (e.enemyType === 'sniper') {
+                      e.scene.events.emit('enemy_shoot', e, e.baseDamage);
+                      
+                      // Elastic recoil snap upon releasing the bowstring
+                      e.scene.tweens.add({
+                         targets: e,
+                         scaleY: e.baseScaleY,
+                         x: { from: e.x - (8 * backDir), to: originalX },
+                         duration: 250,
+                         ease: 'Elastic.easeOut'
+                      });
+                  } else if (e.enemyType === 'guard') {
+                      // Heavy Guard lunges forward during swing
+                      const forwardDir = e.flipX ? -1 : 1;
+                      e.scene.tweens.add({
+                         targets: e,
+                         x: e.x + (20 * forwardDir),
+                         duration: 150,
+                         yoyo: true,
+                         ease: 'Cubic.easeOut'
+                      });
+                      e.scene.events.emit('enemy_attack', e, e.baseDamage, e.attackReach);
+                  } else if (e.enemyType === 'ninja') {
+                      // Nimble Shadow Ninja strikes with a lightning-fast dash
+                      const forwardDir = e.flipX ? -1 : 1;
+                      e.scene.tweens.add({
+                         targets: e,
+                         x: e.x + (35 * forwardDir),
+                         duration: 120,
+                         yoyo: true,
+                         ease: 'Quart.easeOut'
+                      });
+                      e.scene.events.emit('enemy_attack', e, e.baseDamage, e.attackReach);
+                  } else if (e.enemyType === 'axe') {
+                      // Axe slam registers and shakes the camera on landing
+                      e.scene.cameras.main.shake(120, 0.015);
+                      e.scene.events.emit('enemy_attack', e, e.baseDamage, e.attackReach);
+                  }
 
-                 if (e.enemyType === 'sniper') {
-                     e.scene.events.emit('enemy_shoot', e, e.baseDamage);
-                 } else {
-                     e.scene.events.emit('enemy_attack', e, e.baseDamage, e.attackReach);
-                 }
-
-                 e.stateMachine.addTimer(e.scene.time.delayedCall(e.attackCooldown, () => {
-                     if (e.active && e.health > 0) e.stateMachine.setState('chase');
-                 }));
+                  e.stateMachine.addTimer(e.scene.time.delayedCall(e.attackCooldown, () => {
+                      if (e.active && e.health > 0) e.stateMachine.setState('chase');
+                  }));
              }
           }));
         },
         onExit: (e) => {
-            if ((e as any)._currentLaser) {
-                (e as any)._currentLaser.destroy();
-                (e as any)._currentLaser = null;
-            }
+            e.setAlpha(1);
+            e.scaleY = e.baseScaleY;
         }
       })
       .addState({
         name: 'hurt',
         onEnter: (e) => {
-          e.setTint(0xff0000);
+          e.play({ key: e.animKey('hurt'), repeat: 0 }, true);
+          e.setTint(0xff4444);
           e.isInvulnerable = true;
 
-          e.stateMachine.addTimer(e.scene.time.delayedCall(150, () => {
+          e.stateMachine.addTimer(e.scene.time.delayedCall(200, () => {
             if (!e.active) return;
             e.clearTint();
             e.isInvulnerable = false;
             if (e.health > 0) {
               e.stateMachine.setState('chase');
             } else {
-              e.disableBody(true, true);
+              e.stateMachine.setState('dying');
             }
           }));
         }
-      });  }
+      })
+      .addState({
+        name: 'dying',
+        onEnter: (e) => {
+          e.play({ key: e.animKey('die'), repeat: 0 }, true);
+          e.setVelocityX(0);
+          e.setVelocityY(0);
+          // Fade out and disable after death animation
+          e.scene.tweens.add({
+            targets: e,
+            alpha: 0,
+            duration: 600,
+            delay: 200,
+            onComplete: () => {
+              e.disableBody(true, true);
+              e.setAlpha(1); // Reset for reuse from pool
+            }
+          });
+        }
+      });
+  }
 
   public takeDamage(amount: number, dirX: number) {
     if (this.isInvulnerable || this.health <= 0 || !this.active) return;
@@ -263,16 +316,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     super.preUpdate(time, delta);
     if (this.active) {
       this.stateMachine.update(delta);
-
-      const cfg = ENEMY_RENDER_CONFIGS[this.enemyType];
-      const baseScale = cfg.displaySize / 256;
-
-      if (this.health <= 0) {
-        this.setScale(baseScale, baseScale);
-      } else {
-        this.setScale(baseScale, baseScale);
-        this.setAngle(0);
-      }
     }
   }
 }

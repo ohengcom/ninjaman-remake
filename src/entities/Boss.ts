@@ -11,41 +11,31 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
   private isInvulnerable = false;
   private phase: number = 1;
 
-  private currentVisualState: string = 'idle';
+  public get baseScaleX(): number {
+    return 200 / 340;
+  }
 
+  public get baseScaleY(): number {
+    return 240 / 512;
+  }
 
   private applyBossRender() {
-    this.setDisplaySize(300, 300);
-    this.body!.setSize(60, 160);
-    this.body!.setOffset(100, 50);
+    this.setScale(this.baseScaleX, this.baseScaleY);
+    this.body!.setSize(60, 200);
+    this.body!.setOffset(140, 280);
     
     // Boss phases color feedback
-    if (this.phase === 2) {
+    if (this.phase === 3) {
+      this.setTint(0xff4444); // Red/Enraged
+    } else if (this.phase === 2) {
       this.setTint(0xffd43b); // Golden
-    } else if (this.phase === 3) {
-      this.setTint(0xff6b6b); // Red/Enraged
     } else {
-      this.setTint(0xffd43b); // Default glowing gold
+      this.clearTint(); // Natural colors in phase 1
     }
   }
 
-  destroy(fromScene?: boolean) {
-    super.destroy(fromScene);
-  }
-
-  public play(key: any, ...args: any[]): this {
-    const keyStr = typeof key === 'string' ? key : (key?.key || '');
-    this.currentVisualState = keyStr;
-    
-    // Fallback to enemy_run to prevent crash since Boss doesn't have its own anims yet
-    super.play('enemy_run', true);
-    
-    // We handle tinting locally, no need to call applyBossRender() here
-    return this;
-  }
-
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, 'zombie');
+    super(scene, x, y, 'boss_oni_sheet');
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
@@ -54,8 +44,6 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     (this.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
 
     this.applyBossRender();
-
-
 
     this.stateMachine = new StateMachine<Boss>(this);
     this.setupStates();
@@ -84,14 +72,10 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     const healthPercent = this.health / this.maxHealth;
     if (healthPercent <= 0.3 && this.phase < 3) {
       this.phase = 3;
-      this.setTint(0xff6b6b);
       this.scene.cameras.main.shake(500, 0.03);
-      this.scene.time.delayedCall(300, () => this.clearTint());
     } else if (healthPercent <= 0.5 && this.phase < 2) {
       this.phase = 2;
-      this.setTint(0xffd43b);
       this.scene.cameras.main.shake(400, 0.025);
-      this.scene.time.delayedCall(300, () => this.clearTint());
     }
   }
 
@@ -100,14 +84,13 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'idle',
         onEnter: (b) => {
-          b.play({ key: 'boss_idle_anim', repeat: -1 }, true);
+          b.play({ key: 'boss_idle', repeat: -1 }, true);
           b.setVelocityX(0);
           b.faceTarget(b);
           const delay = b.isEnraged ? BOSS_STATS.idleDelay * 0.4 : BOSS_STATS.idleDelay;
           b.stateMachine.addTimer(b.scene.time.delayedCall(delay, () => {
             if (b.health <= 0 || !b.target) return;
             const dist = Phaser.Math.Distance.Between(b.x, b.y, b.target.x, b.target.y);
-            // Always engage - Boss is aggressive
             if (dist < BOSS_STATS.meleeDistance) {
               if (b.phase >= 3 && Math.random() < 0.4) {
                 b.stateMachine.setState('rush');
@@ -123,7 +106,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
       .addState({
         name: 'chase',
         onEnter: (b) => {
-          b.play({ key: 'boss_walk_anim', repeat: -1 }, true);
+          b.play({ key: 'boss_walk', repeat: -1 }, true);
           b.faceTarget(b);
         },
         onUpdate: (b) => {
@@ -150,15 +133,14 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
         name: 'windup',
         onEnter: (b) => {
           b.setVelocityX(0);
-          b.play('boss_windup_anim');
+          b.play({ key: 'boss_hurt', repeat: 0 }, true); // Use hurt frame as windup telegraph
           b.faceTarget(b);
           const windup = b.isEnraged ? BOSS_STATS.attackWindup * 0.5 : BOSS_STATS.attackWindup;
           
-          // Pulsing tint during windup for visual telegraph
-          b.setTint(0xffd43b);
+          // Pulsing alpha during windup for visual telegraph
           b.scene.tweens.add({
             targets: b,
-            alpha: 0.7,
+            alpha: 0.6,
             duration: 100,
             yoyo: true,
             repeat: Math.floor(windup / 200),
@@ -171,14 +153,14 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
           }));
         },
         onExit: (b) => {
-          b.clearTint();
           b.setAlpha(1);
+          b.applyBossRender();
         }
       })
       .addState({
         name: 'attack',
         onEnter: (b) => {
-          b.play('boss_attack_anim');
+          b.play({ key: 'boss_attack', repeat: 0 }, true);
           b.setVelocityX(0);
           b.scene.cameras.main.shake(300, 0.025);
           b.scene.events.emit('boss_attack', b);
@@ -204,15 +186,15 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
         name: 'rush',
         onEnter: (b) => {
           if (!b.target) { b.stateMachine.setState('idle'); return; }
-          b.play({ key: 'boss_rush_anim', repeat: -1 }, true);
-          b.setTint(0xff6b6b);
+          b.play({ key: 'boss_rush', repeat: -1 }, true);
+          b.setTint(0xff4444);
           const dir = Math.sign(b.target.x - b.x);
           b.setFlipX(dir < 0);
 
           // Brief telegraph before charging
           b.stateMachine.addTimer(b.scene.time.delayedCall(400, () => {
             if (b.health <= 0) return;
-            b.clearTint();
+            b.applyBossRender();
             b.setVelocityX(dir * BOSS_STATS.moveSpeed * 4);
             b.scene.cameras.main.shake(200, 0.015);
 
@@ -220,7 +202,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
             b.stateMachine.addTimer(b.scene.time.delayedCall(500, () => {
               if (b.health <= 0) return;
               b.setVelocityX(0);
-              b.play('boss_attack_anim');
+              b.play({ key: 'boss_attack', repeat: 0 }, true);
               b.scene.events.emit('boss_attack', b);
               b.scene.cameras.main.shake(400, 0.04);
 
@@ -231,7 +213,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
           }));
         },
         onExit: (b) => {
-          b.clearTint();
+          b.applyBossRender();
         }
       });
   }
@@ -247,14 +229,22 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     this.isInvulnerable = true;
     
     this.scene.time.delayedCall(BOSS_STATS.invulnerabilityDuration, () => {
-      this.applyBossRender(); // Re-apply default golden/phase tint instead of clearing
+      this.applyBossRender();
       this.isInvulnerable = false;
       if (this.health <= 0) {
         // Death sequence
-        this.setTint(0xff6b6b);
+        this.play({ key: 'boss_die', repeat: 0 }, true);
         this.scene.cameras.main.shake(800, 0.05);
-        this.scene.time.delayedCall(500, () => {
-          this.destroy();
+        this.scene.tweens.add({
+          targets: this,
+          alpha: 0,
+          y: this.y + 50,
+          duration: 1000,
+          delay: 500,
+          onComplete: () => {
+            this.setActive(false);
+            this.setVisible(false);
+          }
         });
       }
     });
@@ -263,24 +253,5 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
   preUpdate(time: number, delta: number) {
     super.preUpdate(time, delta);
     this.stateMachine.update(delta);
-
-    // Procedural Animation System removed in favor of real sprite animations
-    const baseScale = 300 / 256;
-
-    if (this.health <= 0) {
-      this.setScale(baseScale, baseScale);
-    } else {
-      const anim = this.currentVisualState;
-
-      // Flash gold/enraged tint on windup or phase changes
-      if (anim.includes('windup') && Math.floor(time / 100) % 2 === 0) {
-        this.setTint(0xffffff); // Telegraph flash
-      } else {
-        this.applyBossRender();
-      }
-
-      this.setScale(baseScale, baseScale);
-      this.setAngle(0);
-    }
   }
 }

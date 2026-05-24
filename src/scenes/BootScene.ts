@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import { manifest } from '../assets/manifest.js';
+import { registerAnimations } from '../animations/AnimationDefs.js';
+import { SoundManager } from '../managers/SoundManager.js';
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -28,24 +30,35 @@ export class BootScene extends Phaser.Scene {
       }
     }
 
+    if ('audio' in manifest) {
+      for (const snd of manifest.audio) {
+        this.load.audio(snd.key, snd.url);
+      }
+    }
+
+    // Loading screen
     const w = this.cameras.main.width;
     const h = this.cameras.main.height;
     
-    const bar = this.add.graphics();
-    const box = this.add.graphics();
-    box.fillStyle(0xe9ecef, 0.9);
-    box.lineStyle(1.5, 0x74c0fc, 1);
-    box.fillRect(w / 2 - 160, h / 2 - 25, 320, 50);
-    box.strokeRect(w / 2 - 160, h / 2 - 25, 320, 50);
+    // Dark background for premium feel
+    this.cameras.main.setBackgroundColor('#0a0a0f');
     
-    const txt = this.add.text(w / 2, h / 2 - 50, 'Synchronizing Core...', {
-      fontFamily: 'Inter, sans-serif', fontSize: '20px', color: '#495057', fontStyle: 'bold'
+    const box = this.add.graphics();
+    box.fillStyle(0x1a1a2e, 0.9);
+    box.lineStyle(2, 0x00d4ff, 1);
+    box.fillRoundedRect(w / 2 - 200, h / 2 - 30, 400, 60, 8);
+    box.strokeRoundedRect(w / 2 - 200, h / 2 - 30, 400, 60, 8);
+    
+    const bar = this.add.graphics();
+    
+    const txt = this.add.text(w / 2, h / 2 - 60, 'INITIALIZING...', {
+      fontFamily: 'Orbitron, sans-serif', fontSize: '18px', color: '#00d4ff', fontStyle: 'bold'
     }).setOrigin(0.5);
 
     this.load.on('progress', (v: number) => {
       bar.clear();
-      bar.fillStyle(0x74c0fc, 1);
-      bar.fillRect(w / 2 - 150, h / 2 - 15, 300 * v, 30);
+      bar.fillStyle(0x00d4ff, 1);
+      bar.fillRoundedRect(w / 2 - 190, h / 2 - 20, 380 * v, 40, 6);
     });
 
     this.load.on('complete', () => {
@@ -56,20 +69,12 @@ export class BootScene extends Phaser.Scene {
   }
 
   create(): void {
-    // Player animations (knight atlas)
-    this.anims.create({ key: 'player_idle', frames: [{ key: 'knight', frame: 'guard/frame0001' }], frameRate: 1, repeat: 0 });
-    this.anims.create({ key: 'player_run', frames: this.anims.generateFrameNames('knight', { prefix: 'run/frame', start: 0, end: 7, zeroPad: 4 }), frameRate: 15, repeat: -1 });
-    this.anims.create({ key: 'player_jump', frames: this.anims.generateFrameNames('knight', { prefix: 'jump_loop/frame', start: 0, end: 1, zeroPad: 4 }), frameRate: 10, repeat: -1 });
-    this.anims.create({ key: 'player_fall', frames: this.anims.generateFrameNames('knight', { prefix: 'fall_loop/frame', start: 0, end: 1, zeroPad: 4 }), frameRate: 10, repeat: -1 });
-    this.anims.create({ key: 'player_attack_A', frames: this.anims.generateFrameNames('knight', { prefix: 'attack_A/frame', start: 0, end: 12, zeroPad: 4 }), frameRate: 20, repeat: 0 });
-    this.anims.create({ key: 'player_attack_B', frames: this.anims.generateFrameNames('knight', { prefix: 'attack_B/frame', start: 0, end: 9, zeroPad: 4 }), frameRate: 20, repeat: 0 });
-    this.anims.create({ key: 'player_attack_C', frames: this.anims.generateFrameNames('knight', { prefix: 'attack_C/frame', start: 0, end: 12, zeroPad: 4 }), frameRate: 20, repeat: 0 });
-    this.anims.create({ key: 'player_hurt', frames: [{ key: 'knight', frame: 'guard/frame0001' }], frameRate: 10, repeat: 0 });
+    // Bind Phaser Sound Manager globally
+    SoundManager.setSoundManager(this.sound);
 
-    // Enemy animations (zombie atlas)
-    this.anims.create({ key: 'enemy_run', frames: this.anims.generateFrameNames('zombie', { prefix: 'walk_', start: 0, end: 8, zeroPad: 3 }), frameRate: 12, repeat: -1 });
-    this.anims.create({ key: 'enemy_die', frames: this.anims.generateFrameNames('zombie', { prefix: 'Death_', start: 0, end: 5, zeroPad: 3 }), frameRate: 10, repeat: 0 });
-
+    // Register all animations from centralized definitions
+    registerAnimations(this);
+    
     this.scene.start('MainMenuScene');
   }
 }

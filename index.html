@@ -572,6 +572,185 @@
         100% { clip-path: none; }
       }
 
+      /* Premium Victory Overlay Styles */
+      .victory-theme {
+        background: rgba(6, 6, 12, 0.92) !important;
+        backdrop-filter: blur(18px) !important;
+      }
+      
+      .victory-panel {
+        width: 620px;
+        background: rgba(13, 13, 23, 0.95) !important;
+        border: 2px solid rgba(0, 212, 255, 0.45) !important;
+        box-shadow: 0 0 45px rgba(0, 212, 255, 0.25) !important;
+        padding: 40px;
+        overflow: hidden;
+      }
+
+      .victory-panel::before {
+        background: linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px) !important;
+        background-size: 20px 20px !important;
+      }
+
+      /* Moving high-tech scanner line */
+      .victory-scanner {
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.7), transparent);
+        box-shadow: 0 0 12px rgba(0, 212, 255, 0.9);
+        animation: scanLine 3s infinite linear;
+        pointer-events: none;
+        z-index: 5;
+      }
+
+      /* Animated crest/ring */
+      .cyber-crest {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 5px;
+      }
+
+      .crest-ring {
+        position: absolute;
+        border-radius: 50%;
+        border: 2px dashed rgba(0, 212, 255, 0.4);
+      }
+
+      .ring-outer {
+        width: 100%;
+        height: 100%;
+        animation: rotateCW 12s infinite linear;
+      }
+
+      .ring-inner {
+        width: 75%;
+        height: 75%;
+        border-style: dotted;
+        border-color: rgba(0, 212, 255, 0.7);
+        animation: rotateCCW 8s infinite linear;
+      }
+
+      .crest-icon {
+        font-size: 32px;
+        color: #00d4ff;
+        text-shadow: 0 0 12px rgba(0, 212, 255, 0.8);
+        font-weight: bold;
+      }
+
+      .victory-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 38px;
+        font-weight: 900;
+        color: #00d4ff;
+        text-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+        letter-spacing: 0.15em;
+        margin-top: 5px;
+      }
+
+      .victory-subtitle {
+        font-size: 11px;
+        color: rgba(0, 212, 255, 0.6);
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+
+      .victory-stats-card {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        width: 100%;
+        margin: 15px 0;
+      }
+
+      .stat-item {
+        background: rgba(0, 212, 255, 0.02);
+        border: 1px solid rgba(0, 212, 255, 0.1);
+        border-radius: 12px;
+        padding: 16px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        transition: all 0.3s;
+      }
+
+      .stat-item:hover {
+        background: rgba(0, 212, 255, 0.05);
+        border-color: rgba(0, 212, 255, 0.3);
+        transform: translateY(-2px);
+      }
+
+      .stat-label {
+        font-size: 9px;
+        font-weight: 600;
+        color: #868e96;
+        letter-spacing: 0.15em;
+      }
+
+      .stat-val {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 22px;
+        font-weight: 900;
+      }
+
+      .highlight-cyan {
+        color: #00d4ff;
+        text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+      }
+
+      .highlight-gold {
+        color: #ffd43b;
+        text-shadow: 0 0 10px rgba(255, 212, 59, 0.5);
+      }
+
+      .highlight-green {
+        color: #51cf66;
+        text-shadow: 0 0 10px rgba(81, 207, 102, 0.5);
+      }
+
+      .victory-btn {
+        background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%) !important;
+        box-shadow: 0 0 25px rgba(0, 212, 255, 0.4) !important;
+        border: none !important;
+        font-size: 15px !important;
+        letter-spacing: 0.1em !important;
+        animation: pulseGlow 2s infinite alternate;
+      }
+
+      .victory-btn:hover {
+        background: linear-gradient(135deg, #33e0ff 0%, #1ab0ff 100%) !important;
+        box-shadow: 0 0 35px rgba(0, 212, 255, 0.6) !important;
+      }
+
+      /* Extra Animations */
+      @keyframes scanLine {
+        0% { top: 0%; opacity: 0.3; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { top: 100%; opacity: 0.3; }
+      }
+
+      @keyframes rotateCW {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+
+      @keyframes rotateCCW {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(-360deg); }
+      }
+
+      @keyframes pulseGlow {
+        from { transform: scale(1); box-shadow: 0 0 20px rgba(0, 212, 255, 0.4); }
+        to { transform: scale(1.03); box-shadow: 0 0 30px rgba(0, 212, 255, 0.7); }
+      }
+
       @media (max-width: 720px), (max-height: 760px) {
         body {
           gap: 0;
@@ -664,12 +843,43 @@
         </div>
       </div>
 
-      <!-- INTERACTIVE OVERLAY: GAME OVER / SECTOR SECURED -->
+      <!-- INTERACTIVE OVERLAY: GAME OVER -->
       <div id="menu-gameover-overlay" class="fullscreen-overlay interactive">
         <div class="terminal-panel gameover-panel">
           <h2 id="gameover-title" class="gameover-title">SECTOR COMPROMISED</h2>
-          <div class="gameover-score-row">FINAL SCORE: <span id="gameover-score" style="color: var(--cyan);">0</span></div>
+          <div class="gameover-score-row">FINAL SCORE: <span id="gameover-score" style="color: var(--accent);">0</span></div>
           <button id="btn-restart-game" class="restart-btn">REBOOT SYSTEM</button>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE OVERLAY: VICTORY / SECTOR SECURED -->
+      <div id="menu-victory-overlay" class="fullscreen-overlay interactive victory-theme">
+        <div class="terminal-panel victory-panel">
+          <div class="victory-scanner"></div>
+          <div class="cyber-crest">
+            <div class="crest-ring ring-outer"></div>
+            <div class="crest-ring ring-inner"></div>
+            <span class="crest-icon">✓</span>
+          </div>
+          <h2 class="victory-title">SECTOR SECURED</h2>
+          <p class="victory-subtitle">SIMULATION COMPLETION SUCCESSFUL</p>
+          
+          <div class="victory-stats-card">
+            <div class="stat-item">
+              <span class="stat-label">FINAL SCORE</span>
+              <span id="victory-score" class="stat-val highlight-cyan">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">SECTOR RATING</span>
+              <span class="stat-val highlight-gold">SSS</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">THREAT STATUS</span>
+              <span class="stat-val highlight-green">CLEARED</span>
+            </div>
+          </div>
+          
+          <button id="btn-victory-restart" class="restart-btn victory-btn">REBOOT NEXUS SYSTEM</button>
         </div>
       </div>
 

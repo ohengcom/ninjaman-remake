@@ -2,6 +2,8 @@ import { EnemyType } from '../entities/Enemy.js';
 
 export interface LevelConfig {
   id: number;
+  /** Level number (1-indexed), used for theming */
+  levelNumber: number;
   name: string;
   farBg: string;
   midBg: string;
@@ -29,6 +31,7 @@ export interface LevelConfig {
 export const LEVELS: readonly LevelConfig[] = [
   {
     id: 1,
+    levelNumber: 1,
     name: 'MYSTICAL FOREST',
     farBg: 'bg_forest',
     midBg: '',
@@ -45,30 +48,32 @@ export const LEVELS: readonly LevelConfig[] = [
   },
   {
     id: 2,
+    levelNumber: 2,
     name: 'SERENE BEACH',
     farBg: 'bg_beach',
     midBg: '',
     mapTiles: 80,
     tileSize: 64,
     hasPlatforms: true,
-    platformStartTile: 15,
-    platformInterval: 6,
+    platformStartTile: 12,
+    platformInterval: 5,
     enemyTypes: ['guard', 'axe', 'ninja', 'sniper'],
-    enemyStartX: 800,
+    enemyStartX: 600,
     enemySpacing: [250, 500],
     isBossLevel: false,
-    completionSP: 10,
+    completionSP: 15,
   },
   {
     id: 3,
+    levelNumber: 3,
     name: 'ANCIENT CASTLE',
     farBg: 'bg_castle',
     midBg: '',
-    mapTiles: 20,
+    mapTiles: 30,
     tileSize: 64,
-    hasPlatforms: false,
-    platformStartTile: 0,
-    platformInterval: 0,
+    hasPlatforms: true,
+    platformStartTile: 5,
+    platformInterval: 8,
     enemyTypes: [],
     enemyStartX: 0,
     enemySpacing: [0, 0],

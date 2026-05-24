@@ -25,8 +25,10 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
         // Adjust hitbox for player wave vs sniper bullet
         if (textureKey === 'player_wave') {
             this.body!.setSize(30, 40);
+            this.setScale(1); // Reset any forced size from previous reuse
         } else {
             this.body!.setSize(20, 10);
+            this.setDisplaySize(60, 15); // Make arrow larger
         }
         
         this.damage = damage;

@@ -48,7 +48,7 @@ export class GameScene extends Phaser.Scene {
       const dir = attacker.flipX ? -1 : 1;
       this.vfxManager.emitHitParticle(attacker.x + (attacker.flipX ? -30 : 30), attacker.y, 8, 'hit');
       p.fire(attacker.x + (20 * dir), attacker.y, dir, PROJECTILE_CONFIG.enemyBulletSpeed, damage, 'projectile');
-      SoundManager.playSwing(this.getPan(attacker.x));
+      SoundManager.playShoot(this.getPan(attacker.x));
     }
   };
   private readonly onPlayerCastWave = (player: Player) => {
@@ -132,23 +132,28 @@ export class GameScene extends Phaser.Scene {
         }
       }
       
-      const portal = this.add.text(this.mapWidth - 300, h - 150, '=> NEXT SECTOR =>', {
-        fontFamily: 'Impact', fontSize: '32px', color: '#00ffff'
+      const portal = this.add.text(this.mapWidth - 300, h - 150, '⟫ NEXT SECTOR ⟫', {
+        fontFamily: 'Orbitron, Impact, sans-serif', fontSize: '28px', color: '#00d4ff',
+        stroke: '#000', strokeThickness: 3,
+        shadow: { blur: 12, color: 'rgba(0, 212, 255, 0.6)', fill: true, offsetX: 0, offsetY: 0 }
       }).setOrigin(0.5);
       this.tweens.add({ targets: portal, alpha: 0.2, yoyo: true, repeat: -1, duration: 800 });
 
     } else {
       // Boss level: spawn boss on the ground, close to player
       const bossX = Math.min(this.mapWidth - 400, 800);
-      const bossY = h - 32 - 60; // ground level minus half boss height
+      const bossY = h - 168; // ground level (h-48) minus half boss height (120)
       this.boss = new Boss(this, bossX, bossY);
       this.boss.setTarget(this.player);
       this.physics.add.collider(this.boss, platforms);
       this.physics.add.collider(this.boss, floor);
       
-      this.add.text(bossX, 100, 'WARNING: CORE GUARDIAN', {
-         fontFamily: 'Impact', fontSize: '48px', color: '#ff0055'
+      const bossWarning = this.add.text(bossX, 100, '⚠ CORE GUARDIAN ⚠', {
+         fontFamily: 'Orbitron, Impact, sans-serif', fontSize: '40px', color: '#ff4444',
+         stroke: '#000', strokeThickness: 4,
+         shadow: { blur: 16, color: 'rgba(255, 68, 68, 0.7)', fill: true, offsetX: 0, offsetY: 0 }
       }).setOrigin(0.5);
+      this.tweens.add({ targets: bossWarning, alpha: 0.3, yoyo: true, repeat: 5, duration: 300 });
     }
 
     this.physics.add.collider(this.enemies, platforms);
@@ -271,8 +276,8 @@ export class GameScene extends Phaser.Scene {
        const transText = this.add.text(
          this.cameras.main.scrollX + this.cameras.main.width / 2,
          this.cameras.main.height / 2,
-         `ENTERING\n${nextLevel.name}`,
-         { fontFamily: 'Impact', fontSize: '48px', color: '#00ffff', align: 'center', stroke: '#000', strokeThickness: 6 }
+          `ENTERING\n${nextLevel.name}`,
+          { fontFamily: 'Orbitron, Impact, sans-serif', fontSize: '42px', color: '#00d4ff', align: 'center', stroke: '#000', strokeThickness: 4, shadow: { blur: 16, color: 'rgba(0, 212, 255, 0.6)', fill: true, offsetX: 0, offsetY: 0 } }
        ).setOrigin(0.5).setScrollFactor(0).setAlpha(0);
 
        this.tweens.add({ targets: transText, alpha: 1, duration: 400 });
