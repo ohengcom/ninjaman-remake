@@ -28,11 +28,11 @@ export const PLAYER_ATTACKS = {
 
 /** Player movement parameters */
 export const PLAYER_MOVEMENT = {
-  runSpeed: 6.5,
-  airSpeed: 5.0,
+  runSpeed: 7.5,
+  airSpeed: 5.5,
   jumpVelocity: -11.0,
   doubleJumpVelocity: -10.0,
-  dashSpeed: 15.0,
+  dashSpeed: 16.0,
   dashDuration: 300,
   maxJumps: 2,
   doubleTapWindow: 300,

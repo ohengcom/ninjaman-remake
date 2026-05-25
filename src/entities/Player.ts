@@ -156,11 +156,13 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   }
 
   private handleCommonTransitions(p: Player) {
-    if (p.checkDashInput() && p.isGrounded()) {
+    const canGroundAction = p.isGroundedOrCoyote();
+
+    if (p.checkDashInput() && canGroundAction) {
       p.stateMachine.setState('dash');
       return true;
     }
-    if (p.isDefendDown() && p.isGrounded()) {
+    if (p.isDefendDown() && canGroundAction) {
       p.stateMachine.setState('defend');
       return true;
     }
@@ -178,7 +180,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     const hasJumpBuffer = (now - p.lastJumpInputTime < PLAYER_MOVEMENT.jumpBufferTime);
 
     if (hasJumpBuffer) {
-      const isGroundedOrCoyote = p.isGrounded() || (now - p.lastGroundedTime < PLAYER_MOVEMENT.coyoteTime);
+      const isGroundedOrCoyote = p.isGroundedOrCoyote();
       if (isGroundedOrCoyote && p.jumpCount === 0) {
         p.lastJumpInputTime = 0; // Consume jump buffer
         p.stateMachine.setState('jump');
@@ -198,7 +200,33 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   }
 
   public isGrounded(): boolean {
-      return Math.abs(this.body!.velocity.y) < 0.1 && this.y > 0;
+      return Math.abs(this.body!.velocity.y) < 0.5 && this.y > 0;
+  }
+
+  private isGroundedOrCoyote(): boolean {
+    return this.isGrounded() || (this.scene.time.now - this.lastGroundedTime < PLAYER_MOVEMENT.coyoteTime);
+  }
+
+  private canApplyMovement(): boolean {
+    const state = this.stateMachine.getCurrentStateName();
+    return state !== 'dash'
+      && state !== 'defend'
+      && state !== 'hurt'
+      && !state.startsWith('attack_')
+      && this.health > 0;
+  }
+
+  private applyBufferedMovement() {
+    if (!this.canApplyMovement()) return;
+
+    const speed = this.isGroundedOrCoyote() ? PLAYER_MOVEMENT.runSpeed : PLAYER_MOVEMENT.airSpeed;
+    if (this.isLeftDown()) {
+      this.setVelocityX(-speed);
+      this.setFlipX(true);
+    } else if (this.isRightDown()) {
+      this.setVelocityX(speed);
+      this.setFlipX(false);
+    }
   }
 
   public applySquash(_sx: number, _sy: number, _dur: number) {
@@ -516,6 +544,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     if (this.isGrounded()) {
       this.lastGroundedTime = time;
     }
+    this.applyBufferedMovement();
     
     if (Phaser.Input.Keyboard.JustDown(this.cursors.down)) this.recordInput('down');
     if (Phaser.Input.Keyboard.JustDown(this.cursors.left)) this.recordInput('left');

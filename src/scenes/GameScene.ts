@@ -159,8 +159,9 @@ export class GameScene extends Phaser.Scene {
     this.comboCount = 0;
     this.currentStyle = '';
     const h = this.cameras.main.height;
+    const groundTop = h - 48;
     this.lastSafeX = 200;
-    this.lastSafeY = h - 250;
+    this.lastSafeY = groundTop - 80;
     this.boss = null;
     this.isTransitioning = false;
 
@@ -198,15 +199,15 @@ export class GameScene extends Phaser.Scene {
       const [minSpacing, maxSpacing] = this.levelCfg.enemySpacing;
       for (let x = this.levelCfg.enemyStartX; x < this.mapWidth - 800; x += minSpacing + this.rng.next() * (maxSpacing - minSpacing)) {
         const type = this.rng.pick(types);
-        const yOffset = type === 'sniper' ? 350 : 250;
-        const enemy = this.enemies.get(x, h - yOffset, type) as Enemy;
+        const enemy = this.enemies.get(x, groundTop - 90, type) as Enemy;
         if (enemy) {
-            enemy.spawn(x, h - yOffset, type);
+            enemy.spawnOnGround(x, groundTop, type);
             enemy.setTarget(this.player);
         }
       }
       
-      const portal = this.add.text(this.mapWidth - 300, h - 150, '⟫ NEXT SECTOR ⟫', {
+      const transitionX = this.mapWidth - 650;
+      const portal = this.add.text(transitionX - 80, h - 170, '⟫ NEXT SECTOR ⟫', {
         fontFamily: 'Orbitron, Impact, sans-serif', fontSize: '28px', color: '#00d4ff',
         stroke: '#000', strokeThickness: 3,
         shadow: { blur: 12, color: 'rgba(0, 212, 255, 0.6)', fill: true, offsetX: 0, offsetY: 0 }
@@ -301,7 +302,7 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
-    if (!this.levelCfg.isBossLevel && this.player.x > this.mapWidth - 400 && !this.isTransitioning) {
+    if (!this.levelCfg.isBossLevel && this.player.x > this.mapWidth - 650 && !this.isTransitioning) {
        this.isTransitioning = true;
        console.log('Transitioning to next level!');
        

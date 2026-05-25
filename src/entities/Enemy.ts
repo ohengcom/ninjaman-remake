@@ -21,6 +21,8 @@ const ENEMY_RENDER_CONFIGS = {
   sniper: { displayWidth: 130, displayHeight: 190, bodyWidth: 50, bodyHeight: 230, bodyOffsetX: 145, bodyOffsetY: 250 },
 } as const;
 
+const ENEMY_GROUND_CLEARANCE = 2;
+
 export class Enemy extends Phaser.Physics.Matter.Sprite {
   public stateMachine: StateMachine<Enemy>;
   public enemyType: EnemyType;
@@ -114,6 +116,15 @@ export class Enemy extends Phaser.Physics.Matter.Sprite {
     this.setTintMode(Phaser.TintModes.MULTIPLY);
     this.setAlpha(1);
     this.stateMachine.setState('patrol');
+  }
+
+  public spawnOnGround(x: number, groundTop: number, type: EnemyType) {
+    this.spawn(x, groundTop - this.getBodyHalfHeight() - ENEMY_GROUND_CLEARANCE, type);
+  }
+
+  private getBodyHalfHeight(): number {
+    const cfg = ENEMY_RENDER_CONFIGS[this.enemyType];
+    return (cfg.bodyHeight * this.baseScaleY) / 2;
   }
 
   private configureType(type: EnemyType) {
