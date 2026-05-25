@@ -134,6 +134,26 @@ export class GameScene extends Phaser.Scene {
       }
     });
   };
+  private readonly onMatterCollisionActive = (event: Phaser.Physics.Matter.Events.CollisionActiveEvent) => {
+    event.pairs.forEach(pair => {
+      this.updatePlayerGroundContact(pair.bodyA, pair.bodyB);
+      this.updatePlayerGroundContact(pair.bodyB, pair.bodyA);
+    });
+  };
+
+  private updatePlayerGroundContact(playerBody: MatterJS.BodyType, otherBody: MatterJS.BodyType) {
+    const obj = playerBody.gameObject;
+    if (!(obj instanceof Player)) return;
+    if (!otherBody.isStatic) return;
+
+    const otherY = otherBody.position.y;
+    const playerBottom = playerBody.bounds.max.y;
+    const otherTop = otherBody.bounds.min.y;
+    const isStandingOnTop = playerBody.position.y < otherY && playerBottom <= otherTop + 8;
+    if (isStandingOnTop) {
+      obj.notifyGroundContact();
+    }
+  }
 
   constructor() {
     super({ key: 'GameScene' });
@@ -271,6 +291,7 @@ export class GameScene extends Phaser.Scene {
     this.input.keyboard!.on('keydown-ESC', this.pauseGame, this);
 
     this.matter.world.on('collisionstart', this.onMatterCollisionStart);
+    this.matter.world.on('collisionactive', this.onMatterCollisionActive);
 
     this.time.delayedCall(10, () => {
       this.events.emit(GAME_EVENTS.UPDATE_HEALTH, this.player.health, this.player.maxHealth);
@@ -468,6 +489,7 @@ export class GameScene extends Phaser.Scene {
     this.events.off(GAME_EVENTS.ENEMY_SHOOT, this.onEnemyShoot);
     this.events.off(GAME_EVENTS.PLAYER_CAST_WAVE, this.onPlayerCastWave);
     this.matter.world.off('collisionstart', this.onMatterCollisionStart);
+    this.matter.world.off('collisionactive', this.onMatterCollisionActive);
     this.input.keyboard?.off('keydown-ESC', this.pauseGame, this);
 
     SoundManager.stopBGM();

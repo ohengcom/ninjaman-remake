@@ -58,6 +58,8 @@ export class Enemy extends Phaser.Physics.Matter.Sprite {
     const scaledWidth = cfg.bodyWidth * this.baseScaleX;
     const scaledHeight = cfg.bodyHeight * this.baseScaleY;
     this.setRectangle(scaledWidth, scaledHeight);
+    this.setFriction(0, 0, 0);
+    this.setFrictionAir(0.02);
 
     // Dynamically calculate the perfect originY so feet are always exactly on the floor!
     const originY = 1 - scaledHeight / (2 * cfg.displayHeight);

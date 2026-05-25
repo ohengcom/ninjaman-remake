@@ -37,7 +37,9 @@ export class Player extends Phaser.Physics.Matter.Sprite {
 
   private inputBuffer: { key: string, time: number }[] = [];
   private static readonly BUFFER_TIMEOUT = PLAYER_MOVEMENT.motionBufferTimeout;
+  private static readonly GROUND_CONTACT_GRACE = 120;
   private lastGroundedTime: number = 0;
+  private lastGroundContactTime: number = 0;
   private lastJumpInputTime: number = 0;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
@@ -200,7 +202,11 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   }
 
   public isGrounded(): boolean {
-      return Math.abs(this.body!.velocity.y) < 0.5 && this.y > 0;
+      return this.scene.time.now - this.lastGroundContactTime < Player.GROUND_CONTACT_GRACE;
+  }
+
+  public notifyGroundContact(): void {
+    this.lastGroundContactTime = this.scene.time.now;
   }
 
   private isGroundedOrCoyote(): boolean {
@@ -241,6 +247,8 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     const baseScale = PLAYER_RENDER.displaySize / 79;
     this.setScale(baseScale, baseScale);
     this.setRectangle(PLAYER_RENDER.bodyWidth, PLAYER_RENDER.bodyHeight);
+    this.setFriction(0, 0, 0);
+    this.setFrictionAir(0.01);
     this.setOrigin(0.35, 0.8);
   }
 
