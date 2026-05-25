@@ -74,9 +74,29 @@ export class MainMenuScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     // Start on SPACE or click
-    const startGame = () => {
+    const startGame = async () => {
       this.input.keyboard?.off('keydown-SPACE', startGame);
       this.input.off('pointerdown', startGame);
+
+      // --- LAZY LOAD SCENES ---
+      // This forces Vite to code-split the massive gameplay chunk
+      if (!this.scene.get('GameScene')) {
+          const [
+              { GameScene },
+              { HUDScene },
+              { GameOverScene },
+              { PauseScene }
+          ] = await Promise.all([
+              import('./GameScene.js'),
+              import('./HUDScene.js'),
+              import('./GameOverScene.js'),
+              import('./PauseScene.js')
+          ]);
+          this.scene.add('GameScene', GameScene, false);
+          this.scene.add('HUDScene', HUDScene, false);
+          this.scene.add('GameOverScene', GameOverScene, false);
+          this.scene.add('PauseScene', PauseScene, false);
+      }
 
       if (this.sys.game.config.renderType === Phaser.CANVAS) {
         this.cameras.main.fadeOut(800, 0, 0, 0);

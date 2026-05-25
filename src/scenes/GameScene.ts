@@ -17,8 +17,8 @@ import { LevelBuilder } from '../utils/LevelBuilder.js';
 
 export class GameScene extends Phaser.Scene {
   private player!: Player;
-  private enemies!: Phaser.Physics.Arcade.Group;
-  private projectiles!: Phaser.Physics.Arcade.Group;
+  private enemies!: Phaser.GameObjects.Group;
+  private projectiles!: Phaser.GameObjects.Group;
   private boss: Boss | null = null;
   private score: number = 0;
   private playerLight!: Phaser.GameObjects.Light;
@@ -69,6 +69,71 @@ export class GameScene extends Phaser.Scene {
       wave.fire(player.x + (30 * dir), player.y, dir, PLAYER_ATTACKS.wave.speed, PLAYER_ATTACKS.wave.damage, 'player_wave');
     }
   };
+  private readonly onMatterCollisionStart = (event: Phaser.Physics.Matter.Events.CollisionStartEvent) => {
+    event.pairs.forEach(pair => {
+      const bodyA = pair.bodyA;
+      const bodyB = pair.bodyB;
+      const objA = bodyA.gameObject;
+      const objB = bodyB.gameObject;
+      if (!objA || !objB) return;
+
+      // Projectile vs Player
+      if ((objA instanceof Projectile && objB instanceof Player) || (objB instanceof Projectile && objA instanceof Player)) {
+        const proj = (objA instanceof Projectile) ? objA : (objB as Projectile);
+        const player = (objA instanceof Player) ? objA : (objB as Player);
+
+        if (proj.active && player.health > 0 && proj.texture.key === 'projectile') {
+          const dir = proj.body!.velocity.x > 0 ? 1 : -1;
+
+          if (player.isBlocking && Math.sign(dir) !== (player.flipX ? -1 : 1)) {
+            player.health -= Math.floor(proj.damage * 0.2);
+            this.events.emit(GAME_EVENTS.PLAYER_PARRY, player);
+            player.setVelocityX(dir * 1.5);
+          } else {
+            player.takeDamage(proj.damage, dir);
+            SoundManager.playDamage(this.getPan(proj.x));
+            this.vfxManager.emitHitParticle(player.x, player.y, 5, 'hit');
+            this.cameras.main.shake(200, 0.02);
+          }
+          this.events.emit(GAME_EVENTS.UPDATE_HEALTH, player.health, player.maxHealth);
+          proj.hit();
+        }
+      }
+
+      // Projectile vs Enemy
+      if ((objA instanceof Projectile && objB instanceof Enemy) || (objB instanceof Projectile && objA instanceof Enemy)) {
+        const proj = (objA instanceof Projectile) ? objA : (objB as Projectile);
+        const enemy = (objA instanceof Enemy) ? objA : (objB as Enemy);
+
+        if (proj.active && enemy.active && enemy.health > 0 && proj.texture.key === 'player_wave') {
+          const dir = proj.body!.velocity.x > 0 ? 1 : -1;
+          enemy.takeDamage(proj.damage, dir);
+          SoundManager.playHit(this.getPan(enemy.x));
+          this.vfxManager.emitHitParticle(enemy.x, enemy.y, 10, 'spark');
+          proj.hit(); // Consume wave
+          if (enemy.health <= 0) {
+            this.addScore(SCORE_CONFIG.waveKill);
+            this.incrementCombo();
+          }
+        }
+      }
+
+      // Projectile vs Boss
+      if (this.boss && ((objA instanceof Projectile && objB instanceof Boss) || (objB instanceof Projectile && objA instanceof Boss))) {
+        const proj = (objA instanceof Projectile) ? objA : (objB as Projectile);
+        const boss = (objA instanceof Boss) ? objA : (objB as Boss);
+
+        if (proj && boss && proj.active && boss.active && boss.health > 0 && proj.texture.key === 'player_wave') {
+          const dir = proj.body!.velocity.x > 0 ? 1 : -1;
+          boss.takeDamage(proj.damage * BOSS_STATS.damageMultiplier, dir);
+          SoundManager.playHit(this.getPan(boss.x));
+          this.vfxManager.emitHitParticle(boss.x, boss.y, 15, 'spark');
+          proj.hit();
+          this.incrementCombo();
+        }
+      }
+    });
+  };
 
   constructor() {
     super({ key: 'GameScene' });
@@ -114,8 +179,8 @@ export class GameScene extends Phaser.Scene {
     this.scene.stop('HUDScene');
     this.scene.launch('HUDScene');
 
-    const { platforms, floor } = LevelBuilder.buildPlatforms(this, this.levelCfg, this.mapWidth, this.rng);
-    const leftWall = LevelBuilder.buildLeftWall(this);
+    LevelBuilder.buildPlatforms(this, this.levelCfg, this.mapWidth, this.rng);
+    LevelBuilder.buildLeftWall(this);
 
     const saveData = SaveManager.load();
     this.player = new Player(this, this.lastSafeX, this.lastSafeY);
@@ -123,12 +188,10 @@ export class GameScene extends Phaser.Scene {
     this.player.health = saveData.maxHealth;
     this.attackTrail = this.vfxManager.createAttackTrail(this.player);
     
-    this.physics.add.collider(this.player, platforms);
-    this.physics.add.collider(this.player, floor);
-    this.physics.add.collider(this.player, leftWall);
+    // Matter physics automatically collides bodies unless collision filtering is used
 
-    this.enemies = this.physics.add.group({ classType: Enemy, maxSize: 30, runChildUpdate: true });
-    this.projectiles = this.physics.add.group({ classType: Projectile, maxSize: 20, runChildUpdate: true });
+    this.enemies = this.add.group({ classType: Enemy, maxSize: 30, runChildUpdate: true });
+    this.projectiles = this.add.group({ classType: Projectile, maxSize: 20, runChildUpdate: true });
     
     if (!this.levelCfg.isBossLevel) {
       const types: EnemyType[] = [...this.levelCfg.enemyTypes];
@@ -156,8 +219,6 @@ export class GameScene extends Phaser.Scene {
       const bossY = h - 168; // ground level (h-48) minus half boss height (120)
       this.boss = new Boss(this, bossX, bossY);
       this.boss.setTarget(this.player);
-      this.physics.add.collider(this.boss, platforms);
-      this.physics.add.collider(this.boss, floor);
       
       const bossWarning = this.add.text(bossX, 100, '⚠ CORE GUARDIAN ⚠', {
          fontFamily: 'Orbitron, Impact, sans-serif', fontSize: '40px', color: '#ff4444',
@@ -167,13 +228,12 @@ export class GameScene extends Phaser.Scene {
       this.tweens.add({ targets: bossWarning, alpha: 0.3, yoyo: true, repeat: 5, duration: 300 });
     }
 
-    this.physics.add.collider(this.enemies, platforms);
-    this.physics.add.collider(this.enemies, floor);
+    // Enemies automatically collide with matter static bodies
     this.vfxManager.createHitParticles();
 
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
     this.cameras.main.setBounds(0, 0, this.mapWidth, h);
-    this.physics.world.setBounds(0, 0, this.mapWidth, h * 2);
+    this.matter.world.setBounds(0, 0, this.mapWidth, h * 2);
 
     this.vfxManager.initAtmosphere();
     this.vfxManager.createAmbientMotes(this.mapWidth, h);
@@ -209,60 +269,7 @@ export class GameScene extends Phaser.Scene {
     // Pause support
     this.input.keyboard!.on('keydown-ESC', this.pauseGame, this);
 
-    this.physics.add.overlap(this.projectiles, this.player, (playerObj, projObj) => {
-        const proj = projObj as Projectile;
-        const player = playerObj as Player;
-        if (proj.active && player.health > 0 && proj.texture.key === 'projectile') {
-            const dir = proj.body!.velocity.x > 0 ? 1 : -1;
-            
-            if (player.isBlocking && Math.sign(dir) !== (player.flipX ? -1 : 1)) {
-                 player.health -= Math.floor(proj.damage * 0.2);
-                 this.events.emit(GAME_EVENTS.PLAYER_PARRY, player);
-                 player.setVelocityX(dir * 50);
-            } else {
-                 player.takeDamage(proj.damage, dir);
-                 SoundManager.playDamage(this.getPan(proj.x));
-                 this.vfxManager.emitHitParticle(player.x, player.y, 5, 'hit');
-                 this.cameras.main.shake(200, 0.02);
-            }
-            this.events.emit(GAME_EVENTS.UPDATE_HEALTH, player.health, player.maxHealth);
-            proj.hit();
-        }
-    });
-
-    // Player wave hitting enemies
-    this.physics.add.overlap(this.projectiles, this.enemies, (projObj, enemyObj) => {
-        const proj = projObj as Projectile;
-        const enemy = enemyObj as Enemy;
-        if (proj.active && enemy.active && enemy.health > 0 && proj.texture.key === 'player_wave') {
-            const dir = proj.body!.velocity.x > 0 ? 1 : -1;
-            enemy.takeDamage(proj.damage, dir);
-            SoundManager.playHit(this.getPan(enemy.x));
-            this.vfxManager.emitHitParticle(enemy.x, enemy.y, 10, 'spark');
-            proj.hit(); // Consume wave
-            if (enemy.health <= 0) {
-               this.addScore(SCORE_CONFIG.waveKill);
-               this.incrementCombo();
-            }
-        }
-    });
-
-    // Player wave hitting Boss
-    if (this.boss) {
-        this.physics.add.overlap(this.projectiles, this.boss, (obj1, obj2) => {
-            const proj = (obj1 instanceof Projectile) ? obj1 : (obj2 as Projectile);
-            const boss = (obj1 instanceof Boss) ? obj1 : (obj2 as Boss);
-            
-            if (proj && boss && proj.active && boss.active && boss.health > 0 && proj.texture.key === 'player_wave') {
-                const dir = proj.body!.velocity.x > 0 ? 1 : -1;
-                boss.takeDamage(proj.damage * BOSS_STATS.damageMultiplier, dir);
-                SoundManager.playHit(this.getPan(boss.x));
-                this.vfxManager.emitHitParticle(boss.x, boss.y, 15, 'spark');
-                proj.hit();
-                this.incrementCombo();
-            }
-        });
-    }
+    this.matter.world.on('collisionstart', this.onMatterCollisionStart);
 
     this.time.delayedCall(10, () => {
       this.events.emit(GAME_EVENTS.UPDATE_HEALTH, this.player.health, this.player.maxHealth);
@@ -277,7 +284,7 @@ export class GameScene extends Phaser.Scene {
         this.playerLight.y = this.player.y;
     }
 
-    if (this.player.body!.touching.down && this.player.y < this.cameras.main.height - 50) {
+    if (this.player.isGrounded() && this.player.y < this.cameras.main.height - 50) {
         this.lastSafeX = this.player.x;
         this.lastSafeY = this.player.y;
     }
@@ -299,7 +306,7 @@ export class GameScene extends Phaser.Scene {
        console.log('Transitioning to next level!');
        
        // Disable physics and input to prevent camera shakes from cancelling the fadeOut
-       this.physics.world.pause();
+       this.matter.world.pause();
        if (this.input.keyboard) this.input.keyboard.enabled = false;
        this.player.setVelocity(0, 0);
        SaveManager.updateLevel(this.currentLevel + 1);
@@ -345,7 +352,7 @@ export class GameScene extends Phaser.Scene {
 
     if (this.levelCfg.isBossLevel && this.boss && !this.boss.active) {
        this.boss = null;
-       this.physics.world.pause(); // Stop physics so boss doesn't hurt player after death
+       this.matter.world.pause(); // Stop physics so boss doesn't hurt player after death
        if (this.input.keyboard) this.input.keyboard.enabled = false;
        
        this.addScore(SCORE_CONFIG.bossKill);
@@ -410,11 +417,11 @@ export class GameScene extends Phaser.Scene {
 
   /** Freeze the physics world for a few frames to add weight to hits */
   public hitstop(durationMs: number = 60) {
-    this.physics.world.pause();
+    this.matter.world.pause();
     this.vfxManager.hitstopFilter(durationMs);
     this.time.delayedCall(durationMs, () => {
-      if (this.physics && this.physics.world) {
-        this.physics.world.resume();
+      if (this.matter && this.matter.world) {
+        this.matter.world.resume();
       }
     });
   }
@@ -459,6 +466,7 @@ export class GameScene extends Phaser.Scene {
     this.events.off(GAME_EVENTS.PLAYER_DEAD, this.onPlayerDead);
     this.events.off(GAME_EVENTS.ENEMY_SHOOT, this.onEnemyShoot);
     this.events.off(GAME_EVENTS.PLAYER_CAST_WAVE, this.onPlayerCastWave);
+    this.matter.world.off('collisionstart', this.onMatterCollisionStart);
     this.input.keyboard?.off('keydown-ESC', this.pauseGame, this);
 
     SoundManager.stopBGM();

@@ -65,13 +65,12 @@ export class LevelBuilder {
     }
   }
 
-  public static buildPlatforms(scene: Phaser.Scene, levelCfg: LevelConfig, mapWidth: number, rng: SeededRandom): { platforms: Phaser.Physics.Arcade.StaticGroup, floor: Phaser.GameObjects.Rectangle } {
+  public static buildPlatforms(scene: Phaser.Scene, levelCfg: LevelConfig, mapWidth: number, rng: SeededRandom) {
     const h = scene.cameras.main.height;
     const levelNum = levelCfg.levelNumber ?? 1;
     const theme = LEVEL_THEMES[levelNum] || LEVEL_THEMES[1]!;
     const tileSize = levelCfg.tileSize;
     const tiles = Math.floor(mapWidth / tileSize);
-    const platforms = scene.physics.add.staticGroup();
 
     // ─── VISIBLE GROUND ───
     // Create a visible, textured ground strip at the bottom of the level
@@ -104,7 +103,7 @@ export class LevelBuilder {
     // Invisible physics floor (single continuous body prevents seam-sticking)
     const floor = scene.add.rectangle(mapWidth / 2, h - 32, mapWidth, 32, 0x000000, 0);
     floor.setVisible(false);
-    scene.physics.add.existing(floor, true);
+    scene.matter.add.gameObject(floor, { isStatic: true });
 
     // ─── VISIBLE PLATFORMS ───
     if (levelCfg.hasPlatforms) {
@@ -136,10 +135,8 @@ export class LevelBuilder {
           plat.fillRect(px + platWidth / 2 - 3, py - platHeight / 2, 3, platHeight);
 
           // Physics body for platform (invisible rectangle collider)
-          const platBody = platforms.create(px, py, 'platform') as Phaser.Physics.Arcade.Sprite;
-          platBody.setVisible(false);
-          platBody.setDisplaySize(platWidth, platHeight);
-          platBody.refreshBody();
+          const platBody = scene.add.rectangle(px, py, platWidth, platHeight, 0x000000, 0);
+          scene.matter.add.gameObject(platBody, { isStatic: true });
         }
       }
     }
@@ -147,7 +144,7 @@ export class LevelBuilder {
     // ─── ENVIRONMENT DECORATIONS ───
     LevelBuilder.addDecorations(scene, levelCfg, mapWidth, rng, theme);
 
-    return { platforms, floor };
+    return;
   }
 
   /** Generate high-performance decoration texture atlas procedurally on startup */
@@ -311,7 +308,7 @@ export class LevelBuilder {
   public static buildLeftWall(scene: Phaser.Scene): Phaser.GameObjects.Rectangle {
     const h = scene.cameras.main.height;
     const leftWall = scene.add.rectangle(-32, h/2, 64, h * 2).setOrigin(0.5);
-    scene.physics.add.existing(leftWall, true);
+    scene.matter.add.gameObject(leftWall, { isStatic: true });
     return leftWall;
   }
 }

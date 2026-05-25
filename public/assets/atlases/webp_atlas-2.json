@@ -1,0 +1,68 @@
+{
+  "textures": [
+    {
+      "image": "webp_atlas-2.png",
+      "format": "RGBA8888",
+      "size": {
+        "w": 2048,
+        "h": 2048
+      },
+      "scale": 1,
+      "frames": [
+        {
+          "filename": "enemy_guard",
+          "rotated": false,
+          "trimmed": false,
+          "sourceSize": {
+            "w": 1020,
+            "h": 1024
+          },
+          "spriteSourceSize": {
+            "x": 0,
+            "y": 0,
+            "w": 1020,
+            "h": 1024
+          },
+          "frame": {
+            "x": 2,
+            "y": 2,
+            "w": 1020,
+            "h": 1024
+          }
+        },
+        {
+          "filename": "enemy_guard_n",
+          "rotated": false,
+          "trimmed": false,
+          "sourceSize": {
+            "w": 1020,
+            "h": 1024
+          },
+          "spriteSourceSize": {
+            "x": 0,
+            "y": 0,
+            "w": 1020,
+            "h": 1024
+          },
+          "frame": {
+            "x": 1024,
+            "y": 2,
+            "w": 1020,
+            "h": 1024
+          }
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "app": "scripts/pack_assets.js",
+    "version": "1.0",
+    "image": "webp_atlas-2.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 2048,
+      "h": 2048
+    },
+    "scale": 1
+  }
+}

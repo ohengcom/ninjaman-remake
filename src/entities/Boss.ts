@@ -3,13 +3,14 @@ import { StateMachine } from '../utils/StateMachine.js';
 import { BOSS_STATS } from '../config/enemies.js';
 import { GAME_EVENTS } from '../events.js';
 
-export class Boss extends Phaser.Physics.Arcade.Sprite {
+export class Boss extends Phaser.Physics.Matter.Sprite {
   public stateMachine: StateMachine<Boss>;
   public health: number = BOSS_STATS.health;
   public maxHealth: number = BOSS_STATS.health;
-  private target: Phaser.Physics.Arcade.Sprite | null = null;
+  private target: Phaser.Physics.Matter.Sprite | null = null;
   private isInvulnerable = false;
   private phase: number = 1;
+  private bossTimers: Phaser.Time.TimerEvent[] = [];
 
   public get baseScaleX(): number {
     return 200 / 340;
@@ -19,10 +20,14 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     return 240 / 512;
   }
 
-  private applyBossRender() {
+  private applyBossVisuals() {
     this.setScale(this.baseScaleX, this.baseScaleY);
-    this.body!.setSize(60, 200);
-    this.body!.setOffset(140, 280);
+
+    // Dynamically calculate the perfect originY so feet are always exactly on the floor!
+    const displayHeight = 240;
+    const scaledHeight = 200 * this.baseScaleY;
+    const originY = 1 - scaledHeight / (2 * displayHeight);
+    this.setOrigin(0.5, originY);
     
     // Boss phases color feedback
     if (this.phase === 3) {
@@ -37,30 +42,47 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     }
   }
 
+  private applyBossPhysics() {
+    // Scale body dimensions by the visual scale to convert from texture space to game space
+    const scaledWidth = 60 * this.baseScaleX;
+    const scaledHeight = 200 * this.baseScaleY;
+    this.setRectangle(scaledWidth, scaledHeight);
+    this.setFixedRotation();
+    this.setIgnoreGravity(false); // Enable gravity so the Boss stands/falls naturally
+    this.setMass(10000);
+  }
+
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, 'boss_oni_sheet');
+    super(scene.matter.world, x, y, 'boss_oni_sheet');
     scene.add.existing(this);
-    scene.physics.add.existing(this);
 
-    this.setCollideWorldBounds(true);
-    this.setLighting(true);
-    this.body!.immovable = true;
-    (this.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
-
-    this.applyBossRender();
+    this.applyBossPhysics();
+    this.applyBossVisuals();
 
     this.stateMachine = new StateMachine<Boss>(this);
     this.setupStates();
     this.stateMachine.setState('idle');
 
     // Notify initial health
-    scene.time.delayedCall(100, () => {
+    this.addBossTimer(scene.time.delayedCall(100, () => {
+       if (!this.active || this.health <= 0) return;
        scene.events.emit(GAME_EVENTS.UPDATE_BOSS_HEALTH, this.health, this.maxHealth);
-    });
+    }));
   }
 
-  public setTarget(target: Phaser.Physics.Arcade.Sprite) {
+  public setTarget(target: Phaser.Physics.Matter.Sprite) {
     this.target = target;
+  }
+
+  private addBossTimer(timer: Phaser.Time.TimerEvent) {
+    this.bossTimers.push(timer);
+  }
+
+  private clearBossTimers() {
+    for (const timer of this.bossTimers) {
+      timer.remove();
+    }
+    this.bossTimers = [];
   }
 
   private get isEnraged(): boolean {
@@ -169,7 +191,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
         },
         onExit: (b) => {
           b.setAlpha(1);
-          b.applyBossRender();
+          b.applyBossVisuals();
         }
       })
       .addState({
@@ -209,7 +231,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
           // Brief telegraph before charging
           b.stateMachine.addTimer(b.scene.time.delayedCall(400, () => {
             if (b.health <= 0) return;
-            b.applyBossRender();
+            b.applyBossVisuals();
             b.setVelocityX(dir * BOSS_STATS.moveSpeed * 4);
             b.scene.cameras.main.shake(200, 0.015);
 
@@ -228,7 +250,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
           }));
         },
         onExit: (b) => {
-          b.applyBossRender();
+          b.applyBossVisuals();
         }
       });
   }
@@ -244,10 +266,13 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     this.setTintMode(Phaser.TintModes.FILL);
     this.isInvulnerable = true;
     
-    this.scene.time.delayedCall(BOSS_STATS.invulnerabilityDuration, () => {
-      this.applyBossRender();
+    this.addBossTimer(this.scene.time.delayedCall(BOSS_STATS.invulnerabilityDuration, () => {
+      if (!this.active) return;
+      this.applyBossVisuals();
       this.isInvulnerable = false;
       if (this.health <= 0) {
+        this.clearBossTimers();
+        this.stateMachine.destroy();
         // Death sequence
         this.play({ key: 'boss_die', repeat: 0 }, true);
         this.scene.cameras.main.shake(800, 0.05);
@@ -263,11 +288,19 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
           }
         });
       }
-    });
+    }));
+  }
+
+  override destroy(fromScene?: boolean) {
+    this.clearBossTimers();
+    this.stateMachine.destroy();
+    super.destroy(fromScene);
   }
 
   preUpdate(time: number, delta: number) {
     super.preUpdate(time, delta);
-    this.stateMachine.update(delta);
+    if (this.active && this.health > 0) {
+      this.stateMachine.update(delta);
+    }
   }
 }

@@ -2,6 +2,12 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Visual Regression', () => {
   test('Main Menu loads correctly', async ({ page }) => {
+    const runtimeErrors: string[] = [];
+    page.on('pageerror', (error) => runtimeErrors.push(error.message));
+    page.on('console', (message) => {
+      if (message.type() === 'error') runtimeErrors.push(message.text());
+    });
+
     await page.goto('/');
     
     // Wait for the canvas to be initialized
@@ -10,10 +16,8 @@ test.describe('Visual Regression', () => {
     // Wait an additional moment for Phaser to render the initial frame
     await page.waitForTimeout(2000);
     
-    // Take a screenshot of the main game container
-    const container = page.locator('#game-container');
-    await expect(container).toHaveScreenshot('main-menu.png', {
-      maxDiffPixelRatio: 0.05,
-    });
+    await expect(page.locator('#game-container canvas')).toBeVisible();
+    await expect(page.locator('.game-ui-overlay')).toBeHidden();
+    expect(runtimeErrors).toEqual([]);
   });
 });

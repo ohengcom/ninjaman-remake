@@ -28,9 +28,9 @@ export const gameConfig: Phaser.Types.Core.GameConfig = {
     gamepad: true,
   },
   physics: {
-    default: 'arcade',
-    arcade: {
-      gravity: { x: 0, y: GAME_CONFIG.PHYSICS.GRAVITY },
+    default: 'matter',
+    matter: {
+      gravity: { x: 0, y: 1 },
       debug: GAME_CONFIG.PHYSICS.DEBUG,
     },
   },

@@ -1,17 +1,18 @@
 import Phaser from 'phaser';
 import { PROJECTILE_CONFIG } from '../config/combat.js';
 
-export class Projectile extends Phaser.Physics.Arcade.Sprite {
+export class Projectile extends Phaser.Physics.Matter.Sprite {
     public damage: number = 10;
     private lifetimeTimer: Phaser.Time.TimerEvent | null = null;
     
     constructor(scene: Phaser.Scene, x: number, y: number) {
-        super(scene, x, y, 'projectile');
+        super(scene.matter.world, x, y, 'projectile');
         scene.add.existing(this);
-        scene.physics.add.existing(this);
         
-        this.body!.setSize(20, 10);
-        (this.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+        this.setRectangle(20, 10);
+        this.setOrigin(0.5, 0.5);
+        this.setIgnoreGravity(true);
+        this.setSensor(true);
     }
 
     public fire(x: number, y: number, dirX: number, speed: number, damage: number, textureKey: string = 'projectile') {
@@ -19,17 +20,23 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
         this.setPosition(x, y);
         this.setActive(true);
         this.setVisible(true);
-        this.enableBody(true, x, y, true, true);
-        (this.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
         
         // Adjust hitbox for player wave vs sniper bullet
         if (textureKey === 'player_wave') {
-            this.body!.setSize(30, 40);
+            this.setRectangle(30, 40);
+            this.setOrigin(0.5, 0.5);
             this.setScale(1); // Reset any forced size from previous reuse
         } else {
-            this.body!.setSize(20, 10);
+            this.setRectangle(20, 10);
+            this.setOrigin(0.5, 0.5);
             this.setDisplaySize(60, 15); // Make arrow larger
         }
+
+        if (!(this.scene.matter.world.localWorld as any).bodies.includes(this.body as MatterJS.BodyType)) {
+          this.scene.matter.world.add(this.body as MatterJS.BodyType);
+        }
+        this.setIgnoreGravity(true);
+        this.setSensor(true);
         
         this.damage = damage;
         this.setVelocityX(speed * dirX);
@@ -39,14 +46,20 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
         this.lifetimeTimer?.remove(false);
         this.lifetimeTimer = this.scene.time.delayedCall(PROJECTILE_CONFIG.lifetime, () => {
             this.lifetimeTimer = null;
-            if (this.active) this.disableBody(true, true);
+            if (this.active) {
+                this.scene.matter.world.remove(this.body as MatterJS.BodyType);
+                this.setActive(false);
+                this.setVisible(false);
+            }
         });
     }
 
     public hit() {
         this.lifetimeTimer?.remove(false);
         this.lifetimeTimer = null;
-        this.disableBody(true, true);
+        this.scene.matter.world.remove(this.body as MatterJS.BodyType);
+        this.setActive(false);
+        this.setVisible(false);
     }
 
     override destroy(fromScene?: boolean) {

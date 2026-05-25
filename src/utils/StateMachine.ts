@@ -98,4 +98,10 @@ export class StateMachine<T> {
   getCurrentStateName(): string {
     return this.currentState?.name || '';
   }
+
+  destroy(): void {
+    this.clearTimers();
+    this.transitionCallbacks = [];
+    this.currentState = undefined;
+  }
 }

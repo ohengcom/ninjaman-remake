@@ -4,23 +4,23 @@ export const PLAYER_ATTACKS = {
     reach: 80,
     baseDamage: 10,
     damagePerStep: 5,
-    forwardMomentum: 50,
+    forwardMomentum: 2.5,
     recovery: 200,
   },
   uppercut: {
     reach: 60,
     baseDamage: 20,
-    launchVelocity: -500,
+    launchVelocity: -9.0,
     recovery: 300,
   },
   dive: {
     reach: 70,
     baseDamage: 25,
-    downVelocity: 800,
-    forwardVelocity: 300,
+    downVelocity: 13.0,
+    forwardVelocity: 5.0,
   },
   wave: {
-    speed: 800,
+    speed: 14.0,
     damage: 20,
     cooldown: 350,
   },
@@ -28,11 +28,11 @@ export const PLAYER_ATTACKS = {
 
 /** Player movement parameters */
 export const PLAYER_MOVEMENT = {
-  runSpeed: 400,
-  airSpeed: 300,
-  jumpVelocity: -600,
-  doubleJumpVelocity: -550,
-  dashSpeed: 800,
+  runSpeed: 6.5,
+  airSpeed: 5.0,
+  jumpVelocity: -11.0,
+  doubleJumpVelocity: -10.0,
+  dashSpeed: 15.0,
   dashDuration: 300,
   maxJumps: 2,
   doubleTapWindow: 300,
@@ -45,9 +45,9 @@ export const PLAYER_MOVEMENT = {
 /** Player defense parameters */
 export const PLAYER_DEFENSE = {
   blockDamageReduction: 0.2,
-  blockPushback: 100,
-  hurtKnockbackX: 250,
-  hurtKnockbackY: -200,
+  blockPushback: 2.0,
+  hurtKnockbackX: 4.0,
+  hurtKnockbackY: -4.0,
   hurtStunDuration: 300,
   invulnerabilityDuration: 1000,
   fallDamage: 25,
@@ -78,6 +78,6 @@ export const SCORE_CONFIG = {
 
 /** Projectile parameters */
 export const PROJECTILE_CONFIG = {
-  enemyBulletSpeed: 600,
+  enemyBulletSpeed: 9.0,
   lifetime: 2000,
 } as const;

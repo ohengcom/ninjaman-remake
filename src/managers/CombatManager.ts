@@ -15,7 +15,7 @@ export class CombatManager {
     this.scene = scene;
   }
 
-  public resolvePlayerAttack(attacker: Player, type: string, enemies: Phaser.Physics.Arcade.Group, boss: Boss | null) {
+  public resolvePlayerAttack(attacker: Player, type: string, enemies: Phaser.GameObjects.Group, boss: Boss | null) {
     let reach: number = PLAYER_ATTACKS.combo.reach;
     let baseDamage: number = PLAYER_ATTACKS.combo.baseDamage;
 
@@ -33,7 +33,7 @@ export class CombatManager {
       const enemy = obj as Enemy;
       // Object pooling: ignore inactive or dead enemies
       if (!enemy.active || enemy.health <= 0) return;
-      const enemyRect = new Phaser.Geom.Rectangle(enemy.body!.x, enemy.body!.y, enemy.body!.width, enemy.body!.height);
+      const enemyRect = enemy.getBounds();
 
       if (Phaser.Geom.Rectangle.Overlaps(attackRect, enemyRect)) {
         enemy.takeDamage(baseDamage, dir);
@@ -48,7 +48,7 @@ export class CombatManager {
     });
 
     if (boss && boss.active && boss.health > 0) {
-      const bossRect = new Phaser.Geom.Rectangle(boss.body!.x, boss.body!.y, boss.body!.width, boss.body!.height);
+      const bossRect = boss.getBounds();
       if (Phaser.Geom.Rectangle.Overlaps(attackRect, bossRect)) {
         boss.takeDamage(baseDamage * BOSS_STATS.damageMultiplier, dir);
         this.scene.vfxManager.hitFlashFilter(boss);
@@ -75,7 +75,7 @@ export class CombatManager {
     if (!attacker.active || attacker.health <= 0) return;
     const dir = attacker.flipX ? -1 : 1;
     const attackRect = new Phaser.Geom.Rectangle(dir > 0 ? attacker.x : attacker.x - reach, attacker.y - attacker.height / 2, reach, attacker.height);
-    const playerRect = new Phaser.Geom.Rectangle(player.body!.x, player.body!.y, player.body!.width, player.body!.height);
+    const playerRect = player.getBounds();
 
     if (Phaser.Geom.Rectangle.Overlaps(attackRect, playerRect)) {
       this.scene.resetCombo();
@@ -97,7 +97,7 @@ export class CombatManager {
     const reach = BOSS_STATS.attackReach;
     const dir = attacker.flipX ? -1 : 1;
     const attackRect = new Phaser.Geom.Rectangle(dir > 0 ? attacker.x : attacker.x - reach, attacker.y - attacker.height / 2, reach, attacker.height);
-    const playerRect = new Phaser.Geom.Rectangle(player.body!.x, player.body!.y, player.body!.width, player.body!.height);
+    const playerRect = player.getBounds();
 
     if (Phaser.Geom.Rectangle.Overlaps(attackRect, playerRect)) {
       this.scene.resetCombo();

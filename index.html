@@ -27,7 +27,7 @@
       <div id="phaser-game-canvas-container" style="width: 100%; height: 100%;"></div>
 
       <!-- HYBRID HTML/CSS INTERACTIVE HUD OVERLAY -->
-      <div class="game-ui-overlay">
+      <div class="game-ui-overlay" style="display: none;">
         
         <!-- Header HUD: HP readouts, Sectors, and Score -->
         <header class="hud-header">
@@ -116,7 +116,7 @@
     </main>
 
     <!-- Footer HUD: Keyboard controllers & procedurally generated Sound switches -->
-    <footer class="hud-footer" style="width: min(calc(100vw - 32px), 1280px); flex: 0 0 auto;">
+    <footer class="hud-footer" style="width: min(calc(100vw - 32px), 1280px); flex: 0 0 auto; display: none;">
       <div class="controls-guide">
         Move <kbd>A</kbd>/<kbd>S</kbd>/<kbd>D</kbd>/<kbd>W</kbd> &nbsp;&middot;&nbsp; Jump <kbd>Space</kbd> &nbsp;&middot;&nbsp; Attack <kbd>J</kbd> &nbsp;&middot;&nbsp; Defend <kbd>K</kbd> &nbsp;&middot;&nbsp; Wave <kbd>L</kbd> &nbsp;&middot;&nbsp; Dash <kbd>Double-Tap</kbd>
       </div>

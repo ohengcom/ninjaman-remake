@@ -331,7 +331,7 @@ export class VfxManager {
   }
 
   /** 跟隨玩家的攻擊拖尾粒子 */
-  public createAttackTrail(player: Phaser.Physics.Arcade.Sprite): Phaser.GameObjects.Particles.ParticleEmitter {
+  public createAttackTrail(player: Phaser.Physics.Matter.Sprite): Phaser.GameObjects.Particles.ParticleEmitter {
     return this.scene.add.particles(0, 0, 'player_wave', {
       follow: player,
       followOffset: { x: 0, y: 0 },

@@ -16,20 +16,37 @@ const DEFAULTS: SaveData = {
   dashInvincible: false,
 };
 
+const toFiniteNumber = (value: unknown, fallback: number, min: number = 0): number => {
+  return typeof value === 'number' && Number.isFinite(value) && value >= min ? value : fallback;
+};
+
+const toBoolean = (value: unknown, fallback: boolean): boolean => {
+  return typeof value === 'boolean' ? value : fallback;
+};
+
+const sanitizeSaveData = (data: Partial<SaveData>): SaveData => ({
+  highScore: toFiniteNumber(data.highScore, DEFAULTS.highScore),
+  sp: toFiniteNumber(data.sp, DEFAULTS.sp),
+  maxHealth: toFiniteNumber(data.maxHealth, DEFAULTS.maxHealth, 1),
+  unlockedLevel: toFiniteNumber(data.unlockedLevel, DEFAULTS.unlockedLevel, 1),
+  comboLevel: Math.min(3, toFiniteNumber(data.comboLevel, DEFAULTS.comboLevel, 1)),
+  dashInvincible: toBoolean(data.dashInvincible, DEFAULTS.dashInvincible),
+});
+
 export class SaveManager {
   private static readonly SAVE_KEY = 'ninjaman_save_data';
 
   public static load(): SaveData {
-    const raw = localStorage.getItem(this.SAVE_KEY);
-    if (raw) {
-      try {
+    try {
+      const raw = localStorage.getItem(this.SAVE_KEY);
+      if (raw) {
         const decoded = atob(raw);
         const data = JSON.parse(decoded) as Partial<SaveData>;
         // Merge with defaults to handle missing fields from old saves
-        return { ...DEFAULTS, ...data };
-      } catch (e) {
-        console.error("Failed to parse save data. Loading defaults.", e);
+        return sanitizeSaveData({ ...DEFAULTS, ...data });
       }
+    } catch (e) {
+      console.error("Failed to load save data. Loading defaults.", e);
     }
     return { ...DEFAULTS };
   }

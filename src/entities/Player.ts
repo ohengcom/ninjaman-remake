@@ -12,7 +12,7 @@ const PLAYER_RENDER = {
   bodyOffsetY: 23,
 } as const;
 
-export class Player extends Phaser.Physics.Arcade.Sprite {
+export class Player extends Phaser.Physics.Matter.Sprite {
   public stateMachine: StateMachine<Player>;
 
   public cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -41,14 +41,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private lastJumpInputTime: number = 0;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, 'knight');
+    super(scene.matter.world, x, y, 'knight');
     scene.add.existing(this);
-    scene.physics.add.existing(this);
 
     this.applyRenderSize();
-    this.setLighting(true);
 
-    this.setCollideWorldBounds(true);
+    this.setFixedRotation();
 
     // Set keys to A, S, D, W, SPACE
     this.cursors = scene.input.keyboard!.addKeys({
@@ -143,7 +141,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     }
     
     if (this.isUpDown()) return 'attack_uppercut';
-    if (!this.body!.touching.down && this.isDownDown()) return 'attack_dive';
+    if (!this.isGrounded() && this.isDownDown()) return 'attack_dive';
     
     // Combo logic: Always enable full 4-stage combo now that upgrade menu is removed
     const maxComboHits = 4;
@@ -158,11 +156,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   private handleCommonTransitions(p: Player) {
-    if (p.checkDashInput() && p.body!.touching.down) {
+    if (p.checkDashInput() && p.isGrounded()) {
       p.stateMachine.setState('dash');
       return true;
     }
-    if (p.isDefendDown() && p.body!.touching.down) {
+    if (p.isDefendDown() && p.isGrounded()) {
       p.stateMachine.setState('defend');
       return true;
     }
@@ -180,7 +178,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     const hasJumpBuffer = (now - p.lastJumpInputTime < PLAYER_MOVEMENT.jumpBufferTime);
 
     if (hasJumpBuffer) {
-      const isGroundedOrCoyote = p.body!.touching.down || (now - p.lastGroundedTime < PLAYER_MOVEMENT.coyoteTime);
+      const isGroundedOrCoyote = p.isGrounded() || (now - p.lastGroundedTime < PLAYER_MOVEMENT.coyoteTime);
       if (isGroundedOrCoyote && p.jumpCount === 0) {
         p.lastJumpInputTime = 0; // Consume jump buffer
         p.stateMachine.setState('jump');
@@ -192,11 +190,15 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         return true;
       }
     }
-    if (!p.body!.touching.down && p.body!.velocity.y > 0) {
+    if (!p.isGrounded() && p.body!.velocity.y > 0) {
       p.stateMachine.setState('fall');
       return true;
     }
     return false;
+  }
+
+  public isGrounded(): boolean {
+      return Math.abs(this.body!.velocity.y) < 0.1 && this.y > 0;
   }
 
   public applySquash(_sx: number, _sy: number, _dur: number) {
@@ -205,16 +207,17 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   public playAnimation(animKey: string) {
     this.play(animKey, true);
-    this.applyRenderSize();
   }
 
   private applyRenderSize() {
-    this.setDisplaySize(PLAYER_RENDER.displaySize, PLAYER_RENDER.displaySize);
-    this.body!.setSize(PLAYER_RENDER.bodyWidth, PLAYER_RENDER.bodyHeight);
-    this.body!.setOffset(PLAYER_RENDER.bodyOffsetX, PLAYER_RENDER.bodyOffsetY);
+    const baseScale = PLAYER_RENDER.displaySize / 79;
+    this.setScale(baseScale, baseScale);
+    this.setRectangle(PLAYER_RENDER.bodyWidth, PLAYER_RENDER.bodyHeight);
+    this.setOrigin(0.35, 0.8);
   }
 
   destroy(fromScene?: boolean) {
+    this.stateMachine.destroy();
     super.destroy(fromScene);
   }
 
@@ -262,9 +265,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           // Dash grants invincibility frames by default now that upgrade menu is removed
           p.isInvulnerable = true;
 
-          p.scene.time.delayedCall(PLAYER_MOVEMENT.dashDuration, () => {
-             if (p.health > 0) p.stateMachine.setState('idle');
-          });
+          p.stateMachine.addTimer(p.scene.time.delayedCall(PLAYER_MOVEMENT.dashDuration, () => {
+             if (p.health > 0 && p.active && p.stateMachine.getCurrentStateName() === 'dash') p.stateMachine.setState('idle');
+          }));
         },
         onExit: (p) => { p.isInvulnerable = false; }
       })
@@ -291,7 +294,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         onUpdate: (p) => {
           if (p.handleCommonTransitions(p)) return;
           p.handleAirMovement();
-          if (p.body!.touching.down) {
+          if (p.isGrounded() && p.body!.velocity.y >= 0) {
             p.stateMachine.setState('idle');
           }
         }
@@ -302,7 +305,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         onUpdate: (p) => {
           if (p.handleCommonTransitions(p)) return;
           p.handleAirMovement();
-          if (p.body!.touching.down) {
+          if (p.isGrounded() && p.body!.velocity.y >= 0) {
             p.stateMachine.setState('idle');
           }
         }
@@ -339,16 +342,18 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           p.playAnimation(animKey);
           p.setVelocityX(p.flipX ? -momentum : momentum);
 
-          if (step === 3 && !p.body!.touching.down) {
-            p.setVelocityY(200);
+          if (step === 3 && !p.isGrounded()) {
+            p.setVelocityY(-4.5); // Fixed velocity Y to negative for upwards
           }
 
           p.scene.cameras.main.shake(shakeDur, shakeIntensity);
           p.scene.events.emit(GAME_EVENTS.PLAYER_ATTACK, p, 'combo');
           
-          p.scene.time.delayedCall(recovery, () => {
-            if (p.health > 0) p.stateMachine.setState(p.body!.touching.down ? 'idle' : 'fall');
-          });
+          p.stateMachine.addTimer(p.scene.time.delayedCall(recovery, () => {
+            if (p.health > 0 && p.active && p.stateMachine.getCurrentStateName() === 'attack_combo') {
+              p.stateMachine.setState(p.isGrounded() ? 'idle' : 'fall');
+            }
+          }));
         },
         onUpdate: (p) => {
           if (Phaser.Input.Keyboard.JustDown(p.waveKey) || (p.pad && p.pad.X)) {
@@ -368,9 +373,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           p.scene.cameras.main.shake(100, 0.005);
           p.scene.events.emit(GAME_EVENTS.PLAYER_CAST_WAVE, p);
           
-          p.scene.time.delayedCall(300, () => {
-             if (p.health > 0) p.stateMachine.setState(p.body!.touching.down ? 'idle' : 'fall');
-          });
+          p.stateMachine.addTimer(p.scene.time.delayedCall(300, () => {
+             if (p.health > 0 && p.active && p.stateMachine.getCurrentStateName() === 'attack_wave') {
+               p.stateMachine.setState(p.isGrounded() ? 'idle' : 'fall');
+             }
+          }));
         }
       })
       .addState({
@@ -396,7 +403,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           p.scene.events.emit(GAME_EVENTS.PLAYER_ATTACK, p, 'dive');
         },
         onUpdate: (p) => {
-           if (p.body!.touching.down) {
+           if (p.isGrounded()) {
               p.scene.cameras.main.shake(200, 0.02);
               p.scene.events.emit(GAME_EVENTS.PLAYER_ATTACK, p, 'dive_land');
               p.stateMachine.setState('idle');
@@ -413,16 +420,18 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
           p.isBlocking = false;
           p.scene.cameras.main.shake(200, 0.01);
           
-          p.scene.time.delayedCall(PLAYER_DEFENSE.hurtStunDuration, () => {
+          p.stateMachine.addTimer(p.scene.time.delayedCall(PLAYER_DEFENSE.hurtStunDuration, () => {
+            if (!p.active || p.health <= 0 || p.stateMachine.getCurrentStateName() !== 'hurt') return;
             p.clearTint();
             p.setTintMode(Phaser.TintModes.MULTIPLY);
-            p.stateMachine.setState(p.body!.touching.down ? 'idle' : 'fall');
-          });
+            p.stateMachine.setState(p.isGrounded() ? 'idle' : 'fall');
+          }));
 
-          p.scene.time.delayedCall(PLAYER_DEFENSE.invulnerabilityDuration, () => {
+          p.stateMachine.addTimer(p.scene.time.delayedCall(PLAYER_DEFENSE.invulnerabilityDuration, () => {
+            if (!p.active || p.health <= 0) return;
             p.isInvulnerable = false;
             p.setAlpha(1);
-          });
+          }));
         },
         onUpdate: (p) => {
           if (p.isInvulnerable && p.stateMachine.getCurrentStateName() !== 'hurt') {
@@ -504,7 +513,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     super.preUpdate(time, delta);
     this.stateMachine.update(delta);
 
-    if (this.body!.touching.down) {
+    if (this.isGrounded()) {
       this.lastGroundedTime = time;
     }
     
@@ -517,13 +526,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       this.setAlpha(time % 200 < 100 ? 0.5 : 1);
     }
 
-    const baseScale = PLAYER_RENDER.displaySize / 79; // Frame width is approx 79
-
     if (this.health <= 0) {
-      this.setScale(baseScale, baseScale);
-    } else {
-      this.setScale(baseScale, baseScale);
-      this.setAngle(0);
+      // dead state handling if needed
     }
   }
 }

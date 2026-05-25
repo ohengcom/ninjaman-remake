@@ -4,7 +4,7 @@ import { ENEMY_STATS } from '../config/enemies.js';
 import { GAME_EVENTS } from '../events.js';
 
 export type EnemyType = 'guard' | 'axe' | 'ninja' | 'sniper';
-type TargetSprite = Phaser.Physics.Arcade.Sprite & { health?: number };
+type TargetSprite = Phaser.Physics.Matter.Sprite & { health?: number };
 
 /** Maps each enemy type to its sprite sheet texture key */
 const ENEMY_TEXTURES: Record<EnemyType, string> = {
@@ -21,7 +21,7 @@ const ENEMY_RENDER_CONFIGS = {
   sniper: { displayWidth: 130, displayHeight: 190, bodyWidth: 50, bodyHeight: 230, bodyOffsetX: 145, bodyOffsetY: 250 },
 } as const;
 
-export class Enemy extends Phaser.Physics.Arcade.Sprite {
+export class Enemy extends Phaser.Physics.Matter.Sprite {
   public stateMachine: StateMachine<Enemy>;
   public enemyType: EnemyType;
   public health: number = 15;
@@ -51,8 +51,19 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   private applyEnemyRender() {
     this.setScale(this.baseScaleX, this.baseScaleY);
     const cfg = ENEMY_RENDER_CONFIGS[this.enemyType];
-    this.body!.setSize(cfg.bodyWidth, cfg.bodyHeight);
-    this.body!.setOffset(cfg.bodyOffsetX, cfg.bodyOffsetY);
+
+    // Scale body dimensions by the visual scale to convert from texture space to game space
+    const scaledWidth = cfg.bodyWidth * this.baseScaleX;
+    const scaledHeight = cfg.bodyHeight * this.baseScaleY;
+    this.setRectangle(scaledWidth, scaledHeight);
+
+    // Dynamically calculate the perfect originY so feet are always exactly on the floor!
+    const originY = 1 - scaledHeight / (2 * cfg.displayHeight);
+    this.setOrigin(0.5, originY);
+
+    this.setFixedRotation();
+    this.setIgnoreGravity(false);
+    this.scene.matter.add.gameObject(this);
   }
 
   /** Get the animation key for this enemy type */
@@ -69,15 +80,14 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   constructor(scene: Phaser.Scene, x: number, y: number, type: EnemyType = 'guard') {
-    super(scene, x, y, ENEMY_TEXTURES[type]);
+    super(scene.matter.world, x, y, ENEMY_TEXTURES[type]);
     this.enemyType = type;
     scene.add.existing(this);
-    scene.physics.add.existing(this);
 
-    this.setCollideWorldBounds(true);
     this.configureType(type);
     this.applyEnemyRender();
-    this.setLighting(true);
+
+    this.setFixedRotation();
 
     this.stateMachine = new StateMachine<Enemy>(this);
     this.setupStates();
@@ -90,10 +100,14 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.setPosition(x, y);
     this.setActive(true);
     this.setVisible(true);
-    this.enableBody(true, x, y, true, true);
-    
+
     this.configureType(type);
     this.applyEnemyRender();
+
+    if (!(this.scene.matter.world.localWorld as any).bodies.includes(this.body as MatterJS.BodyType)) {
+      this.scene.matter.world.add(this.body as MatterJS.BodyType);
+    }
+
     this.isInvulnerable = false;
     this.patrolDir = 1;
     this.clearTint();
@@ -299,7 +313,9 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
             duration: 600,
             delay: 200,
             onComplete: () => {
-              e.disableBody(true, true);
+              e.scene.matter.world.remove(e.body as MatterJS.BodyType);
+              e.setActive(false);
+              e.setVisible(false);
               e.setAlpha(1); // Reset for reuse from pool
             }
           });
@@ -313,7 +329,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     // Heavy enemies get knocked back less
     const kb = ENEMY_STATS[this.enemyType].knockback;
     this.setVelocityX(dirX * kb);
-    this.setVelocityY(-150);
+    this.setVelocityY(-3.5);
     this.stateMachine.setState('hurt');
   }
 

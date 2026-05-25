@@ -27,3 +27,9 @@ jobs:
 
       - name: Production build
         run: npm run build
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Gameplay smoke test
+        run: npm run test:visual -- --grep "Gameplay Smoke"

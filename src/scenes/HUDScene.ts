@@ -31,21 +31,35 @@ export class HUDScene extends Phaser.Scene {
     super({ key: 'HUDScene' });
   }
 
+  private getRequiredElement(id: string): HTMLElement {
+    const element = document.getElementById(id);
+    if (!element) {
+      throw new Error(`Missing HUD DOM element: #${id}`);
+    }
+    return element;
+  }
+
   create(): void {
+    // Show overlay and footer
+    const overlay = document.querySelector('.game-ui-overlay') as HTMLElement;
+    if (overlay) overlay.style.display = 'block';
+    const footer = document.querySelector('.hud-footer') as HTMLElement;
+    if (footer) footer.style.display = 'flex';
+
     // Top Right: FPS
     this.fpsText = this.add.text(this.cameras.main.width - 20, 20, 'FPS: 0', {
       fontFamily: 'Courier', fontSize: '16px', color: '#6c7086'
     }).setOrigin(1, 0);
 
     // Grab DOM references
-    this.domHealthFill = document.getElementById('hud-integrity-bar')!;
-    this.domHealthValue = document.getElementById('hud-hp-numeric')!;
-    this.domScoreValue = document.getElementById('hud-score-value')!;
-    this.domLevelValue = document.getElementById('hud-sector-display')!;
-    this.domStyleContainer = document.getElementById('hud-style-meter')!;
-    this.domStyleText = document.getElementById('hud-style-letter')!;
-    this.domBossPanel = document.getElementById('hud-boss-panel')!;
-    this.domBossFill = document.getElementById('hud-boss-bar-fill')!;
+    this.domHealthFill = this.getRequiredElement('hud-integrity-bar');
+    this.domHealthValue = this.getRequiredElement('hud-hp-numeric');
+    this.domScoreValue = this.getRequiredElement('hud-score-value');
+    this.domLevelValue = this.getRequiredElement('hud-sector-display');
+    this.domStyleContainer = this.getRequiredElement('hud-style-meter');
+    this.domStyleText = this.getRequiredElement('hud-style-letter');
+    this.domBossPanel = this.getRequiredElement('hud-boss-panel');
+    this.domBossFill = this.getRequiredElement('hud-boss-bar-fill');
 
     // Initial resets
     if (this.domHealthFill) this.domHealthFill.style.width = '100%';
@@ -197,6 +211,12 @@ export class HUDScene extends Phaser.Scene {
   private cleanup() {
     // Clear global function
     (window as any).toggleHUDGameSound = undefined;
+
+    // Hide overlay and footer
+    const overlay = document.querySelector('.game-ui-overlay') as HTMLElement;
+    if (overlay) overlay.style.display = 'none';
+    const footer = document.querySelector('.hud-footer') as HTMLElement;
+    if (footer) footer.style.display = 'none';
 
     if (!this.gameScene) return;
     this.gameScene.events.off(GAME_EVENTS.UPDATE_HEALTH, this.onUpdateHealth);

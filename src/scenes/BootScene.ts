@@ -157,7 +157,7 @@ export class BootScene extends Phaser.Scene {
         const normKey = key === 'knight' ? 'knight_n' : (key === 'player_hero' ? 'player_hero_n' : `${key}_n`);
         const normTex = this.textures.get(normKey);
         if (tex && normTex) {
-          (tex as any).addNormalMap(normTex.getSourceImage());
+          tex.setDataSource(normTex.getSourceImage());
         }
       } catch (e) {
         console.warn(`Failed to attach normal map for texture: ${key}`, e);
