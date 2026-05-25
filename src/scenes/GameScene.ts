@@ -225,6 +225,15 @@ export class GameScene extends Phaser.Scene {
   }
 
   create(): void {
+    // Clear any lingering camera filters from previous transitions (fixes level transition white screen)
+    try {
+      if (this.cameras.main && (this.cameras.main as any).filters) {
+        (this.cameras.main as any).filters.clear();
+      }
+    } catch (e) {
+      console.warn("Failed to clear camera filters on create:", e);
+    }
+
     this.cameras.main.fadeIn(800, 0, 0, 0);
     this.cameras.main.setAlpha(1);
 

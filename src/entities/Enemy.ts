@@ -54,15 +54,16 @@ export class Enemy extends Phaser.Physics.Matter.Sprite {
     this.setScale(this.baseScaleX, this.baseScaleY);
     const cfg = ENEMY_RENDER_CONFIGS[this.enemyType];
 
-    // Compute the perfect originY based on our pixel-perfect physics-visual formula
-    const originY = cfg.yFeet / 512 - cfg.bodyHeight / (2 * cfg.displayHeight);
-    this.setOrigin(0.5, originY);
-
     this.setRectangle(cfg.bodyWidth, cfg.bodyHeight, {
       friction: 0,
       frictionStatic: 0,
       frictionAir: 0.02,
     });
+
+    // Compute the perfect originY based on our pixel-perfect physics-visual formula
+    const originY = cfg.yFeet / 512 - cfg.bodyHeight / (2 * cfg.displayHeight);
+    this.setOrigin(0.5, originY); // Must be called AFTER setRectangle to prevent Phaser from resetting it!
+
     this.setFixedRotation();
     this.setIgnoreGravity(false);
   }

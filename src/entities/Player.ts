@@ -38,6 +38,12 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   private lastTapRightTime: number = 0;
   private dashDir: number = 1;
 
+  private attackJustPressed: boolean = false;
+  private waveJustPressed: boolean = false;
+  private jumpJustPressed: boolean = false;
+  private leftJustPressed: boolean = false;
+  private rightJustPressed: boolean = false;
+
   private inputBuffer: { key: string, time: number }[] = [];
   private static readonly BUFFER_TIMEOUT = PLAYER_MOVEMENT.motionBufferTimeout;
   private static readonly GROUND_CONTACT_GRACE = 120;
@@ -111,33 +117,33 @@ export class Player extends Phaser.Physics.Matter.Sprite {
 
   private checkDashInput(): boolean {
     const time = this.scene.time.now;
-    if (Phaser.Input.Keyboard.JustDown(this.cursors.left)) {
+    if (this.leftJustPressed) {
       if (time - this.lastTapLeftTime < PLAYER_MOVEMENT.doubleTapWindow) { this.dashDir = -1; return true; }
       this.lastTapLeftTime = time;
     }
-    if (Phaser.Input.Keyboard.JustDown(this.cursors.right)) {
+    if (this.rightJustPressed) {
       if (time - this.lastTapRightTime < PLAYER_MOVEMENT.doubleTapWindow) { this.dashDir = 1; return true; }
       this.lastTapRightTime = time;
     }
     return false;
   }
 
-  private checkAttackInput(): string | null {
+  private checkAttackInput(forceAttack: boolean = false): string | null {
     const time = this.scene.time.now;
 
     // Direct check for Wave Key (L) for one-button special move
-    if (Phaser.Input.Keyboard.JustDown(this.waveKey) || (this.pad && this.pad.X)) {
+    if (this.waveJustPressed || (this.pad && this.pad.X)) {
       if (time - this.lastWaveTime > PLAYER_ATTACKS.wave.cooldown) {
         this.lastWaveTime = time;
         return 'attack_wave';
       }
     }
 
-    if (!this.isAttackJustDown()) return null;
+    if (!forceAttack && !this.isAttackJustDown()) return null;
 
     // Check for Hadouken motion: Down -> Forward -> Attack
     const forwardKey = this.flipX ? 'left' : 'right';
-    if (time - this.lastWaveTime > PLAYER_ATTACKS.wave.cooldown && this.checkMotionInput(['down', forwardKey])) {
+    if (!forceAttack && time - this.lastWaveTime > PLAYER_ATTACKS.wave.cooldown && this.checkMotionInput(['down', forwardKey])) {
         this.lastWaveTime = time;
         return 'attack_wave';
     }
@@ -172,7 +178,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
       }
       
       if (type === 'attack') {
-        const attackState = p.checkAttackInput();
+        const attackState = p.checkAttackInput(true); // Force attack trigger!
         if (attackState) {
           p.bufferedAction = null;
           p.stateMachine.setState(attackState);
@@ -281,12 +287,12 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   private applyRenderSize() {
     const baseScale = PLAYER_RENDER.displaySize / 79;
     this.setScale(baseScale, baseScale);
-    this.setOrigin(0.5, 0.9);
     this.setRectangle(PLAYER_RENDER.bodyWidth, PLAYER_RENDER.bodyHeight, {
       friction: 0,
       frictionStatic: 0,
       frictionAir: 0.01,
     });
+    this.setOrigin(0.5, 0.76); // Pixel-perfect grounded feet. Must be called AFTER setRectangle!
     this.setFixedRotation();
   }
 
@@ -350,11 +356,15 @@ export class Player extends Phaser.Physics.Matter.Sprite {
           p.playAnimation('player_idle');
           p.setVelocityX(0);
           p.isBlocking = true;
+          p.setTint(0x80d4ff); // Beautiful cyan-blue protective shield aura!
         },
         onUpdate: (p) => {
           if (!p.isDefendDown()) p.stateMachine.setState('idle');
         },
-        onExit: (p) => { p.isBlocking = false; }
+        onExit: (p) => {
+          p.isBlocking = false;
+          p.clearTint();
+        }
       })
       .addState({
         name: 'jump',
@@ -549,7 +559,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   }
 
   private isAttackJustDown(): boolean {
-    if (Phaser.Input.Keyboard.JustDown(this.attackKey)) return true;
+    if (this.attackJustPressed) return true;
     if (this.pad && this.pad.A) return true;
     return false;
   }
@@ -585,16 +595,23 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   preUpdate(time: number, delta: number) {
     super.preUpdate(time, delta);
 
+    // Capture inputs once per frame to prevent double-consumption of JustDown in Phaser
+    this.attackJustPressed = Phaser.Input.Keyboard.JustDown(this.attackKey);
+    this.waveJustPressed = Phaser.Input.Keyboard.JustDown(this.waveKey);
+    this.jumpJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.space);
+    this.leftJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.left);
+    this.rightJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.right);
+
     // Buffer action inputs
-    if (Phaser.Input.Keyboard.JustDown(this.cursors.space) || (this.pad && this.pad.A)) {
+    if (this.jumpJustPressed || (this.pad && this.pad.A)) {
       if (this.isDownDown() && this.isOnOneWayPlatform && !this.isDroppingThrough) {
         this.triggerDropThrough();
       } else {
         this.bufferedAction = { type: 'jump', time: time };
       }
-    } else if (Phaser.Input.Keyboard.JustDown(this.attackKey) || (this.pad && this.pad.A)) {
+    } else if (this.attackJustPressed || (this.pad && this.pad.A)) {
       this.bufferedAction = { type: 'attack', time: time };
-    } else if (Phaser.Input.Keyboard.JustDown(this.waveKey) || (this.pad && this.pad.X)) {
+    } else if (this.waveJustPressed || (this.pad && this.pad.X)) {
       this.bufferedAction = { type: 'wave', time: time };
     } else if (this.checkDashInput()) {
       this.bufferedAction = { type: 'dash', time: time };
