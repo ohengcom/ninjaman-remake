@@ -15,10 +15,10 @@ const ENEMY_TEXTURES: Record<EnemyType, string> = {
 };
 
 const ENEMY_RENDER_CONFIGS = {
-  guard:  { displayWidth: 130, displayHeight: 190, bodyWidth: 50, bodyHeight: 230, bodyOffsetX: 145, bodyOffsetY: 250 },
-  axe:    { displayWidth: 140, displayHeight: 200, bodyWidth: 55, bodyHeight: 240, bodyOffsetX: 143, bodyOffsetY: 240 },
-  ninja:  { displayWidth: 130, displayHeight: 190, bodyWidth: 50, bodyHeight: 230, bodyOffsetX: 145, bodyOffsetY: 250 },
-  sniper: { displayWidth: 130, displayHeight: 190, bodyWidth: 50, bodyHeight: 230, bodyOffsetX: 145, bodyOffsetY: 250 },
+  guard:  { displayWidth: 130, displayHeight: 190, bodyWidth: 42, bodyHeight: 110, bodyOffsetX: 0, bodyOffsetY: 0 },
+  axe:    { displayWidth: 140, displayHeight: 200, bodyWidth: 46, bodyHeight: 120, bodyOffsetX: 0, bodyOffsetY: 0 },
+  ninja:  { displayWidth: 130, displayHeight: 190, bodyWidth: 40, bodyHeight: 108, bodyOffsetX: 0, bodyOffsetY: 0 },
+  sniper: { displayWidth: 130, displayHeight: 190, bodyWidth: 40, bodyHeight: 108, bodyOffsetX: 0, bodyOffsetY: 0 },
 } as const;
 
 const ENEMY_GROUND_CLEARANCE = 2;
@@ -54,20 +54,17 @@ export class Enemy extends Phaser.Physics.Matter.Sprite {
     this.setScale(this.baseScaleX, this.baseScaleY);
     const cfg = ENEMY_RENDER_CONFIGS[this.enemyType];
 
-    // Scale body dimensions by the visual scale to convert from texture space to game space
-    const scaledWidth = cfg.bodyWidth * this.baseScaleX;
-    const scaledHeight = cfg.bodyHeight * this.baseScaleY;
-    this.setRectangle(scaledWidth, scaledHeight);
+    this.setRectangle(cfg.bodyWidth, cfg.bodyHeight, {
+      friction: 0,
+      frictionStatic: 0,
+      frictionAir: 0.02,
+    });
     this.setFriction(0, 0, 0);
     this.setFrictionAir(0.02);
-
-    // Dynamically calculate the perfect originY so feet are always exactly on the floor!
-    const originY = 1 - scaledHeight / (2 * cfg.displayHeight);
-    this.setOrigin(0.5, originY);
+    this.setOrigin(0.5, 0.75);
 
     this.setFixedRotation();
     this.setIgnoreGravity(false);
-    this.scene.matter.add.gameObject(this);
   }
 
   /** Get the animation key for this enemy type */
@@ -126,7 +123,7 @@ export class Enemy extends Phaser.Physics.Matter.Sprite {
 
   private getBodyHalfHeight(): number {
     const cfg = ENEMY_RENDER_CONFIGS[this.enemyType];
-    return (cfg.bodyHeight * this.baseScaleY) / 2;
+    return cfg.bodyHeight / 2;
   }
 
   private configureType(type: EnemyType) {

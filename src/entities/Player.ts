@@ -6,8 +6,8 @@ import { GAME_EVENTS } from '../events.js';
 
 const PLAYER_RENDER = {
   displaySize: 200,
-  bodyWidth: 20,
-  bodyHeight: 40,
+  bodyWidth: 34,
+  bodyHeight: 96,
   bodyOffsetX: 30,
   bodyOffsetY: 23,
 } as const;
@@ -246,10 +246,18 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   private applyRenderSize() {
     const baseScale = PLAYER_RENDER.displaySize / 79;
     this.setScale(baseScale, baseScale);
-    this.setRectangle(PLAYER_RENDER.bodyWidth, PLAYER_RENDER.bodyHeight);
+    this.setRectangle(PLAYER_RENDER.bodyWidth, PLAYER_RENDER.bodyHeight, {
+      friction: 0,
+      frictionStatic: 0,
+      frictionAir: 0.01,
+    });
     this.setFriction(0, 0, 0);
     this.setFrictionAir(0.01);
     this.setOrigin(0.35, 0.8);
+  }
+
+  public getBodyHalfHeight(): number {
+    return PLAYER_RENDER.bodyHeight / 2;
   }
 
   destroy(fromScene?: boolean) {

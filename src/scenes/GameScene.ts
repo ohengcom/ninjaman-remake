@@ -205,6 +205,7 @@ export class GameScene extends Phaser.Scene {
 
     const saveData = SaveManager.load();
     this.player = new Player(this, this.lastSafeX, this.lastSafeY);
+    this.player.setPosition(this.lastSafeX, groundTop - this.player.getBodyHalfHeight() - 2);
     this.player.maxHealth = saveData.maxHealth;
     this.player.health = saveData.maxHealth;
     this.attackTrail = this.vfxManager.createAttackTrail(this.player);
