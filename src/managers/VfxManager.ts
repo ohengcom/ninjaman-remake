@@ -337,22 +337,28 @@ export class VfxManager {
 
   /** 生成残影幻影拖尾 */
   public emitGhostTrail(target: Phaser.GameObjects.Sprite, tint: number = 0x00d4ff) {
-    const ghost = this.scene.add.sprite(target.x, target.y, target.texture.key, target.frame.name);
-    ghost.setScale(target.scaleX, target.scaleY);
-    ghost.setFlipX(target.flipX);
-    ghost.setOrigin(target.originX, target.originY);
-    ghost.setTint(tint);
-    ghost.setAlpha(0.6);
-    ghost.setDepth(target.depth - 1);
+    try {
+      if (!target || !target.active || !target.texture) return;
+      const frameName = target.frame ? target.frame.name : undefined;
+      const ghost = this.scene.add.sprite(target.x, target.y, target.texture.key, frameName);
+      ghost.setScale(target.scaleX, target.scaleY);
+      ghost.setFlipX(target.flipX);
+      ghost.setOrigin(target.originX, target.originY);
+      ghost.setTint(tint);
+      ghost.setAlpha(0.6);
+      ghost.setDepth(target.depth - 1);
 
-    this.scene.tweens.add({
-      targets: ghost,
-      alpha: 0,
-      duration: 300,
-      onComplete: () => {
-        ghost.destroy();
-      }
-    });
+      this.scene.tweens.add({
+        targets: ghost,
+        alpha: 0,
+        duration: 300,
+        onComplete: () => {
+          ghost.destroy();
+        }
+      });
+    } catch (e) {
+      console.warn("Failed to emit ghost trail:", e);
+    }
   }
 
   /** 跟隨玩家的攻擊拖尾粒子 */
