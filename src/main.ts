@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { gameConfig } from './config.js';
 import { BootScene } from './scenes/BootScene.js';
+
+(window as any).Phaser = Phaser;
 import { MainMenuScene } from './scenes/MainMenuScene.js';
 import { SoundManager } from './managers/SoundManager.js';
 

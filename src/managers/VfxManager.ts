@@ -12,9 +12,16 @@ export class VfxManager {
   }
 
   public initAtmosphere() {
-    // Subtle ambient glow + vignette for cinematic feel
-    this.scene.cameras.main.filters.internal.addGlow(0x4dadf7, 1.5, 0, 0.3, undefined, 4, 6);
-    this.scene.cameras.main.filters.internal.addVignette(0.5, 0.5, 0.85, 0.2);
+    // Subtle ambient glow + vignette for cinematic feel - safely check for custom filters support
+    try {
+      const cam = this.scene.cameras.main;
+      if (cam && (cam as any).filters && (cam as any).filters.internal) {
+        (cam as any).filters.internal.addGlow(0x4dadf7, 1.5, 0, 0.3, undefined, 4, 6);
+        (cam as any).filters.internal.addVignette(0.5, 0.5, 0.85, 0.2);
+      }
+    } catch (e) {
+      console.warn("Failed to apply atmospheric camera filters:", e);
+    }
   }
 
   public createAmbientMotes(mapWidth: number, mapHeight: number) {
@@ -203,7 +210,7 @@ export class VfxManager {
     try {
       if (!target.filters) target.enableFilters();
       const filters = target.filters as any;
-      if (filters) {
+      if (filters && filters.internal) {
         const glow = filters.internal.addGlow(color, 8, 0, 1, false, 4, 6);
         const cm = filters.internal.addColorMatrix();
         if (cm && typeof (cm as any).brightness === 'function') {
@@ -218,10 +225,20 @@ export class VfxManager {
           onComplete: () => {
             if (target.active && target.filters) {
               const currentFilters = target.filters as any;
-              currentFilters.internal.remove(glow);
-              currentFilters.internal.remove(cm);
+              if (currentFilters.internal) {
+                try {
+                  currentFilters.internal.remove(glow);
+                  currentFilters.internal.remove(cm);
+                } catch(e) {}
+              }
             }
           }
+        });
+      } else {
+        // Fallback to standard tint if filters.internal is missing
+        target.setTint(color);
+        this.scene.time.delayedCall(duration, () => {
+          if (target.active) target.clearTint();
         });
       }
     } catch (e) {
@@ -239,20 +256,30 @@ export class VfxManager {
 
     try {
       const cam = this.scene.cameras.main;
+      if (!cam || !(cam as any).filters) return;
+      
       if (phase === 2) {
         // 短暫 Bloom + 色偏
-        const bloom = cam.filters.external.addBlur(0, 2, 2, 1);
-        const cm = cam.filters.external.addColorMatrix();
-        if (cm && typeof (cm as any).brightness === 'function') {
-          (cm as any).brightness(1.3);
+        const ext = (cam as any).filters.external;
+        if (ext) {
+          const bloom = ext.addBlur(0, 2, 2, 1);
+          const cm = ext.addColorMatrix();
+          if (cm && typeof (cm as any).brightness === 'function') {
+            (cm as any).brightness(1.3);
+          }
+          this.scene.time.delayedCall(600, () => {
+            try {
+              ext.remove(bloom);
+              ext.remove(cm);
+            } catch(e) {}
+          });
         }
-        this.scene.time.delayedCall(600, () => {
-          cam.filters.external.remove(bloom);
-          cam.filters.external.remove(cm);
-        });
       } else if (phase === 3) {
         // 狂暴階段：紅色 Vignette
-        cam.filters.internal.addVignette(0.5, 0.5, 0.7, 0.4, 0xff2222);
+        const internal = (cam as any).filters.internal;
+        if (internal) {
+          internal.addVignette(0.5, 0.5, 0.7, 0.4, 0xff2222);
+        }
       }
     } catch (e) {
       console.warn("VfxManager bossPhaseTransition filters failed:", e);
@@ -265,8 +292,11 @@ export class VfxManager {
 
     try {
       const cam = this.scene.cameras.main;
-      const cm = cam.filters.external.addColorMatrix();
-      const blur = cam.filters.external.addBlur(0, 0, 0, 0.5);
+      if (!cam || !(cam as any).filters || !(cam as any).filters.external) return;
+      
+      const ext = (cam as any).filters.external;
+      const cm = ext.addColorMatrix();
+      const blur = ext.addBlur(0, 0, 0, 0.5);
 
       this.scene.tweens.addCounter({
         from: 0, to: 1, duration: 1500,
@@ -291,7 +321,10 @@ export class VfxManager {
 
     try {
       const cam = this.scene.cameras.main;
-      const barrel = cam.filters.external.addBarrel(1.04);
+      if (!cam || !(cam as any).filters || !(cam as any).filters.external) return;
+      
+      const ext = (cam as any).filters.external;
+      const barrel = ext.addBarrel(1.04);
 
       this.scene.tweens.add({
         targets: barrel,
@@ -300,7 +333,7 @@ export class VfxManager {
         ease: 'Cubic.easeOut',
         onComplete: () => {
           try {
-            cam.filters.external.remove(barrel);
+            ext.remove(barrel);
           } catch(e) {}
         }
       });
@@ -315,17 +348,28 @@ export class VfxManager {
 
     try {
       const cam = this.scene.cameras.main;
-      const cm = cam.filters.external.addColorMatrix();
-      if (cm && typeof (cm as any).contrast === 'function') {
-        (cm as any).contrast(1.3);
-      }
-
+      if (!cam) return;
+      
       // Elastic camera zoom in!
       cam.zoomTo(1.05, durationMs, 'Cubic.easeOut', true);
 
+      const hasFilters = (cam as any).filters && (cam as any).filters.external;
+      let cm: any = null;
+      
+      if (hasFilters) {
+        try {
+          cm = (cam as any).filters.external.addColorMatrix();
+          if (cm && typeof (cm as any).contrast === 'function') {
+            (cm as any).contrast(1.3);
+          }
+        } catch(e) {}
+      }
+
       this.scene.time.delayedCall(durationMs, () => {
         try {
-          cam.filters.external.remove(cm);
+          if (hasFilters && cm) {
+            (cam as any).filters.external.remove(cm);
+          }
           // Elastic camera zoom back out!
           cam.zoomTo(1.0, 150, 'Cubic.easeIn', true);
         } catch(e) {}

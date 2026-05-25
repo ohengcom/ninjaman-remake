@@ -228,7 +228,20 @@ export class GameScene extends Phaser.Scene {
     // Clear any lingering camera filters from previous transitions (fixes level transition white screen)
     try {
       if (this.cameras.main && (this.cameras.main as any).filters) {
-        (this.cameras.main as any).filters.clear();
+        const cFilters = (this.cameras.main as any).filters;
+        if (typeof cFilters.clear === 'function') {
+          cFilters.clear();
+        } else if (Array.isArray(cFilters)) {
+          cFilters.length = 0;
+        } else {
+          // Never delete the .filters property as Phaser v4 rendering expects it to exist!
+          if (cFilters.internal && typeof cFilters.internal.clear === 'function') {
+            cFilters.internal.clear();
+          }
+          if (cFilters.external && typeof cFilters.external.clear === 'function') {
+            cFilters.external.clear();
+          }
+        }
       }
     } catch (e) {
       console.warn("Failed to clear camera filters on create:", e);
@@ -439,24 +452,8 @@ export class GameScene extends Phaser.Scene {
 
        this.tweens.add({ targets: transText, alpha: 1, duration: 400 });
 
-       if (this.sys.game.config.renderType === Phaser.CANVAS) {
-         this.cameras.main.fadeOut(1200, 0, 0, 0);
-       } else {
-         try {
-           const cam = this.cameras.main;
-           const wipe = cam.filters.external.addWipe(0.1, 0, 0);
-           wipe.setLeftToRight();
-           this.tweens.add({
-             targets: wipe,
-             progress: 1,
-             duration: 1200,
-             ease: 'Cubic.easeInOut'
-           });
-         } catch (e) {
-           console.warn("Wipe filter failed, using fadeOut fallback:", e);
-           this.cameras.main.fadeOut(1200, 0, 0, 0);
-         }
-       }
+        // Always use standard robust fadeOut transition to prevent persistent filter white screens!
+        this.cameras.main.fadeOut(1200, 0, 0, 0);
        
        // Use a fallback timer in case fadeOut gets cancelled by a rogue camera effect
        this.time.delayedCall(1300, () => {
@@ -618,10 +615,11 @@ export class GameScene extends Phaser.Scene {
       repeat: 1
     });
 
-    // Apply physics impulse (push)
+    // Apply physics impulse (push) by directly modifying Matter body forces
     const body = prop.body as MatterJS.BodyType;
     if (body) {
-      this.matter.body.applyForce(body, body.position, { x: dirX * 0.04, y: -0.015 });
+      body.force.x += dirX * 0.04;
+      body.force.y += -0.015;
     }
 
     if (hp <= 0) {
@@ -681,8 +679,7 @@ export class GameScene extends Phaser.Scene {
       
       (debBody as any).setPosition(px + (Math.random() - 0.5) * 15, py + (Math.random() - 0.5) * 15);
       (debBody as any).setVelocity(dx, dy);
-      
-      this.matter.body.setAngularVelocity(debBody.body as MatterJS.BodyType, (Math.random() - 0.5) * 0.3);
+      (debBody as any).setAngularVelocity((Math.random() - 0.5) * 0.3);
       
       this.tweens.add({
         targets: debrisObj,

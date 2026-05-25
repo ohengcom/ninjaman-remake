@@ -66,6 +66,9 @@ export class LevelBuilder {
   }
 
   public static buildPlatforms(scene: Phaser.Scene, levelCfg: LevelConfig, mapWidth: number, rng: SeededRandom) {
+    // Generate the procedural decoration atlas first so all crate/barrel/deco frames are immediately ready
+    LevelBuilder.generateDecoAtlas(scene);
+
     const h = scene.cameras.main.height;
     const levelNum = levelCfg.levelNumber ?? 1;
     const theme = LEVEL_THEMES[levelNum] || LEVEL_THEMES[1]!;
@@ -286,8 +289,12 @@ export class LevelBuilder {
     if (isWebGL) {
       try {
         const decoLayer = (scene.add as any).spriteGPULayer('deco_atlas', 200);
-        decoLayer.setScrollFactor(0.95);
-        decoLayer.setDepth(-1);
+        if (typeof decoLayer.setScrollFactor === 'function') {
+          decoLayer.setScrollFactor(0.95);
+        }
+        if (typeof decoLayer.setDepth === 'function') {
+          decoLayer.setDepth(-1);
+        }
 
         for (let x = 100; x < mapWidth - 200; x += 200 + rng.next() * 300) {
           const decoType = rng.next();
