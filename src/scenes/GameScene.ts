@@ -168,6 +168,7 @@ export class GameScene extends Phaser.Scene {
 
   create(): void {
     this.cameras.main.fadeIn(800, 0, 0, 0);
+    this.cameras.main.setAlpha(1);
 
     // Restore HUD header (hidden by MainMenuScene)
     const hudHeader = document.querySelector('.hud-header') as HTMLElement;
@@ -180,8 +181,9 @@ export class GameScene extends Phaser.Scene {
     this.currentStyle = '';
     const h = this.cameras.main.height;
     const groundTop = h - 48;
+    const playerHalfHeight = 48; // PLAYER_RENDER.bodyHeight / 2
     this.lastSafeX = 200;
-    this.lastSafeY = groundTop - 80;
+    this.lastSafeY = groundTop - playerHalfHeight;
     this.boss = null;
     this.isTransitioning = false;
 
@@ -205,7 +207,7 @@ export class GameScene extends Phaser.Scene {
 
     const saveData = SaveManager.load();
     this.player = new Player(this, this.lastSafeX, this.lastSafeY);
-    this.player.setPosition(this.lastSafeX, groundTop - this.player.getBodyHalfHeight() - 2);
+    this.player.setPosition(this.lastSafeX, groundTop - this.player.getBodyHalfHeight());
     this.player.maxHealth = saveData.maxHealth;
     this.player.health = saveData.maxHealth;
     this.attackTrail = this.vfxManager.createAttackTrail(this.player);
