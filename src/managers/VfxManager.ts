@@ -309,7 +309,7 @@ export class VfxManager {
     }
   }
 
-  /** Hitstop 期間增強視覺衝擊 */
+  /** Hitstop 期間增強視覺衝擊与弹性缩放 */
   public hitstopFilter(durationMs: number = 60) {
     if (this.scene.sys.game.config.renderType === Phaser.CANVAS) return;
 
@@ -320,14 +320,39 @@ export class VfxManager {
         (cm as any).contrast(1.3);
       }
 
+      // Elastic camera zoom in!
+      cam.zoomTo(1.05, durationMs, 'Cubic.easeOut', true);
+
       this.scene.time.delayedCall(durationMs, () => {
         try {
           cam.filters.external.remove(cm);
+          // Elastic camera zoom back out!
+          cam.zoomTo(1.0, 150, 'Cubic.easeIn', true);
         } catch(e) {}
       });
     } catch (e) {
       console.warn("VfxManager hitstopFilter failed:", e);
     }
+  }
+
+  /** 生成残影幻影拖尾 */
+  public emitGhostTrail(target: Phaser.GameObjects.Sprite, tint: number = 0x00d4ff) {
+    const ghost = this.scene.add.sprite(target.x, target.y, target.texture.key, target.frame.name);
+    ghost.setScale(target.scaleX, target.scaleY);
+    ghost.setFlipX(target.flipX);
+    ghost.setOrigin(target.originX, target.originY);
+    ghost.setTint(tint);
+    ghost.setAlpha(0.6);
+    ghost.setDepth(target.depth - 1);
+
+    this.scene.tweens.add({
+      targets: ghost,
+      alpha: 0,
+      duration: 300,
+      onComplete: () => {
+        ghost.destroy();
+      }
+    });
   }
 
   /** 跟隨玩家的攻擊拖尾粒子 */

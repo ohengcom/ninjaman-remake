@@ -10,8 +10,12 @@ A modern, high-definition action-platformer remake built with Phaser 4, TypeScri
   - **4-Hit Combos**: Timing-based combos with escalating damage.
   - **Wave Attack**: Special single button energy wave.
   - **Directional Attacks**: Launcher/Uppercut (`W + J`) and Dive Attacks (`S + J` in the air).
-- **Fluid Movement**: Double jumping, Coyote time, and an invincible horizontal Dash.
+  - **Action Input Buffer**: Buffers jumps, attacks, dashes, and waves for up to 150ms to fire immediately after hitstuns or recoveries.
+- **Fluid Movement**: Double jumping, Coyote time, an invincible horizontal Dash, and **One-Way Semisolid Platforms** (jump through from below or drop through with `S + Space`).
 - **Parry System**: Hold `K` to defend. Perfect blocks mitigate damage, prevent knockback, and award bonus points.
+- **Intelligent Patrol AI**: Enemies utilize Matter.js downward and forward Raycasting queries to detect cliffs and obstacle walls to automatically turn around.
+- **Interactive Physics Props**: Procedurally rendered wooden crates and metal barrels that can be pushed, slide realistically, and shatter upon receiving damage. Shattering spawns 4-6 dynamic flying debris blocks with gravity/impulses and deals splash area damage to nearby enemies.
+- **Impact VFX Juice**: Screenshake, particle bursts, afterimage ghost trails during dashes/combos, and elastic camera zoom during hitstops.
 - **Multi-stage Progression**:
   - Sector 1: Mystical Forest
   - Sector 2: Beach Ruins
@@ -22,7 +26,8 @@ A modern, high-definition action-platformer remake built with Phaser 4, TypeScri
 
 - `A` / `D`: Run
 - `W`: Jump / Double Jump
-- `S` (tap): Crouch/Drop
+- `S + SPACE` (on floating platforms): Drop through semisolid platform
+- `S` (tap): Crouch/Slide
 - `K` (hold): Defend/Block (Triggers Parry when hit)
 - `DOUBLE TAP A/D`: Invincible Dash
 - `J`: Attack (Spam for 4-hit combo)

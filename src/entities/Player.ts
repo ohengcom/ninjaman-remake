@@ -30,6 +30,9 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   public comboStep: number = 0;
   public lastAttackTime: number = 0;
   public lastWaveTime: number = 0;
+  public isDroppingThrough: boolean = false;
+  public isOnOneWayPlatform: boolean = false;
+  public bufferedAction: { type: 'jump' | 'attack' | 'dash' | 'wave'; time: number } | null = null;
   
   private lastTapLeftTime: number = 0;
   private lastTapRightTime: number = 0;
@@ -40,7 +43,6 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   private static readonly GROUND_CONTACT_GRACE = 120;
   private lastGroundedTime: number = 0;
   private lastGroundContactTime: number = 0;
-  private lastJumpInputTime: number = 0;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene.matter.world, x, y, 'knight');
@@ -157,7 +159,51 @@ export class Player extends Phaser.Physics.Matter.Sprite {
 
   private handleCommonTransitions(p: Player) {
     const canGroundAction = p.isGroundedOrCoyote();
+    const time = p.scene.time.now;
 
+    // Check buffered action first!
+    if (p.bufferedAction && time - p.bufferedAction.time <= 150) {
+      const type = p.bufferedAction.type;
+
+      if (type === 'dash' && canGroundAction) {
+        p.bufferedAction = null;
+        p.stateMachine.setState('dash');
+        return true;
+      }
+      
+      if (type === 'attack') {
+        const attackState = p.checkAttackInput();
+        if (attackState) {
+          p.bufferedAction = null;
+          p.stateMachine.setState(attackState);
+          return true;
+        }
+      }
+
+      if (type === 'wave') {
+        if (time - p.lastWaveTime > PLAYER_ATTACKS.wave.cooldown) {
+          p.lastWaveTime = time;
+          p.bufferedAction = null;
+          p.stateMachine.setState('attack_wave');
+          return true;
+        }
+      }
+
+      if (type === 'jump') {
+        const isGroundedOrCoyote = p.isGroundedOrCoyote();
+        if (isGroundedOrCoyote && p.jumpCount === 0) {
+          p.bufferedAction = null;
+          p.stateMachine.setState('jump');
+          return true;
+        } else if (p.jumpCount < PLAYER_MOVEMENT.maxJumps && !isGroundedOrCoyote) {
+          p.bufferedAction = null;
+          p.stateMachine.setState('jump');
+          return true;
+        }
+      }
+    }
+
+    // Fallback to real-time inputs
     if (p.checkDashInput() && canGroundAction) {
       p.stateMachine.setState('dash');
       return true;
@@ -171,27 +217,6 @@ export class Player extends Phaser.Physics.Matter.Sprite {
       p.stateMachine.setState(attackState);
       return true;
     }
-    // Jump with independent Space key, allow single & double jumps
-    if (Phaser.Input.Keyboard.JustDown(p.cursors.space) || (p.pad && p.pad.A && p.pad.A)) {
-       p.lastJumpInputTime = p.scene.time.now;
-    }
-    
-    const now = p.scene.time.now;
-    const hasJumpBuffer = (now - p.lastJumpInputTime < PLAYER_MOVEMENT.jumpBufferTime);
-
-    if (hasJumpBuffer) {
-      const isGroundedOrCoyote = p.isGroundedOrCoyote();
-      if (isGroundedOrCoyote && p.jumpCount === 0) {
-        p.lastJumpInputTime = 0; // Consume jump buffer
-        p.stateMachine.setState('jump');
-        return true;
-      } else if (p.jumpCount < PLAYER_MOVEMENT.maxJumps && !isGroundedOrCoyote) {
-        // Only allow double jump if we are not grounded to prevent consuming both jumps instantly
-        p.lastJumpInputTime = 0;
-        p.stateMachine.setState('jump');
-        return true;
-      }
-    }
     if (!p.isGrounded() && p.body!.velocity.y > 0) {
       p.stateMachine.setState('fall');
       return true;
@@ -203,8 +228,18 @@ export class Player extends Phaser.Physics.Matter.Sprite {
       return this.scene.time.now - this.lastGroundContactTime < Player.GROUND_CONTACT_GRACE;
   }
 
-  public notifyGroundContact(): void {
+  public notifyGroundContact(isOnOneWay: boolean = false): void {
     this.lastGroundContactTime = this.scene.time.now;
+    this.isOnOneWayPlatform = isOnOneWay;
+  }
+
+  public triggerDropThrough() {
+    this.isDroppingThrough = true;
+    this.isOnOneWayPlatform = false;
+    this.stateMachine.setState('fall');
+    this.scene.time.delayedCall(150, () => {
+      this.isDroppingThrough = false;
+    });
   }
 
   private isGroundedOrCoyote(): boolean {
@@ -549,7 +584,36 @@ export class Player extends Phaser.Physics.Matter.Sprite {
 
   preUpdate(time: number, delta: number) {
     super.preUpdate(time, delta);
+
+    // Buffer action inputs
+    if (Phaser.Input.Keyboard.JustDown(this.cursors.space) || (this.pad && this.pad.A)) {
+      if (this.isDownDown() && this.isOnOneWayPlatform && !this.isDroppingThrough) {
+        this.triggerDropThrough();
+      } else {
+        this.bufferedAction = { type: 'jump', time: time };
+      }
+    } else if (Phaser.Input.Keyboard.JustDown(this.attackKey) || (this.pad && this.pad.A)) {
+      this.bufferedAction = { type: 'attack', time: time };
+    } else if (Phaser.Input.Keyboard.JustDown(this.waveKey) || (this.pad && this.pad.X)) {
+      this.bufferedAction = { type: 'wave', time: time };
+    } else if (this.checkDashInput()) {
+      this.bufferedAction = { type: 'dash', time: time };
+    }
+
+    // Clean up expired buffered inputs (older than 150ms)
+    if (this.bufferedAction && time - this.bufferedAction.time > 150) {
+      this.bufferedAction = null;
+    }
+
     this.stateMachine.update(delta);
+
+    const stateName = this.stateMachine.getCurrentStateName();
+    if (stateName === 'dash' || stateName.startsWith('attack_')) {
+       if (Math.floor(time / 60) !== Math.floor((time - delta) / 60)) {
+          const tint = stateName === 'dash' ? 0x00ffff : 0xff4488;
+          (this.scene as any).vfxManager.emitGhostTrail(this, tint);
+       }
+    }
 
     if (this.isGrounded()) {
       this.lastGroundedTime = time;

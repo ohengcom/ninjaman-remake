@@ -22,11 +22,11 @@ export class Boss extends Phaser.Physics.Matter.Sprite {
 
   private applyBossVisuals() {
     this.setScale(this.baseScaleX, this.baseScaleY);
-
-    // Dynamically calculate the perfect originY so feet are always exactly on the floor!
+    
+    // Compute the perfect originY based on our pixel-perfect physics-visual formula (yFeet = 499, scaledHeight = 200 * baseScaleY)
     const displayHeight = 240;
     const scaledHeight = 200 * this.baseScaleY;
-    const originY = 1 - scaledHeight / (2 * displayHeight);
+    const originY = 499 / 512 - scaledHeight / (2 * displayHeight);
     this.setOrigin(0.5, originY);
     
     // Boss phases color feedback

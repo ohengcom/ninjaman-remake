@@ -15,10 +15,10 @@ const ENEMY_TEXTURES: Record<EnemyType, string> = {
 };
 
 const ENEMY_RENDER_CONFIGS = {
-  guard:  { displayWidth: 130, displayHeight: 190, bodyWidth: 42, bodyHeight: 110, bodyOffsetX: 0, bodyOffsetY: 0 },
-  axe:    { displayWidth: 140, displayHeight: 200, bodyWidth: 46, bodyHeight: 120, bodyOffsetX: 0, bodyOffsetY: 0 },
-  ninja:  { displayWidth: 130, displayHeight: 190, bodyWidth: 40, bodyHeight: 108, bodyOffsetX: 0, bodyOffsetY: 0 },
-  sniper: { displayWidth: 130, displayHeight: 190, bodyWidth: 40, bodyHeight: 108, bodyOffsetX: 0, bodyOffsetY: 0 },
+  guard:  { displayWidth: 130, displayHeight: 190, bodyWidth: 42, bodyHeight: 110, yFeet: 493 },
+  axe:    { displayWidth: 140, displayHeight: 200, bodyWidth: 46, bodyHeight: 120, yFeet: 459 },
+  ninja:  { displayWidth: 130, displayHeight: 190, bodyWidth: 40, bodyHeight: 108, yFeet: 441 },
+  sniper: { displayWidth: 130, displayHeight: 190, bodyWidth: 40, bodyHeight: 108, yFeet: 501 },
 } as const;
 
 const ENEMY_GROUND_CLEARANCE = 2;
@@ -54,7 +54,10 @@ export class Enemy extends Phaser.Physics.Matter.Sprite {
     this.setScale(this.baseScaleX, this.baseScaleY);
     const cfg = ENEMY_RENDER_CONFIGS[this.enemyType];
 
-    this.setOrigin(0.5, 0.9);
+    // Compute the perfect originY based on our pixel-perfect physics-visual formula
+    const originY = cfg.yFeet / 512 - cfg.bodyHeight / (2 * cfg.displayHeight);
+    this.setOrigin(0.5, originY);
+
     this.setRectangle(cfg.bodyWidth, cfg.bodyHeight, {
       friction: 0,
       frictionStatic: 0,
@@ -150,13 +153,13 @@ export class Enemy extends Phaser.Physics.Matter.Sprite {
              return;
           }
 
+          e.checkPatrolNavigation();
+
           if (e.scene.time.now > e.patrolTimer) {
-            e.patrolDir *= -1;
-            e.patrolTimer = e.scene.time.now + 2000 + Math.random() * 2000;
+            e.flipDirection();
           }
           
           e.setVelocityX(e.moveSpeed * e.patrolDir);
-          e.setFlipX(e.patrolDir < 0);
 
           if (e.target && e.target.active && Phaser.Math.Distance.Between(e.x, e.y, e.target.x, e.target.y) < 300) {
             e.stateMachine.setState('chase');
@@ -332,6 +335,53 @@ export class Enemy extends Phaser.Physics.Matter.Sprite {
     this.setVelocityX(dirX * kb);
     this.setVelocityY(-3.5);
     this.stateMachine.setState('hurt');
+  }
+
+  private isCliffAhead(): boolean {
+    const halfHeight = this.getBodyHalfHeight();
+    const startX = this.x + this.patrolDir * 24;
+    const startY = this.y + halfHeight;
+    const start = { x: startX, y: startY };
+    const end = { x: startX, y: startY + 40 };
+
+    const bodies = (this.scene.matter.world.localWorld as any).bodies as MatterJS.BodyType[];
+    const collisions = this.scene.matter.query.ray(bodies, start, end);
+    const staticCollisions = collisions.filter(c => {
+      const b = (c as any).body;
+      return b && b.isStatic && b.gameObject !== this;
+    });
+
+    return staticCollisions.length === 0;
+  }
+
+  private isObstacleAhead(): boolean {
+    const startX = this.x;
+    const startY = this.y;
+    const start = { x: startX, y: startY };
+    const end = { x: startX + this.patrolDir * 30, y: startY };
+
+    const bodies = (this.scene.matter.world.localWorld as any).bodies as MatterJS.BodyType[];
+    const collisions = this.scene.matter.query.ray(bodies, start, end);
+    const staticCollisions = collisions.filter(c => {
+      const b = (c as any).body;
+      return b && b.isStatic && b.gameObject !== this;
+    });
+
+    return staticCollisions.length > 0;
+  }
+
+  public checkPatrolNavigation() {
+    if (this.enemyType === 'sniper') return;
+
+    if (this.isCliffAhead() || this.isObstacleAhead()) {
+      this.flipDirection();
+    }
+  }
+
+  public flipDirection() {
+    this.patrolDir *= -1;
+    this.setFlipX(this.patrolDir < 0);
+    this.patrolTimer = this.scene.time.now + 2000 + Math.random() * 2000;
   }
 
   preUpdate(time: number, delta: number) {

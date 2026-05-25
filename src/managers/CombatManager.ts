@@ -59,6 +59,18 @@ export class CombatManager {
       }
     }
 
+    this.scene.physicsProps.getChildren().forEach((obj) => {
+      const prop = obj as Phaser.GameObjects.Image;
+      if (!prop.active || !prop.getData('isDestructible')) return;
+      const propRect = prop.getBounds();
+
+      if (Phaser.Geom.Rectangle.Overlaps(attackRect, propRect)) {
+        this.scene.damagePhysicsProp(prop, baseDamage, dir);
+        hitAnything = true;
+        lastHitX = prop.x;
+      }
+    });
+
     if (hitAnything) {
       SoundManager.playHit(this.scene.getPan(lastHitX));
       this.scene.hitstop(60);

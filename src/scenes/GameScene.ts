@@ -19,6 +19,7 @@ export class GameScene extends Phaser.Scene {
   private player!: Player;
   private enemies!: Phaser.GameObjects.Group;
   private projectiles!: Phaser.GameObjects.Group;
+  public physicsProps!: Phaser.GameObjects.Group;
   private boss: Boss | null = null;
   private score: number = 0;
   private playerLight!: Phaser.GameObjects.Light;
@@ -71,10 +72,24 @@ export class GameScene extends Phaser.Scene {
   };
   private readonly onMatterCollisionStart = (event: Phaser.Physics.Matter.Events.CollisionStartEvent) => {
     event.pairs.forEach(pair => {
+      this.handleOneWayCollisions(pair);
+      if (!pair.isActive) return;
+
       const bodyA = pair.bodyA;
       const bodyB = pair.bodyB;
       const objA = bodyA.gameObject;
       const objB = bodyB.gameObject;
+
+      // Projectile vs Physics Prop
+      if (objA && objB && ((objA instanceof Projectile && objB.getData && objB.getData('isDestructible')) || (objB instanceof Projectile && objA.getData && objA.getData('isDestructible')))) {
+        const proj = (objA instanceof Projectile) ? objA : (objB as Projectile);
+        const prop = (objA instanceof Projectile) ? objB : objA;
+        if (proj.active && proj.texture.key === 'player_wave') {
+          proj.hit();
+          this.damagePhysicsProp(prop, proj.damage, proj.body!.velocity.x > 0 ? 1 : -1);
+        }
+      }
+
       if (!objA || !objB) return;
 
       // Projectile vs Player
@@ -136,6 +151,9 @@ export class GameScene extends Phaser.Scene {
   };
   private readonly onMatterCollisionActive = (event: Phaser.Physics.Matter.Events.CollisionActiveEvent) => {
     event.pairs.forEach(pair => {
+      this.handleOneWayCollisions(pair);
+      if (!pair.isActive) return;
+
       this.updatePlayerGroundContact(pair.bodyA, pair.bodyB);
       this.updatePlayerGroundContact(pair.bodyB, pair.bodyA);
     });
@@ -151,7 +169,47 @@ export class GameScene extends Phaser.Scene {
     const otherTop = otherBody.bounds.min.y;
     const isStandingOnTop = playerBody.position.y < otherY && playerBottom <= otherTop + 8;
     if (isStandingOnTop) {
-      obj.notifyGroundContact();
+      const otherObj = otherBody.gameObject;
+      const isOneWay = otherObj && typeof (otherObj as any).getData === 'function' && (otherObj as any).getData('isOneWay');
+      obj.notifyGroundContact(!!isOneWay);
+    }
+  }
+
+  private handleOneWayCollisions(pair: MatterJS.ICollisionPair) {
+    const bodyA = pair.bodyA as any;
+    const bodyB = pair.bodyB as any;
+    const objA = bodyA.gameObject;
+    const objB = bodyB.gameObject;
+
+    // Check if one body is Player and the other is a one-way platform
+    const isPlayerA = objA instanceof Player;
+    const isPlayerB = objB instanceof Player;
+    if (!isPlayerA && !isPlayerB) return;
+
+    const player = isPlayerA ? (objA as Player) : (objB as Player);
+    const playerBody = isPlayerA ? bodyA : bodyB;
+    const platBody = isPlayerA ? bodyB : bodyA;
+    const platObj = platBody.gameObject;
+
+    if (!platObj || typeof (platObj as any).getData !== 'function' || !(platObj as any).getData('isOneWay')) return;
+
+    // Condition 1: Player is dropping through
+    if (player.isDroppingThrough) {
+      pair.isActive = false;
+      return;
+    }
+
+    // Condition 2: Player is moving upwards
+    if (playerBody.velocity.y < -0.1) {
+      pair.isActive = false;
+      return;
+    }
+
+    // Condition 3: Player's feet are below the platform top surface (give it a small tolerance)
+    const playerBottom = playerBody.bounds.max.y;
+    const platTop = platBody.bounds.min.y;
+    if (playerBottom > platTop + 4) {
+      pair.isActive = false;
     }
   }
 
@@ -202,6 +260,7 @@ export class GameScene extends Phaser.Scene {
     this.scene.stop('HUDScene');
     this.scene.launch('HUDScene');
 
+    this.physicsProps = this.add.group();
     LevelBuilder.buildPlatforms(this, this.levelCfg, this.mapWidth, this.rng);
     LevelBuilder.buildLeftWall(this);
 
@@ -216,6 +275,28 @@ export class GameScene extends Phaser.Scene {
 
     this.enemies = this.add.group({ classType: Enemy, maxSize: 30, runChildUpdate: true });
     this.projectiles = this.add.group({ classType: Projectile, maxSize: 20, runChildUpdate: true });
+    
+    // Spawn dynamic wooden crates & barrels scattered on the ground!
+    if (!this.levelCfg.isBossLevel) {
+       for (let x = 600; x < this.mapWidth - 800; x += 300 + this.rng.next() * 500) {
+          const isCrate = this.rng.next() < 0.6;
+          const propY = groundTop - (isCrate ? 25 : 30);
+          const frame = isCrate ? 'crate' : 'barrel';
+          const prop = this.add.image(x, propY, 'deco_atlas', frame);
+          
+          const body = this.matter.add.gameObject(prop, {
+            friction: 0.1,
+            frictionAir: 0.02,
+            restitution: 0.05,
+            density: 0.01
+          });
+          (body as any).setFixedRotation(true);
+          prop.setData('isDestructible', true);
+          prop.setData('health', isCrate ? 15 : 30);
+          prop.setData('type', frame);
+          this.physicsProps.add(prop);
+       }
+    }
     
     if (!this.levelCfg.isBossLevel) {
       const types: EnemyType[] = [...this.levelCfg.enemyTypes];
@@ -511,6 +592,119 @@ export class GameScene extends Phaser.Scene {
     const dx = sourceX - this.player.x;
     const halfWidth = this.cameras.main.width / 2;
     return Phaser.Math.Clamp(dx / halfWidth, -1, 1);
+  }
+
+  public damagePhysicsProp(prop: any, damage: number, dirX: number) {
+    if (!prop || !prop.active || !prop.getData('isDestructible')) return;
+    
+    let hp = prop.getData('health') - damage;
+    prop.setData('health', hp);
+    
+    // Trigger visual hit feedback: flash the prop white
+    this.tweens.add({
+      targets: prop,
+      alpha: 0.5,
+      duration: 50,
+      yoyo: true,
+      repeat: 1
+    });
+
+    // Apply physics impulse (push)
+    const body = prop.body as MatterJS.BodyType;
+    if (body) {
+      this.matter.body.applyForce(body, body.position, { x: dirX * 0.04, y: -0.015 });
+    }
+
+    if (hp <= 0) {
+      this.explodePhysicsProp(prop, dirX);
+    } else {
+      SoundManager.playHit(this.getPan(prop.x));
+    }
+  }
+
+  public explodePhysicsProp(prop: any, _dirX: number) {
+    if (!prop || !prop.active) return;
+    
+    const px = prop.x;
+    const py = prop.y;
+    const type = prop.getData('type') || 'crate';
+    
+    // Deactivate and remove from tracking group
+    prop.setActive(false);
+    prop.setVisible(false);
+    this.physicsProps.remove(prop);
+    
+    // Remove Matter body
+    this.matter.world.remove(prop.body);
+    
+    // Play explosion/damage sound
+    SoundManager.playDamage(this.getPan(px));
+    
+    // Camera shake
+    this.cameras.main.shake(200, 0.02);
+    
+    // VFX Particle blast
+    this.vfxManager.emitHitParticle(px, py, 15, 'spark');
+    this.vfxManager.emitHitParticle(px, py, 15, 'dust');
+    
+    // Spawn 4-6 small dynamic blocks with physics impulse to fly as debris in all directions
+    const numDebris = 4 + Math.floor(Math.random() * 3);
+    const debrisColor = type === 'crate' ? 0x8b5a2b : 0x4a4a4a; // Brown for wood crate, gray/dark for metal barrel
+    
+    for (let i = 0; i < numDebris; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 3 + Math.random() * 5;
+      const dx = Math.cos(angle) * speed;
+      const dy = Math.sin(angle) * speed - 2; // Bias upwards
+      
+      const debrisSize = 6 + Math.floor(Math.random() * 6);
+      const debrisObj = this.add.graphics();
+      debrisObj.fillStyle(debrisColor, 1);
+      debrisObj.fillRect(-debrisSize/2, -debrisSize/2, debrisSize, debrisSize);
+      
+      // Make it a dynamic matter body
+      const debBody = this.matter.add.gameObject(debrisObj, {
+        friction: 0.1,
+        frictionAir: 0.01,
+        restitution: 0.3,
+        density: 0.005
+      });
+      
+      (debBody as any).setPosition(px + (Math.random() - 0.5) * 15, py + (Math.random() - 0.5) * 15);
+      (debBody as any).setVelocity(dx, dy);
+      
+      this.matter.body.setAngularVelocity(debBody.body as MatterJS.BodyType, (Math.random() - 0.5) * 0.3);
+      
+      this.tweens.add({
+        targets: debrisObj,
+        alpha: 0,
+        delay: 800 + Math.random() * 400,
+        duration: 300,
+        onComplete: () => {
+          this.matter.world.remove(debBody);
+          debrisObj.destroy();
+        }
+      });
+    }
+
+    // Splash Damage to nearby enemies
+    const splashRadius = 120;
+    const splashDamage = type === 'barrel' ? 30 : 15;
+    
+    this.enemies.getChildren().forEach((child: any) => {
+      if (child && child.active && child.health > 0) {
+        const dist = Phaser.Math.Distance.Between(px, py, child.x, child.y);
+        if (dist <= splashRadius) {
+          const enemyDir = child.x > px ? 1 : -1;
+          child.takeDamage(splashDamage, enemyDir);
+          this.vfxManager.emitHitParticle(child.x, child.y, 8, 'hit');
+          this.vfxManager.hitFlashFilter(child);
+        }
+      }
+    });
+
+    // Destroy original game object
+    prop.destroy();
   }
 
   private pauseGame() {

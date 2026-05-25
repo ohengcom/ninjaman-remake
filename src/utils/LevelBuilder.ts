@@ -136,7 +136,37 @@ export class LevelBuilder {
 
           // Physics body for platform (invisible rectangle collider)
           const platBody = scene.add.rectangle(px, py, platWidth, platHeight, 0x000000, 0);
+          platBody.setData('isOneWay', true);
           scene.matter.add.gameObject(platBody, { isStatic: true, friction: 0, frictionStatic: 0, frictionAir: 0 });
+
+          // 40% chance to spawn a dynamic physics crate or barrel on top of the platform!
+          const propRoll = rng.next();
+          if (propRoll < 0.4) {
+            const isCrate = propRoll < 0.25;
+            const propX = px + (rng.next() - 0.5) * (platWidth - 40);
+            const propY = py - platHeight / 2 - (isCrate ? 25 : 30);
+            const frame = isCrate ? 'crate' : 'barrel';
+            const prop = scene.add.image(propX, propY, 'deco_atlas', frame);
+            
+            // Register as a dynamic Matter body!
+            const body = scene.matter.add.gameObject(prop, {
+              friction: 0.1,
+              frictionAir: 0.02,
+              restitution: 0.05,
+              density: 0.01 // lighter weight so they can be pushed or launched!
+            });
+            (body as any).setFixedRotation(true); // Keep them upright for cleaner look
+            
+            prop.setData('isDestructible', true);
+            prop.setData('health', isCrate ? 15 : 30); // crate is fragile, barrel is sturdier
+            prop.setData('type', frame);
+            
+            // Add to the scene's physicsProps group for tracking!
+            const gScene = scene as any;
+            if (gScene.physicsProps) {
+              gScene.physicsProps.add(prop);
+            }
+          }
         }
       }
     }
@@ -197,6 +227,30 @@ export class LevelBuilder {
     rt.draw(g, 0, 0);
     g.clear();
 
+    // Draw Crate (frame crate: x=320, y=0, w=50, h=50)
+    g.fillStyle(0x8b5a2b, 1);
+    g.fillRect(320, 0, 50, 50);
+    g.lineStyle(3, 0x5c3a21, 1);
+    g.strokeRect(320, 0, 50, 50);
+    g.lineBetween(320, 0, 370, 50);
+    g.lineBetween(370, 0, 320, 50);
+    rt.draw(g, 0, 0);
+    g.clear();
+
+    // Draw Barrel (frame barrel: x=380, y=0, w=40, h=60)
+    g.fillStyle(0x4b5320, 1);
+    g.fillRect(380, 0, 40, 60);
+    g.fillStyle(0x353a1a, 1);
+    g.fillRect(380, 0, 40, 5);
+    g.fillRect(380, 55, 40, 5);
+    g.fillStyle(0x282c14, 1);
+    g.fillRect(380, 15, 40, 6);
+    g.fillRect(380, 38, 40, 6);
+    g.fillStyle(0xff4500, 1);
+    g.fillRect(380, 27, 40, 5);
+    rt.draw(g, 0, 0);
+    g.clear();
+
     g.destroy();
 
     // Export RenderTexture to texture manager
@@ -207,6 +261,8 @@ export class LevelBuilder {
       texture.add('mushroom', 0, 120, 0, 40, 40);
       texture.add('rock', 0, 180, 0, 60, 40);
       texture.add('pillar', 0, 260, 0, 50, 200);
+      texture.add('crate', 0, 320, 0, 50, 50);
+      texture.add('barrel', 0, 380, 0, 40, 60);
     }
   }
 
