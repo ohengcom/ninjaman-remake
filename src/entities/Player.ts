@@ -48,8 +48,6 @@ export class Player extends Phaser.Physics.Matter.Sprite {
 
     this.applyRenderSize();
 
-    this.setFixedRotation();
-
     // Set keys to A, S, D, W, SPACE
     this.cursors = scene.input.keyboard!.addKeys({
       up: Phaser.Input.Keyboard.KeyCodes.W,
@@ -232,6 +230,8 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     } else if (this.isRightDown()) {
       this.setVelocityX(speed);
       this.setFlipX(false);
+    } else if (this.isGroundedOrCoyote()) {
+      this.setVelocityX(0);
     }
   }
 
@@ -246,14 +246,13 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   private applyRenderSize() {
     const baseScale = PLAYER_RENDER.displaySize / 79;
     this.setScale(baseScale, baseScale);
+    this.setOrigin(0.5, 0.9);
     this.setRectangle(PLAYER_RENDER.bodyWidth, PLAYER_RENDER.bodyHeight, {
       friction: 0,
       frictionStatic: 0,
       frictionAir: 0.01,
     });
-    this.setFriction(0, 0, 0);
-    this.setFrictionAir(0.01);
-    this.setOrigin(0.35, 0.8);
+    this.setFixedRotation();
   }
 
   public getBodyHalfHeight(): number {
@@ -271,7 +270,6 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         name: 'idle',
         onEnter: (p) => {
           p.playAnimation('player_idle');
-          p.setVelocityX(0);
           p.jumpCount = 0;
           p.isBlocking = false;
         },
@@ -290,11 +288,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         },
         onUpdate: (p) => {
           if (p.handleCommonTransitions(p)) return;
-          if (p.isLeftDown()) {
-            p.setVelocityX(-PLAYER_MOVEMENT.runSpeed); p.setFlipX(true);
-          } else if (p.isRightDown()) {
-            p.setVelocityX(PLAYER_MOVEMENT.runSpeed); p.setFlipX(false);
-          } else {
+          if (!p.isLeftDown() && !p.isRightDown()) {
             p.stateMachine.setState('idle');
           }
         }

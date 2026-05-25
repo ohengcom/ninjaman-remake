@@ -54,15 +54,12 @@ export class Enemy extends Phaser.Physics.Matter.Sprite {
     this.setScale(this.baseScaleX, this.baseScaleY);
     const cfg = ENEMY_RENDER_CONFIGS[this.enemyType];
 
+    this.setOrigin(0.5, 0.9);
     this.setRectangle(cfg.bodyWidth, cfg.bodyHeight, {
       friction: 0,
       frictionStatic: 0,
       frictionAir: 0.02,
     });
-    this.setFriction(0, 0, 0);
-    this.setFrictionAir(0.02);
-    this.setOrigin(0.5, 0.75);
-
     this.setFixedRotation();
     this.setIgnoreGravity(false);
   }
@@ -88,8 +85,6 @@ export class Enemy extends Phaser.Physics.Matter.Sprite {
     this.configureType(type);
     this.applyEnemyRender();
 
-    this.setFixedRotation();
-
     this.stateMachine = new StateMachine<Enemy>(this);
     this.setupStates();
     this.stateMachine.setState('patrol');
@@ -104,10 +99,6 @@ export class Enemy extends Phaser.Physics.Matter.Sprite {
 
     this.configureType(type);
     this.applyEnemyRender();
-
-    if (!(this.scene.matter.world.localWorld as any).bodies.includes(this.body as MatterJS.BodyType)) {
-      this.scene.matter.world.add(this.body as MatterJS.BodyType);
-    }
 
     this.isInvulnerable = false;
     this.patrolDir = 1;

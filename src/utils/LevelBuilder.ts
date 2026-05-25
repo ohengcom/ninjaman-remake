@@ -103,7 +103,7 @@ export class LevelBuilder {
     // Invisible physics floor (single continuous body prevents seam-sticking)
     const floor = scene.add.rectangle(mapWidth / 2, h - 32, mapWidth, 32, 0x000000, 0);
     floor.setVisible(false);
-    scene.matter.add.gameObject(floor, { isStatic: true });
+    scene.matter.add.gameObject(floor, { isStatic: true, friction: 0, frictionStatic: 0, frictionAir: 0 });
 
     // ─── VISIBLE PLATFORMS ───
     if (levelCfg.hasPlatforms) {
@@ -136,7 +136,7 @@ export class LevelBuilder {
 
           // Physics body for platform (invisible rectangle collider)
           const platBody = scene.add.rectangle(px, py, platWidth, platHeight, 0x000000, 0);
-          scene.matter.add.gameObject(platBody, { isStatic: true });
+          scene.matter.add.gameObject(platBody, { isStatic: true, friction: 0, frictionStatic: 0, frictionAir: 0 });
         }
       }
     }
@@ -308,7 +308,7 @@ export class LevelBuilder {
   public static buildLeftWall(scene: Phaser.Scene): Phaser.GameObjects.Rectangle {
     const h = scene.cameras.main.height;
     const leftWall = scene.add.rectangle(-32, h/2, 64, h * 2).setOrigin(0.5);
-    scene.matter.add.gameObject(leftWall, { isStatic: true });
+    scene.matter.add.gameObject(leftWall, { isStatic: true, friction: 0, frictionStatic: 0, frictionAir: 0 });
     return leftWall;
   }
 }
