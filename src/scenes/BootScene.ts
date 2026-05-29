@@ -149,21 +149,6 @@ export class BootScene extends Phaser.Scene {
     // Bind Phaser Sound Manager globally
     SoundManager.setSoundManager(this.sound);
 
-    // Attach normal maps to their corresponding textures
-    const textureKeys = ['knight', 'player_hero', 'enemy_guard_sheet', 'enemy_axe_sheet', 'enemy_ninja_sheet', 'enemy_sniper_sheet', 'boss_oni_sheet'];
-    for (const key of textureKeys) {
-      try {
-        const tex = this.textures.get(key);
-        const normKey = key === 'knight' ? 'knight_n' : (key === 'player_hero' ? 'player_hero_n' : `${key}_n`);
-        const normTex = this.textures.get(normKey);
-        if (tex && normTex) {
-          tex.setDataSource(normTex.getSourceImage());
-        }
-      } catch (e) {
-        console.warn(`Failed to attach normal map for texture: ${key}`, e);
-      }
-    }
-
     // Register all animations from centralized definitions
     registerAnimations(this);
     

@@ -226,11 +226,8 @@ export class GameScene extends Phaser.Scene {
   }
 
   create(): void {
-    // Ensure camera is fully visible before fade-in (prevents black screen on scene.restart)
+    // Clear any lingering camera state before fading in
     this.cameras.main.setAlpha(1);
-    // Clear any lingering fade/flash effects from the previous scene
-    try { this.cameras.main.resetFX(); } catch(e) {}
-    // Now fade in from black — this explicitly starts at black overlay and fades to clear
     this.cameras.main.fadeIn(800, 0, 0, 0);
 
 
@@ -262,16 +259,13 @@ export class GameScene extends Phaser.Scene {
 
     LevelBuilder.buildBackground(this, farBg, midBg, this.mapWidth);
 
-    // Refresh HUD: stop and re-launch so it reconnects event listeners to the new GameScene instance.
-    // Use a deferred call to avoid race condition with SceneManager during restart.
-    if (this.scene.isActive('HUDScene')) {
-      this.scene.stop('HUDScene');
-    }
-    this.time.delayedCall(0, () => {
-      if (!this.scene.isActive('HUDScene')) {
+    // Refresh HUD cleanly
+    const hud = this.scene.get('HUDScene');
+    if (hud && this.scene.isActive('HUDScene')) {
+        hud.scene.restart();
+    } else {
         this.scene.launch('HUDScene');
-      }
-    });
+    }
 
     this.physicsProps = this.add.group();
     LevelBuilder.buildPlatforms(this, this.levelCfg, this.mapWidth, this.rng);
@@ -382,6 +376,7 @@ export class GameScene extends Phaser.Scene {
     this.events.on(GAME_EVENTS.PLAYER_DEAD, this.onPlayerDead);
     this.events.on(GAME_EVENTS.ENEMY_SHOOT, this.onEnemyShoot);
     this.events.on(GAME_EVENTS.PLAYER_CAST_WAVE, this.onPlayerCastWave);
+
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup, this);
 
     // Pause support
@@ -442,10 +437,9 @@ export class GameScene extends Phaser.Scene {
 
        this.tweens.add({ targets: transText, alpha: 1, duration: 400 });
 
-       // Fade to black then restart — use timer as primary (not fade event which can be cancelled)
+       // Fade to black then restart
        this.cameras.main.fadeOut(1000, 0, 0, 0);
-       
-       this.time.delayedCall(1100, () => {
+       this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
          if (this.input.keyboard) this.input.keyboard.enabled = true;
          this.scene.restart({ level: this.currentLevel + 1 });
        });
@@ -570,9 +564,16 @@ export class GameScene extends Phaser.Scene {
     this.events.off(GAME_EVENTS.PLAYER_DEAD, this.onPlayerDead);
     this.events.off(GAME_EVENTS.ENEMY_SHOOT, this.onEnemyShoot);
     this.events.off(GAME_EVENTS.PLAYER_CAST_WAVE, this.onPlayerCastWave);
-    this.matter.world.off('collisionstart', this.onMatterCollisionStart);
-    this.matter.world.off('collisionactive', this.onMatterCollisionActive);
-    this.input.keyboard?.off('keydown-ESC', this.pauseGame, this);
+    this.events.off(Phaser.Scenes.Events.SHUTDOWN, this.cleanup, this);
+    
+    if (this.matter && this.matter.world) {
+        this.matter.world.off('collisionstart', this.onMatterCollisionStart);
+        this.matter.world.off('collisionactive', this.onMatterCollisionActive);
+    }
+    
+    if (this.input && this.input.keyboard) {
+        this.input.keyboard.off('keydown-ESC', this.pauseGame, this);
+    }
 
     SoundManager.stopBGM();
 

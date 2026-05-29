@@ -15,6 +15,7 @@ let game: Phaser.Game | null = null;
 
 window.addEventListener('load', () => {
   game = new Phaser.Game(config);
+  (window as any).game = game;
 
   // Global user interaction unlock for suspended Web Audio Contexts
   const unlockAudio = () => {

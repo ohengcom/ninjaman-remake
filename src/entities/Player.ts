@@ -294,12 +294,21 @@ export class Player extends Phaser.Physics.Matter.Sprite {
       frictionStatic: 0,
       frictionAir: 0.01,
     });
-    this.setOrigin(0.5, 0.76); // Pixel-perfect grounded feet. Must be called AFTER setRectangle!
+    this.setOrigin(0.62, 0.76); // Offset X for scarf, Y for feet. Must be called AFTER setRectangle!
     this.setFixedRotation();
   }
 
   public getBodyHalfHeight(): number {
     return PLAYER_RENDER.bodyHeight / 2;
+  }
+
+  public setFlipX(value: boolean) {
+    super.setFlipX(value);
+    // The ninja sprite is off-center (scarf trails behind), so we must adjust
+    // the visual origin when flipping to keep the physics body aligned with the feet!
+    const originX = value ? 0.38 : 0.62;
+    this.setOrigin(originX, 0.76);
+    return this;
   }
 
   destroy(fromScene?: boolean) {
@@ -341,6 +350,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         onEnter: (p) => {
           SoundManager.playDash((p.scene as any).getPan?.(p.x) ?? 0);
           p.playAnimation('player_run');
+          p.setFlipX(p.dashDir < 0);
           p.setVelocityX(p.dashDir * PLAYER_MOVEMENT.dashSpeed);
           
           // Dash grants invincibility frames by default now that upgrade menu is removed
