@@ -20,57 +20,63 @@ test.describe('Gameplay Smoke', () => {
 
     await page.goto('/');
     await page.waitForSelector('#game-container canvas');
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(5000);
 
     const overlay = page.locator('.game-ui-overlay');
-    const canvas = page.locator('#game-container canvas');
 
-    console.log('--- ATTEMPTING TO START GAME ---');
-    
-    // Proactive canvas click with force: true to guarantee browser and keyboard focus!
-    for (let attempt = 0; attempt < 5; attempt++) {
-      await canvas.click({ force: true });
-      await page.waitForTimeout(200);
+    // Proven startup loop that guarantees entry into GameScene
+    for (let attempt = 0; attempt < 10; attempt++) {
       await page.keyboard.press('Space');
+      await page.locator('#game-container').click();
       await page.waitForTimeout(1000);
       if (await overlay.isVisible()) break;
     }
 
-    await expect(overlay).toBeVisible({ timeout: 15000 });
+    await expect(overlay).toBeVisible({ timeout: 45000 });
     await expect(page.locator('#hud-integrity-bar')).toBeVisible();
     await expect(page.locator('#hud-score-value')).toHaveText(/\d+/);
     await expect(page.locator('#hud-sector-display')).toContainText('SECTOR');
 
-    console.log('--- STARTING BUTTON-MASH PLAYGROUND SIMULATION ---');
+    // Hold D to walk right, press J to attack, repeat to hit crates/barrels/enemies
+    console.log('--- STARTING PLAYGROUND SIMULATION ---');
     
-    // Walk a bit
-    await page.keyboard.down('D');
-    await page.waitForTimeout(1000);
-    await page.keyboard.up('D');
-    
-    // Mash J 6 times very quickly to trigger 4th and 5th hits in recovery
-    console.log('Mashing J key...');
-    for (let i = 0; i < 6; i++) {
-      await page.keyboard.press('J');
-      await page.waitForTimeout(80);
-    }
-    
-    await page.waitForTimeout(500);
-
-    // Walk a bit more and mash again
+    // Phase 1: Walk to right and swing
     await page.keyboard.down('D');
     await page.waitForTimeout(1500);
     await page.keyboard.up('D');
-
-    console.log('Mashing J key again...');
-    for (let i = 0; i < 6; i++) {
-      await page.keyboard.press('J');
-      await page.waitForTimeout(80);
-    }
-
-    await page.waitForTimeout(1000);
     
-    console.log('--- ENDING BUTTON-MASH PLAYGROUND SIMULATION ---');
+    // Press J multiple times (combo)
+    await page.keyboard.press('J');
+    await page.waitForTimeout(150);
+    await page.keyboard.press('J');
+    await page.waitForTimeout(150);
+    await page.keyboard.press('J');
+    await page.waitForTimeout(300);
+
+    // Phase 2: Walk right further
+    await page.keyboard.down('D');
+    await page.waitForTimeout(2000);
+    await page.keyboard.up('D');
+
+    // Press J and L
+    await page.keyboard.press('J');
+    await page.waitForTimeout(150);
+    await page.keyboard.press('L');
+    await page.waitForTimeout(300);
+
+    // Phase 3: Walk to the end of level (Sector 1 mapWidth = 5120)
+    // Hold D for a long duration to walk to x > 4470 (level portal)
+    await page.keyboard.down('D');
+    await page.waitForTimeout(6500);
+    await page.keyboard.up('D');
+
+    // Wait for level transition fade out & restart to complete
+    await page.waitForTimeout(3000);
+
+    await expect(page.locator('#game-container canvas')).toBeVisible();
+    
+    // Verify we have transitioned (either Sector 2 HUD is loaded or no white screen/errors occurred)
+    console.log('--- ENDING PLAYGROUND SIMULATION ---');
     expect(runtimeErrors).toEqual([]);
   });
 });

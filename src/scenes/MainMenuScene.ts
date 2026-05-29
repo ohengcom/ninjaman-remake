@@ -75,32 +75,41 @@ export class MainMenuScene extends Phaser.Scene {
 
     // Start on SPACE or click
     const startGame = async () => {
+      console.log('startGame triggered!');
       this.input.keyboard?.off('keydown-SPACE', startGame);
       this.input.off('pointerdown', startGame);
 
+      console.log('Lazy loading scenes...');
       // --- LAZY LOAD SCENES ---
       // This forces Vite to code-split the massive gameplay chunk
-      if (!this.scene.get('GameScene')) {
-          const [
-              { GameScene },
-              { HUDScene },
-              { GameOverScene },
-              { PauseScene }
-          ] = await Promise.all([
-              import('./GameScene.js'),
-              import('./HUDScene.js'),
-              import('./GameOverScene.js'),
-              import('./PauseScene.js')
-          ]);
-          this.scene.add('GameScene', GameScene, false);
-          this.scene.add('HUDScene', HUDScene, false);
-          this.scene.add('GameOverScene', GameOverScene, false);
-          this.scene.add('PauseScene', PauseScene, false);
+      try {
+        if (!this.scene.get('GameScene')) {
+            const [
+                { GameScene },
+                { HUDScene },
+                { GameOverScene },
+                { PauseScene }
+            ] = await Promise.all([
+                import('./GameScene.js'),
+                import('./HUDScene.js'),
+                import('./GameOverScene.js'),
+                import('./PauseScene.js')
+            ]);
+            console.log('Lazy loading completed successfully!');
+            this.scene.add('GameScene', GameScene, false);
+            this.scene.add('HUDScene', HUDScene, false);
+            this.scene.add('GameOverScene', GameOverScene, false);
+            this.scene.add('PauseScene', PauseScene, false);
+        }
+      } catch (err) {
+        console.error('LAZY LOAD SCENES FAILED:', err);
       }
+
+      console.log('Starting GameScene...');
 
       if (this.sys.game.config.renderType === Phaser.CANVAS) {
         this.cameras.main.fadeOut(800, 0, 0, 0);
-        this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+        this.cameras.main.once('camerafadeoutcomplete', () => {
           this.scene.start('GameScene', { level: 1 });
         });
       } else {
@@ -122,7 +131,7 @@ export class MainMenuScene extends Phaser.Scene {
         } catch (e) {
           console.warn("Wipe filter failed on MainMenuScene, falling back to fade:", e);
           this.cameras.main.fadeOut(800, 0, 0, 0);
-          this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+          this.cameras.main.once('camerafadeoutcomplete', () => {
             this.scene.start('GameScene', { level: 1 });
           });
         }

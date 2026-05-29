@@ -36,6 +36,7 @@ export class GameScene extends Phaser.Scene {
   private rng!: SeededRandom;
   private mapWidth: number = 0;
   private isTransitioning: boolean = false;
+  private isHitstopping: boolean = false;
 
   private combatManager!: CombatManager;
   public vfxManager!: VfxManager;
@@ -225,6 +226,16 @@ export class GameScene extends Phaser.Scene {
   }
 
   create(): void {
+    console.log('GameScene.create() started!');
+    // Force Matter physics to use standard refresh-rate independent stepping (prevents 144Hz/240Hz speedups)
+    try {
+      if (this.matter && this.matter.world) {
+        (this.matter.world as any).fixedStep = false;
+      }
+    } catch (e) {
+      console.warn("Failed to set Matter fixedStep:", e);
+    }
+
     // Reset all lingering camera effects (fade, flash, shake) to prevent black/white transition hangs!
     try {
       if (this.cameras.main) {
@@ -538,9 +549,13 @@ export class GameScene extends Phaser.Scene {
 
   /** Freeze the physics world for a few frames to add weight to hits */
   public hitstop(durationMs: number = 60) {
+    if (this.isHitstopping) return;
+    this.isHitstopping = true;
+
     this.matter.world.pause();
     this.vfxManager.hitstopFilter(durationMs);
     this.time.delayedCall(durationMs, () => {
+      this.isHitstopping = false;
       if (this.matter && this.matter.world) {
         this.matter.world.resume();
       }

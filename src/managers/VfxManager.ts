@@ -197,56 +197,18 @@ export class VfxManager {
     });
   }
 
-  /** 對精靈施加短暫的 Glow + ColorMatrix 受擊反饋，支持 Canvas 優雅降級 */
+  /** 對精靈施加短暫的受擊色彩反饋，高兼容性且100%無崩潰 */
   public hitFlashFilter(target: Phaser.GameObjects.Sprite, color: number = 0xff4444, duration: number = 150) {
-    if (this.scene.sys.game.config.renderType === Phaser.CANVAS) {
-      target.setTint(color);
-      this.scene.time.delayedCall(duration, () => {
-        if (target.active) target.clearTint();
-      });
-      return;
-    }
-
+    if (!target || !target.active) return;
     try {
-      if (!target.filters) target.enableFilters();
-      const filters = target.filters as any;
-      if (filters && filters.internal) {
-        const glow = filters.internal.addGlow(color, 8, 0, 1, false, 4, 6);
-        const cm = filters.internal.addColorMatrix();
-        if (cm && typeof (cm as any).brightness === 'function') {
-          (cm as any).brightness(1.5);
-        }
-
-        this.scene.tweens.add({
-          targets: glow,
-          outerStrength: 0,
-          duration: duration,
-          ease: 'Cubic.easeOut',
-          onComplete: () => {
-            if (target.active && target.filters) {
-              const currentFilters = target.filters as any;
-              if (currentFilters.internal) {
-                try {
-                  currentFilters.internal.remove(glow);
-                  currentFilters.internal.remove(cm);
-                } catch(e) {}
-              }
-            }
-          }
-        });
-      } else {
-        // Fallback to standard tint if filters.internal is missing
-        target.setTint(color);
-        this.scene.time.delayedCall(duration, () => {
-          if (target.active) target.clearTint();
-        });
-      }
-    } catch (e) {
-      console.warn("Filters not supported or failed to apply:", e);
       target.setTint(color);
       this.scene.time.delayedCall(duration, () => {
-        if (target.active) target.clearTint();
+        if (target && target.active) {
+          target.clearTint();
+        }
       });
+    } catch (e) {
+      console.warn("Failed to apply hit flash tint:", e);
     }
   }
 
@@ -344,36 +306,13 @@ export class VfxManager {
 
   /** Hitstop 期間增強視覺衝擊与弹性缩放 */
   public hitstopFilter(durationMs: number = 60) {
-    if (this.scene.sys.game.config.renderType === Phaser.CANVAS) return;
-
     try {
+      // Clean, high-performance hit stop: use a very subtle camera shake,
+      // avoiding heavy WebGL ReadPixels filters or zoom tweens that cause GPU stalls during button-mashing combos!
       const cam = this.scene.cameras.main;
-      if (!cam) return;
-      
-      // Elastic camera zoom in!
-      cam.zoomTo(1.05, durationMs, 'Cubic.easeOut', true);
-
-      const hasFilters = (cam as any).filters && (cam as any).filters.external;
-      let cm: any = null;
-      
-      if (hasFilters) {
-        try {
-          cm = (cam as any).filters.external.addColorMatrix();
-          if (cm && typeof (cm as any).contrast === 'function') {
-            (cm as any).contrast(1.3);
-          }
-        } catch(e) {}
+      if (cam) {
+        cam.shake(durationMs, 0.01);
       }
-
-      this.scene.time.delayedCall(durationMs, () => {
-        try {
-          if (hasFilters && cm) {
-            (cam as any).filters.external.remove(cm);
-          }
-          // Elastic camera zoom back out!
-          cam.zoomTo(1.0, 150, 'Cubic.easeIn', true);
-        } catch(e) {}
-      });
     } catch (e) {
       console.warn("VfxManager hitstopFilter failed:", e);
     }
