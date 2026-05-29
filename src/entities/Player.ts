@@ -264,13 +264,9 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   private applyBufferedMovement() {
     if (!this.canApplyMovement()) return;
 
-    // Normalize velocity by delta to be frame-rate independent.
-    // Matter.js velocity is px/physics-step; at 144Hz steps are more frequent,
-    // so without delta compensation player moves 2.4x faster than at 60Hz.
-    const dt = this.scene.game.loop.delta;
-    const dtScale = Math.min(dt / 16.667, 2.0); // clamp to prevent huge spikes on lag frames
-    const speed = (this.isGroundedOrCoyote() ? PLAYER_MOVEMENT.runSpeed : PLAYER_MOVEMENT.airSpeed) * dtScale;
-
+    // Matter.js Body.setVelocity normalizes speed by body.deltaTime/_baseDelta internally,
+    // so this value is frame-rate independent (same speed at 60Hz, 144Hz, 240Hz).
+    const speed = this.isGroundedOrCoyote() ? PLAYER_MOVEMENT.runSpeed : PLAYER_MOVEMENT.airSpeed;
     if (this.isLeftDown()) {
       this.setVelocityX(-speed);
       this.setFlipX(true);
@@ -445,6 +441,14 @@ export class Player extends Phaser.Physics.Matter.Sprite {
           }));
         },
         onUpdate: (p) => {
+          // Allow chaining to next combo hit if J is pressed during active frames
+          if (p.attackJustPressed || (p.pad && p.pad.A)) {
+            const time = p.scene.time.now;
+            if (time - p.lastAttackTime < PLAYER_MOVEMENT.comboWindow) {
+              // Chain to next combo step
+              p.bufferedAction = { type: 'attack', time };
+            }
+          }
           if (p.waveJustPressed || (p.pad && p.pad.X)) {
             const time = p.scene.time.now;
             if (time - p.lastWaveTime > PLAYER_ATTACKS.wave.cooldown) {
@@ -531,9 +535,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   }
 
   private handleAirMovement() {
-    const dt = this.scene.game.loop.delta;
-    const dtScale = Math.min(dt / 16.667, 2.0);
-    const airSpeed = PLAYER_MOVEMENT.airSpeed * dtScale;
+    const airSpeed = PLAYER_MOVEMENT.airSpeed;
     if (this.isLeftDown()) {
       this.setVelocityX(-airSpeed); this.setFlipX(true);
     } else if (this.isRightDown()) {

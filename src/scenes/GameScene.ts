@@ -262,9 +262,16 @@ export class GameScene extends Phaser.Scene {
 
     LevelBuilder.buildBackground(this, farBg, midBg, this.mapWidth);
 
-    // Refresh HUD properly by stopping and re-launching it so events connect to the new GameScene instance
-    this.scene.stop('HUDScene');
-    this.scene.launch('HUDScene');
+    // Refresh HUD: stop and re-launch so it reconnects event listeners to the new GameScene instance.
+    // Use a deferred call to avoid race condition with SceneManager during restart.
+    if (this.scene.isActive('HUDScene')) {
+      this.scene.stop('HUDScene');
+    }
+    this.time.delayedCall(0, () => {
+      if (!this.scene.isActive('HUDScene')) {
+        this.scene.launch('HUDScene');
+      }
+    });
 
     this.physicsProps = this.add.group();
     LevelBuilder.buildPlatforms(this, this.levelCfg, this.mapWidth, this.rng);
