@@ -36,10 +36,10 @@ export class CombatManager {
       const enemyRect = enemy.getBounds();
 
       if (Phaser.Geom.Rectangle.Overlaps(attackRect, enemyRect)) {
-        enemy.takeDamage(baseDamage, dir);
-        this.scene.vfxManager.hitFlashFilter(enemy);
         hitAnything = true;
         lastHitX = enemy.x;
+        enemy.takeDamage(baseDamage, dir);
+        this.scene.vfxManager.hitFlashFilter(enemy);
         this.scene.emitHitParticle(enemy.x, enemy.y, 15);
         if (enemy.health <= 0) {
           this.scene.addScore(Math.floor(SCORE_CONFIG.enemyKill * this.scene.incrementCombo()));
@@ -50,10 +50,10 @@ export class CombatManager {
     if (boss && boss.active && boss.health > 0) {
       const bossRect = boss.getBounds();
       if (Phaser.Geom.Rectangle.Overlaps(attackRect, bossRect)) {
-        boss.takeDamage(baseDamage * BOSS_STATS.damageMultiplier, dir);
-        this.scene.vfxManager.hitFlashFilter(boss);
         hitAnything = true;
         lastHitX = boss.x;
+        boss.takeDamage(baseDamage * BOSS_STATS.damageMultiplier, dir);
+        this.scene.vfxManager.hitFlashFilter(boss);
         this.scene.emitHitParticle(boss.x, boss.y, 25);
         this.scene.incrementCombo();
       }
@@ -65,9 +65,9 @@ export class CombatManager {
       const propRect = prop.getBounds();
 
       if (Phaser.Geom.Rectangle.Overlaps(attackRect, propRect)) {
-        this.scene.damagePhysicsProp(prop, baseDamage, dir);
         hitAnything = true;
         lastHitX = prop.x;
+        this.scene.damagePhysicsProp(prop, baseDamage, dir);
       }
     });
 
