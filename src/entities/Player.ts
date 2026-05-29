@@ -439,7 +439,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
           }));
         },
         onUpdate: (p) => {
-          if (Phaser.Input.Keyboard.JustDown(p.waveKey) || (p.pad && p.pad.X)) {
+          if (p.waveJustPressed || (p.pad && p.pad.X)) {
             const time = p.scene.time.now;
             if (time - p.lastWaveTime > PLAYER_ATTACKS.wave.cooldown) {
               p.lastWaveTime = time;
@@ -638,8 +638,8 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     this.applyBufferedMovement();
     
     if (Phaser.Input.Keyboard.JustDown(this.cursors.down)) this.recordInput('down');
-    if (Phaser.Input.Keyboard.JustDown(this.cursors.left)) this.recordInput('left');
-    if (Phaser.Input.Keyboard.JustDown(this.cursors.right)) this.recordInput('right');
+    if (this.leftJustPressed) this.recordInput('left');
+    if (this.rightJustPressed) this.recordInput('right');
     if (Phaser.Input.Keyboard.JustDown(this.cursors.up)) this.recordInput('up');
 
     if (this.isInvulnerable && this.stateMachine.getCurrentStateName() !== 'hurt') {

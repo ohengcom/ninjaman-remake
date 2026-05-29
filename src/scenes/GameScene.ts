@@ -225,6 +225,15 @@ export class GameScene extends Phaser.Scene {
   }
 
   create(): void {
+    // Reset all lingering camera effects (fade, flash, shake) to prevent black/white transition hangs!
+    try {
+      if (this.cameras.main) {
+        this.cameras.main.resetFX();
+      }
+    } catch (e) {
+      console.warn("Failed to reset camera FX:", e);
+    }
+
     // Clear any lingering camera filters from previous transitions (fixes level transition white screen)
     try {
       if (this.cameras.main && (this.cameras.main as any).filters) {
@@ -665,9 +674,7 @@ export class GameScene extends Phaser.Scene {
       const dy = Math.sin(angle) * speed - 2; // Bias upwards
       
       const debrisSize = 6 + Math.floor(Math.random() * 6);
-      const debrisObj = this.add.graphics();
-      debrisObj.fillStyle(debrisColor, 1);
-      debrisObj.fillRect(-debrisSize/2, -debrisSize/2, debrisSize, debrisSize);
+      const debrisObj = this.add.rectangle(px + (Math.random() - 0.5) * 15, py + (Math.random() - 0.5) * 15, debrisSize, debrisSize, debrisColor, 1);
       
       // Make it a dynamic matter body
       const debBody = this.matter.add.gameObject(debrisObj, {
@@ -677,7 +684,6 @@ export class GameScene extends Phaser.Scene {
         density: 0.005
       });
       
-      (debBody as any).setPosition(px + (Math.random() - 0.5) * 15, py + (Math.random() - 0.5) * 15);
       (debBody as any).setVelocity(dx, dy);
       (debBody as any).setAngularVelocity((Math.random() - 0.5) * 0.3);
       
