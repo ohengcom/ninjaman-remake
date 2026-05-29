@@ -1,15 +1,12 @@
 /// <reference types="vite/client" />
 
-interface Window {
-  webkitAudioContext: typeof AudioContext;
+import type Phaser from 'phaser';
+
+declare global {
+  interface Window {
+    game?: Phaser.Game;
+    Phaser?: typeof Phaser;
+  }
 }
 
-declare module '*.svg' {
-  const content: string;
-  export default content;
-}
-
-declare module '*.glsl' {
-  const content: string;
-  export default content;
-}
+export {};

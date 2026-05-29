@@ -1,6 +1,6 @@
 # Ninja Man Remake
 
-A modern, high-definition action-platformer remake built with Phaser 4, TypeScript, and Vite. This project abandons legacy assets in favor of high-quality raster images powered by a state-of-the-art **Procedural Animation System** with a premium Macaron-aesthetic filter.
+A modern, high-definition action-platformer remake built with Phaser 4, TypeScript, and Vite. This project uses high-quality raster images, procedural animation, responsive scaling, keyboard controls, and gamepad support.
 
 ## Features
 
@@ -25,15 +25,24 @@ A modern, high-definition action-platformer remake built with Phaser 4, TypeScri
 ## Controls
 
 - `A` / `D`: Run
-- `W`: Jump / Double Jump
+- `W`: Up modifier / uppercut aim
+- `S`: Down modifier
+- `SPACE`: Jump / Double Jump
 - `S + SPACE` (on floating platforms): Drop through semisolid platform
-- `S` (tap): Crouch/Slide
 - `K` (hold): Defend/Block (Triggers Parry when hit)
 - `DOUBLE TAP A/D`: Invincible Dash
 - `J`: Attack (Spam for 4-hit combo)
 - `L`: Wave Attack
 - `W + J` (on ground): Uppercut (Launcher)
 - `S + J` (in air): Dive Attack
+
+### Gamepad
+
+- Left stick / D-pad: Move and directional modifiers
+- `A`: Jump / Double Jump
+- `X`: Attack
+- `B`: Defend / Block
+- `Y`: Wave Attack
 
 ## Installation and Running
 

@@ -77,12 +77,9 @@ export class HUDScene extends Phaser.Scene {
       this.domBossPanel.classList.remove('active');
     }
 
-    // Initialize global UI hooks (for Sound Toggle)
+    // Initialize UI hook for Sound Toggle.
     const btnSound = document.getElementById('hud-sound-toggle');
     if (btnSound) {
-      (window as any).toggleHUDGameSound = () => this.onToggleSound();
-      btnSound.setAttribute('onclick', 'window.toggleHUDGameSound()');
-      
       // Initialize sound toggle display to match actual status on boot
       const isEnabled = SoundManager.enabled;
       const statusText = document.getElementById('hud-sound-status');
@@ -94,6 +91,7 @@ export class HUDScene extends Phaser.Scene {
       } else {
         btnSound.classList.remove('on');
       }
+      btnSound.addEventListener('click', this.onToggleSound);
     }
 
     this.gameScene = this.scene.get('GameScene') as GameScene;
@@ -117,17 +115,16 @@ export class HUDScene extends Phaser.Scene {
 
     if (pct < 30) {
       this.domHealthFill.style.background = '#ff8787'; // Fresh pastel red
-      this.domHealthFill.classList.add('pulse');
+      this.domHealthFill.classList.add('critical-hp');
     } else {
       this.domHealthFill.style.background = '#51cf66'; // Fresh mint green
-      this.domHealthFill.classList.remove('pulse');
+      this.domHealthFill.classList.remove('critical-hp');
     }
   }
 
   private readonly onUpdateHealth = (health: number, max?: number) => {
     this.currentHealth = health;
-    if (max) this.maxHealth = max;
-    this.maxHealth = max || 100;
+    if (typeof max === 'number') this.maxHealth = max;
     this.updateDOMHealth();
   };
 
@@ -209,8 +206,7 @@ export class HUDScene extends Phaser.Scene {
   };
 
   private cleanup() {
-    // Clear global function
-    (window as any).toggleHUDGameSound = undefined;
+    document.getElementById('hud-sound-toggle')?.removeEventListener('click', this.onToggleSound);
 
     // Hide overlay and footer
     const overlay = document.querySelector('.game-ui-overlay') as HTMLElement;

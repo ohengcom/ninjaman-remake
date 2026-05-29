@@ -83,5 +83,8 @@ export const LEVELS: readonly LevelConfig[] = [
 ] as const;
 
 export function getLevelConfig(level: number): LevelConfig {
-  return LEVELS[level - 1] ?? LEVELS[0]!;
+  const index = Math.min(Math.max(Math.floor(level), 1), LEVELS.length) - 1;
+  return LEVELS[index]!;
 }
+
+export const MAX_LEVEL = LEVELS.length;

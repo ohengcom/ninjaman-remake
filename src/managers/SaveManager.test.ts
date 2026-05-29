@@ -65,7 +65,6 @@ describe('SaveManager', () => {
     expect(data.sp).toBe(10);
     expect(data.maxHealth).toBe(150);
     expect(data.highScore).toBe(0); // merged default
-    expect(data.comboLevel).toBe(1); // merged default
   });
 
   it('falls back to defaults when save data is malformed', () => {
@@ -88,8 +87,6 @@ describe('SaveManager', () => {
       sp: -10,
       maxHealth: 0,
       unlockedLevel: 2,
-      comboLevel: 99,
-      dashInvincible: 'yes',
     };
     localStorageMock.setItem('ninjaman_save_data', btoa(JSON.stringify(badData)));
 
@@ -98,7 +95,11 @@ describe('SaveManager', () => {
     expect(data.sp).toBe(0);
     expect(data.maxHealth).toBe(100);
     expect(data.unlockedLevel).toBe(2);
-    expect(data.comboLevel).toBe(3);
-    expect(data.dashInvincible).toBe(false);
+  });
+
+  it('clamps unlocked level to available levels', () => {
+    localStorageMock.setItem('ninjaman_save_data', btoa(JSON.stringify({ unlockedLevel: 99 })));
+
+    expect(SaveManager.load().unlockedLevel).toBe(3);
   });
 });

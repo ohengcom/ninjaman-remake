@@ -34,12 +34,12 @@ export const PLAYER_MOVEMENT = {
   doubleJumpVelocity: -10.0,
   dashSpeed: 14.0,
   dashDuration: 300,
+  actionBufferTime: 150,
   maxJumps: 2,
   doubleTapWindow: 300,
   motionBufferTimeout: 500,
   comboWindow: 800,
   coyoteTime: 100,
-  jumpBufferTime: 80,
 } as const;
 
 /** Player defense parameters */

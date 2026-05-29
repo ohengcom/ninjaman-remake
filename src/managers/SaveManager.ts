@@ -1,10 +1,10 @@
+import { MAX_LEVEL } from '../config/levels.js';
+
 export interface SaveData {
   highScore: number;
   sp: number; // Skill Points
   maxHealth: number;
   unlockedLevel: number;
-  comboLevel: number; // 1 = 2 hits, 2 = 3 hits, 3 = 4 hits
-  dashInvincible: boolean;
 }
 
 const DEFAULTS: SaveData = {
@@ -12,25 +12,17 @@ const DEFAULTS: SaveData = {
   sp: 0,
   maxHealth: 100,
   unlockedLevel: 1,
-  comboLevel: 1,
-  dashInvincible: false,
 };
 
 const toFiniteNumber = (value: unknown, fallback: number, min: number = 0): number => {
   return typeof value === 'number' && Number.isFinite(value) && value >= min ? value : fallback;
 };
 
-const toBoolean = (value: unknown, fallback: boolean): boolean => {
-  return typeof value === 'boolean' ? value : fallback;
-};
-
 const sanitizeSaveData = (data: Partial<SaveData>): SaveData => ({
   highScore: toFiniteNumber(data.highScore, DEFAULTS.highScore),
   sp: toFiniteNumber(data.sp, DEFAULTS.sp),
   maxHealth: toFiniteNumber(data.maxHealth, DEFAULTS.maxHealth, 1),
-  unlockedLevel: toFiniteNumber(data.unlockedLevel, DEFAULTS.unlockedLevel, 1),
-  comboLevel: Math.min(3, toFiniteNumber(data.comboLevel, DEFAULTS.comboLevel, 1)),
-  dashInvincible: toBoolean(data.dashInvincible, DEFAULTS.dashInvincible),
+  unlockedLevel: Math.min(MAX_LEVEL, toFiniteNumber(data.unlockedLevel, DEFAULTS.unlockedLevel, 1)),
 });
 
 export class SaveManager {
@@ -95,25 +87,4 @@ export class SaveManager {
     return false;
   }
 
-  public static upgradeCombo(cost: number): boolean {
-    const data = this.load();
-    if (data.sp >= cost && data.comboLevel < 3) {
-      data.sp -= cost;
-      data.comboLevel++;
-      this.save(data);
-      return true;
-    }
-    return false;
-  }
-
-  public static unlockDashInvincibility(cost: number): boolean {
-    const data = this.load();
-    if (data.sp >= cost && !data.dashInvincible) {
-      data.sp -= cost;
-      data.dashInvincible = true;
-      this.save(data);
-      return true;
-    }
-    return false;
-  }
 }

@@ -42,4 +42,23 @@ describe('StateMachine', () => {
 
     expect(calls).toEqual(['enter:first', 'exit:first', 'enter:second']);
   });
+
+  it('does not exit the current state when target state is missing', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const calls: string[] = [];
+    const machine = new StateMachine({});
+
+    machine.addState({
+      name: 'idle',
+      onEnter: () => calls.push('enter:idle'),
+      onExit: () => calls.push('exit:idle'),
+    });
+
+    machine.setState('idle');
+    machine.setState('missing');
+
+    expect(machine.getCurrentStateName()).toBe('idle');
+    expect(calls).toEqual(['enter:idle']);
+    warn.mockRestore();
+  });
 });

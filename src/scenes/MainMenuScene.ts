@@ -67,7 +67,7 @@ export class MainMenuScene extends Phaser.Scene {
     });
 
     // Version/credit text
-    this.add.text(w / 2, h - 40, 'v3.3 — Remake', {
+    this.add.text(w / 2, h - 40, 'v3.6.0 - Remake', {
       fontFamily: 'Inter, sans-serif',
       fontSize: '14px',
       color: '#666',

@@ -41,6 +41,7 @@ test.describe('Gameplay Smoke', () => {
     console.log('--- STARTING PLAYGROUND SIMULATION ---');
     
     // Phase 1: Walk to right and swing
+    await page.locator('#game-container').click();
     await page.keyboard.down('D');
     await page.waitForTimeout(1500);
     await page.keyboard.up('D');

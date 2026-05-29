@@ -20,11 +20,17 @@ export class SeededRandom {
 
   /** Returns an integer in [min, max) */
   nextInt(min: number, max: number): number {
+    if (max <= min) {
+      throw new RangeError('SeededRandom.nextInt requires max > min');
+    }
     return Math.floor(this.next() * (max - min)) + min;
   }
 
   /** Picks a random element from an array */
   pick<T>(arr: readonly T[]): T {
+    if (arr.length === 0) {
+      throw new RangeError('SeededRandom.pick requires a non-empty array');
+    }
     return arr[Math.floor(this.next() * arr.length)]!;
   }
 }

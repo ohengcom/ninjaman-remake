@@ -1,41 +1,47 @@
 import { test, expect } from '@playwright/test';
 
 test('Transition Test', async ({ page }) => {
+  test.setTimeout(90000);
+  const runtimeErrors: string[] = [];
   page.on('console', msg => console.log(`[Browser Console]: ${msg.text()}`));
-  page.on('pageerror', error => console.error(`[Browser Error]: ${error.message}`));
+  page.on('pageerror', error => {
+    console.error(`[Browser Error]: ${error.message}`);
+    runtimeErrors.push(error.message);
+  });
   
-  console.log("Navigating to local dev server...");
-  await page.goto('http://localhost:3000');
+  await page.goto('/');
   
-  await page.waitForTimeout(2000);
-  console.log("Clicking to start...");
-  await page.mouse.click(640, 360);
-  await page.waitForTimeout(1000);
+  await page.waitForSelector('#game-container canvas');
+  const overlay = page.locator('.game-ui-overlay');
+  await page.waitForTimeout(5000);
+
+  for (let attempt = 0; attempt < 10; attempt++) {
+    await page.keyboard.press('Space');
+    await page.locator('#game-container').click();
+    await page.waitForTimeout(1000);
+    if (await overlay.isVisible()) break;
+  }
+  await expect(overlay).toBeVisible({ timeout: 45000 });
   
-  console.log("Teleporting to end of level using browser evaluation...");
   await page.evaluate(() => {
-    // Access Phaser game instance via window
-    const game = (window as any).game;
+    if (!window.game) throw new Error('Missing game test hook');
+    const game = window.game;
     const gameScene = game.scene.scenes.find((s: any) => s.scene.key === 'GameScene');
     if (gameScene && gameScene.player) {
       gameScene.player.setPosition(gameScene.mapWidth - 150, 200);
     }
   });
 
-  console.log("Walking right to trigger transition...");
-  await page.keyboard.down('d');
+  await page.keyboard.down('KeyD');
   await page.waitForTimeout(3000); // 3 seconds should trigger transition
-  await page.keyboard.up('d');
+  await page.keyboard.up('KeyD');
   
-  console.log("Waiting 3 seconds for fade to complete...");
-  await page.waitForTimeout(3000);
-  
-  console.log("Checking if GameScene level is 2...");
-  const level = await page.evaluate(() => {
-    const game = (window as any).game;
+  await expect.poll(async () => page.evaluate(() => {
+    if (!window.game) throw new Error('Missing game test hook');
+    const game = window.game;
     const gameScene = game.scene.scenes.find((s: any) => s.scene.key === 'GameScene');
     return gameScene ? gameScene.currentLevel : -1;
-  });
+  }), { timeout: 10000 }).toBe(2);
   
-  console.log("Current level is:", level);
+  expect(runtimeErrors).toEqual([]);
 });

@@ -150,7 +150,7 @@ export class Boss extends Phaser.Physics.Matter.Sprite {
           if (!b.target || b.health <= 0) return;
           const dist = Math.abs(b.target.x - b.x);
           const dir = Math.sign(b.target.x - b.x);
-          const speed = b.isEnraged ? BOSS_STATS.moveSpeed * 1.5 : BOSS_STATS.moveSpeed;
+          const speed = b.isEnraged ? BOSS_STATS.moveSpeed * BOSS_STATS.enragedMoveMultiplier : BOSS_STATS.moveSpeed;
           
           b.setFlipX(dir < 0);
 
@@ -232,7 +232,7 @@ export class Boss extends Phaser.Physics.Matter.Sprite {
           b.stateMachine.addTimer(b.scene.time.delayedCall(400, () => {
             if (b.health <= 0) return;
             b.applyBossVisuals();
-            b.setVelocityX(dir * BOSS_STATS.moveSpeed * 4);
+            b.setVelocityX(dir * BOSS_STATS.moveSpeed * BOSS_STATS.rushMoveMultiplier);
             b.scene.cameras.main.shake(200, 0.015);
 
             // Stop and slam after rush

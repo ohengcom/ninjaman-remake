@@ -76,6 +76,9 @@ export class GameScene extends Phaser.Scene {
       this.handleOneWayCollisions(pair);
       if (!pair.isActive) return;
 
+      this.updatePlayerGroundContact(pair.bodyA, pair.bodyB);
+      this.updatePlayerGroundContact(pair.bodyB, pair.bodyA);
+
       const bodyA = pair.bodyA;
       const bodyB = pair.bodyB;
       const objA = bodyA.gameObject;
@@ -226,6 +229,8 @@ export class GameScene extends Phaser.Scene {
   }
 
   create(): void {
+    this.matter.world.resume();
+
     // Clear any lingering camera state before fading in
     this.cameras.main.setAlpha(1);
     this.cameras.main.fadeIn(800, 0, 0, 0);

@@ -4,7 +4,7 @@ export const GAME_CONFIG = {
   WIDTH: 1280,
   HEIGHT: 720,
   PHYSICS: {
-    GRAVITY: 1200,
+    MATTER_GRAVITY_Y: 1,
     DEBUG: false,
   },
 } as const;
@@ -30,7 +30,7 @@ export const gameConfig: Phaser.Types.Core.GameConfig = {
   physics: {
     default: 'matter',
     matter: {
-      gravity: { x: 0, y: 1 },
+      gravity: { x: 0, y: GAME_CONFIG.PHYSICS.MATTER_GRAVITY_Y },
       debug: GAME_CONFIG.PHYSICS.DEBUG,
     },
   },

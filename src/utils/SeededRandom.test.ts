@@ -37,4 +37,10 @@ describe('SeededRandom', () => {
       expect(arr).toContain(rng.pick(arr));
     }
   });
+
+  it('throws for invalid ranges and empty picks', () => {
+    const rng = new SeededRandom(1);
+    expect(() => rng.nextInt(5, 5)).toThrow(RangeError);
+    expect(() => rng.pick([])).toThrow(RangeError);
+  });
 });

@@ -43,6 +43,9 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   private jumpJustPressed: boolean = false;
   private leftJustPressed: boolean = false;
   private rightJustPressed: boolean = false;
+  private dashJustPressed: boolean = false;
+  private padButtonDown = { A: false, B: false, X: false, Y: false };
+  private padButtonJustPressed = { A: false, B: false, X: false, Y: false };
 
   private inputBuffer: { key: string, time: number }[] = [];
   private static readonly BUFFER_TIMEOUT = PLAYER_MOVEMENT.motionBufferTimeout;
@@ -56,7 +59,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
 
     this.applyRenderSize();
 
-    // Set keys to A, S, D, W, SPACE
+    // Keyboard: A/D move, W/S aim modifier, Space jump, J attack, K defend, L wave.
     this.cursors = scene.input.keyboard!.addKeys({
       up: Phaser.Input.Keyboard.KeyCodes.W,
       down: Phaser.Input.Keyboard.KeyCodes.S,
@@ -132,7 +135,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     const time = this.scene.time.now;
 
     // Direct check for Wave Key (L) for one-button special move
-    if (this.waveJustPressed || (this.pad && this.pad.X)) {
+    if (this.waveJustPressed || this.padButtonJustPressed.Y) {
       if (time - this.lastWaveTime > PLAYER_ATTACKS.wave.cooldown) {
         this.lastWaveTime = time;
         return 'attack_wave';
@@ -167,8 +170,8 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     const canGroundAction = p.isGroundedOrCoyote();
     const time = p.scene.time.now;
 
-    // Check buffered action first!
-    if (p.bufferedAction && time - p.bufferedAction.time <= 150) {
+    // Check buffered action first.
+    if (p.bufferedAction && time - p.bufferedAction.time <= PLAYER_MOVEMENT.actionBufferTime) {
       const type = p.bufferedAction.type;
 
       if (type === 'dash' && canGroundAction) {
@@ -210,7 +213,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     }
 
     // Fallback to real-time inputs
-    if (p.checkDashInput() && canGroundAction) {
+    if (p.dashJustPressed && canGroundAction) {
       p.stateMachine.setState('dash');
       return true;
     }
@@ -243,9 +246,9 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     this.isDroppingThrough = true;
     this.isOnOneWayPlatform = false;
     this.stateMachine.setState('fall');
-    this.scene.time.delayedCall(150, () => {
+    this.stateMachine.addTimer(this.scene.time.delayedCall(PLAYER_MOVEMENT.actionBufferTime, () => {
       this.isDroppingThrough = false;
-    });
+    }));
   }
 
   private isGroundedOrCoyote(): boolean {
@@ -452,14 +455,14 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         },
         onUpdate: (p) => {
           // Allow chaining to next combo hit if J is pressed during active frames
-          if (p.attackJustPressed || (p.pad && p.pad.A)) {
+          if (p.attackJustPressed || p.padButtonJustPressed.X) {
             const time = p.scene.time.now;
             if (time - p.lastAttackTime < PLAYER_MOVEMENT.comboWindow) {
               // Chain to next combo step
               p.bufferedAction = { type: 'attack', time };
             }
           }
-          if (p.waveJustPressed || (p.pad && p.pad.X)) {
+          if (p.waveJustPressed || p.padButtonJustPressed.Y) {
             const time = p.scene.time.now;
             if (time - p.lastWaveTime > PLAYER_ATTACKS.wave.cooldown) {
               p.lastWaveTime = time;
@@ -581,13 +584,13 @@ export class Player extends Phaser.Physics.Matter.Sprite {
 
   private isAttackJustDown(): boolean {
     if (this.attackJustPressed) return true;
-    if (this.pad && this.pad.A) return true;
+    if (this.padButtonJustPressed.X) return true;
     return false;
   }
 
   private isDefendDown(): boolean {
     if (this.defendKey.isDown) return true;
-    if (this.pad && this.pad.B) return true;
+    if (this.padButtonDown.B) return true;
     return false;
   }
 
@@ -622,24 +625,26 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     this.jumpJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.space);
     this.leftJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.left);
     this.rightJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.right);
+    this.captureGamepadButtons();
+    this.dashJustPressed = this.checkDashInput();
 
     // Buffer action inputs
-    if (this.jumpJustPressed || (this.pad && this.pad.A)) {
+    if (this.jumpJustPressed || this.padButtonJustPressed.A) {
       if (this.isDownDown() && this.isOnOneWayPlatform && !this.isDroppingThrough) {
         this.triggerDropThrough();
       } else {
         this.bufferedAction = { type: 'jump', time: time };
       }
-    } else if (this.attackJustPressed || (this.pad && this.pad.A)) {
+    } else if (this.attackJustPressed || this.padButtonJustPressed.X) {
       this.bufferedAction = { type: 'attack', time: time };
-    } else if (this.waveJustPressed || (this.pad && this.pad.X)) {
+    } else if (this.waveJustPressed || this.padButtonJustPressed.Y) {
       this.bufferedAction = { type: 'wave', time: time };
-    } else if (this.checkDashInput()) {
+    } else if (this.dashJustPressed) {
       this.bufferedAction = { type: 'dash', time: time };
     }
 
-    // Clean up expired buffered inputs (older than 150ms)
-    if (this.bufferedAction && time - this.bufferedAction.time > 150) {
+    // Clean up expired buffered inputs.
+    if (this.bufferedAction && time - this.bufferedAction.time > PLAYER_MOVEMENT.actionBufferTime) {
       this.bufferedAction = null;
     }
 
@@ -670,5 +675,21 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     if (this.health <= 0) {
       // dead state handling if needed
     }
+  }
+
+  private captureGamepadButtons() {
+    const previous = { ...this.padButtonDown };
+    this.padButtonDown = {
+      A: !!this.pad?.A,
+      B: !!this.pad?.B,
+      X: !!this.pad?.X,
+      Y: !!this.pad?.Y,
+    };
+    this.padButtonJustPressed = {
+      A: this.padButtonDown.A && !previous.A,
+      B: this.padButtonDown.B && !previous.B,
+      X: this.padButtonDown.X && !previous.X,
+      Y: this.padButtonDown.Y && !previous.Y,
+    };
   }
 }

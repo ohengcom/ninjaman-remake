@@ -2,7 +2,10 @@ import { Jimp } from 'jimp';
 
 async function process() {
   try {
-    const rawPath = 'C:\\Users\\lixia\\.gemini\\antigravity\\brain\\345659f6-904e-4498-8a3a-29ff8422aa8d\\ninja_single_raw_1779546540510.png';
+    const rawPath = process.argv[2];
+    if (!rawPath) {
+      throw new Error('Usage: node scripts/process-sprite.js <input-image> [output-image]');
+    }
     console.log('Loading image from', rawPath);
     
     // In jimp v1.x the default export might not be Jimp itself, but let's try read
@@ -30,7 +33,7 @@ async function process() {
       }
     });
 
-    const outPath = 'public/assets/sprites/ninja_transparent.png';
+    const outPath = process.argv[3] || 'public/assets/sprites/ninja_transparent.png';
     await image.write(outPath); // note: writeAsync in old versions, write in new versions returns a promise
     console.log('Successfully wrote transparent sprite to', outPath);
   } catch (e) {

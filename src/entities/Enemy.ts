@@ -35,6 +35,7 @@ export class Enemy extends Phaser.Physics.Matter.Sprite {
   private isInvulnerable = false;
   
   private moveSpeed: number = 50;
+  private chaseMultiplier: number = 1.5;
   private attackReach: number = 60;
   private attackWindup: number = 500;
   private attackCooldown: number = 800;
@@ -103,6 +104,7 @@ export class Enemy extends Phaser.Physics.Matter.Sprite {
 
     this.configureType(type);
     this.applyEnemyRender();
+    this.ensureBodyInWorld();
 
     this.isInvulnerable = false;
     this.patrolDir = 1;
@@ -126,6 +128,7 @@ export class Enemy extends Phaser.Physics.Matter.Sprite {
     this.health = stats.health;
     this.baseDamage = stats.baseDamage;
     this.moveSpeed = stats.moveSpeed;
+    this.chaseMultiplier = stats.chaseMultiplier;
     this.attackReach = stats.attackReach;
     this.attackWindup = stats.attackWindup;
     this.attackCooldown = stats.attackCooldown;
@@ -191,7 +194,7 @@ export class Enemy extends Phaser.Physics.Matter.Sprite {
                 e.stateMachine.setState('attack');
              }
           } else if (e.enemyType !== 'sniper') {
-            e.setVelocityX((e.moveSpeed * 1.5) * dir);
+            e.setVelocityX((e.moveSpeed * e.chaseMultiplier) * dir);
           }
         }
       })
@@ -383,6 +386,13 @@ export class Enemy extends Phaser.Physics.Matter.Sprite {
     this.patrolDir *= -1;
     this.setFlipX(this.patrolDir < 0);
     this.patrolTimer = this.scene.time.now + 2000 + Math.random() * 2000;
+  }
+
+  private ensureBodyInWorld() {
+    const worldBodies = (this.scene.matter.world.localWorld as unknown as { bodies: MatterJS.BodyType[] }).bodies;
+    if (this.body && !worldBodies.includes(this.body as MatterJS.BodyType)) {
+      this.scene.matter.world.add(this.body as MatterJS.BodyType);
+    }
   }
 
   preUpdate(time: number, delta: number) {

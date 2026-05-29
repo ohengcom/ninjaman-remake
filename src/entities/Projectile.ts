@@ -16,6 +16,8 @@ export class Projectile extends Phaser.Physics.Matter.Sprite {
     }
 
     public fire(x: number, y: number, dirX: number, speed: number, damage: number, textureKey: string = 'projectile') {
+        this.lifetimeTimer?.remove(false);
+        this.lifetimeTimer = null;
         this.setTexture(textureKey);
         this.setPosition(x, y);
         this.setActive(true);
@@ -25,14 +27,14 @@ export class Projectile extends Phaser.Physics.Matter.Sprite {
         if (textureKey === 'player_wave') {
             this.setRectangle(30, 40);
             this.setOrigin(0.5, 0.5);
-            this.setScale(1); // Reset any forced size from previous reuse
+            this.setDisplaySize(60, 60);
         } else {
             this.setRectangle(20, 10);
             this.setOrigin(0.5, 0.5);
             this.setDisplaySize(60, 15); // Make arrow larger
         }
 
-        if (!(this.scene.matter.world.localWorld as any).bodies.includes(this.body as MatterJS.BodyType)) {
+        if (!this.isBodyInWorld()) {
           this.scene.matter.world.add(this.body as MatterJS.BodyType);
         }
         this.setIgnoreGravity(true);
@@ -43,7 +45,6 @@ export class Projectile extends Phaser.Physics.Matter.Sprite {
         this.setFlipX(dirX < 0);
         
         // Auto kill after lifetime expires
-        this.lifetimeTimer?.remove(false);
         this.lifetimeTimer = this.scene.time.delayedCall(PROJECTILE_CONFIG.lifetime, () => {
             this.lifetimeTimer = null;
             if (this.active) {
@@ -60,6 +61,11 @@ export class Projectile extends Phaser.Physics.Matter.Sprite {
         this.scene.matter.world.remove(this.body as MatterJS.BodyType);
         this.setActive(false);
         this.setVisible(false);
+    }
+
+    private isBodyInWorld(): boolean {
+        const worldBodies = (this.scene.matter.world.localWorld as unknown as { bodies: MatterJS.BodyType[] }).bodies;
+        return !!this.body && worldBodies.includes(this.body as MatterJS.BodyType);
     }
 
     override destroy(fromScene?: boolean) {

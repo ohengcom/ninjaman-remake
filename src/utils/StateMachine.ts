@@ -53,6 +53,12 @@ export class StateMachine<T> {
     if (this.currentState?.name === name) {
       return;
     }
+
+    const nextState = this.states.get(name);
+    if (!nextState) {
+      console.warn(`State '${name}' not found.`);
+      return;
+    }
     
     // Check if transition is allowed
     if (this.allowedTransitions && this.currentState) {
@@ -70,12 +76,6 @@ export class StateMachine<T> {
     }
     
     this.clearTimers();
-
-    const nextState = this.states.get(name);
-    if (!nextState) {
-      console.warn(`State '${name}' not found.`);
-      return;
-    }
 
     this.currentState = nextState;
 
