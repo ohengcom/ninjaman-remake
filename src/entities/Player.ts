@@ -264,7 +264,13 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   private applyBufferedMovement() {
     if (!this.canApplyMovement()) return;
 
-    const speed = this.isGroundedOrCoyote() ? PLAYER_MOVEMENT.runSpeed : PLAYER_MOVEMENT.airSpeed;
+    // Normalize velocity by delta to be frame-rate independent.
+    // Matter.js velocity is px/physics-step; at 144Hz steps are more frequent,
+    // so without delta compensation player moves 2.4x faster than at 60Hz.
+    const dt = this.scene.game.loop.delta;
+    const dtScale = Math.min(dt / 16.667, 2.0); // clamp to prevent huge spikes on lag frames
+    const speed = (this.isGroundedOrCoyote() ? PLAYER_MOVEMENT.runSpeed : PLAYER_MOVEMENT.airSpeed) * dtScale;
+
     if (this.isLeftDown()) {
       this.setVelocityX(-speed);
       this.setFlipX(true);
@@ -525,10 +531,13 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   }
 
   private handleAirMovement() {
+    const dt = this.scene.game.loop.delta;
+    const dtScale = Math.min(dt / 16.667, 2.0);
+    const airSpeed = PLAYER_MOVEMENT.airSpeed * dtScale;
     if (this.isLeftDown()) {
-      this.setVelocityX(-PLAYER_MOVEMENT.airSpeed); this.setFlipX(true);
+      this.setVelocityX(-airSpeed); this.setFlipX(true);
     } else if (this.isRightDown()) {
-      this.setVelocityX(PLAYER_MOVEMENT.airSpeed); this.setFlipX(false);
+      this.setVelocityX(airSpeed); this.setFlipX(false);
     } else {
       this.setVelocityX(0);
     }

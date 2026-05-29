@@ -226,49 +226,13 @@ export class GameScene extends Phaser.Scene {
   }
 
   create(): void {
-    console.log('GameScene.create() started!');
-    // Force Matter physics to use standard refresh-rate independent stepping (prevents 144Hz/240Hz speedups)
-    try {
-      if (this.matter && this.matter.world) {
-        (this.matter.world as any).fixedStep = false;
-      }
-    } catch (e) {
-      console.warn("Failed to set Matter fixedStep:", e);
-    }
-
-    // Reset all lingering camera effects (fade, flash, shake) to prevent black/white transition hangs!
-    try {
-      if (this.cameras.main) {
-        this.cameras.main.resetFX();
-      }
-    } catch (e) {
-      console.warn("Failed to reset camera FX:", e);
-    }
-
-    // Clear any lingering camera filters from previous transitions (fixes level transition white screen)
-    try {
-      if (this.cameras.main && (this.cameras.main as any).filters) {
-        const cFilters = (this.cameras.main as any).filters;
-        if (typeof cFilters.clear === 'function') {
-          cFilters.clear();
-        } else if (Array.isArray(cFilters)) {
-          cFilters.length = 0;
-        } else {
-          // Never delete the .filters property as Phaser v4 rendering expects it to exist!
-          if (cFilters.internal && typeof cFilters.internal.clear === 'function') {
-            cFilters.internal.clear();
-          }
-          if (cFilters.external && typeof cFilters.external.clear === 'function') {
-            cFilters.external.clear();
-          }
-        }
-      }
-    } catch (e) {
-      console.warn("Failed to clear camera filters on create:", e);
-    }
-
-    this.cameras.main.fadeIn(800, 0, 0, 0);
+    // Ensure camera is fully visible before fade-in (prevents black screen on scene.restart)
     this.cameras.main.setAlpha(1);
+    // Clear any lingering fade/flash effects from the previous scene
+    try { this.cameras.main.resetFX(); } catch(e) {}
+    // Now fade in from black — this explicitly starts at black overlay and fades to clear
+    this.cameras.main.fadeIn(800, 0, 0, 0);
+
 
     // Restore HUD header (hidden by MainMenuScene)
     const hudHeader = document.querySelector('.hud-header') as HTMLElement;
@@ -453,8 +417,7 @@ export class GameScene extends Phaser.Scene {
        this.isTransitioning = true;
        console.log('Transitioning to next level!');
        
-       // Disable physics and input to prevent camera shakes from cancelling the fadeOut
-       this.matter.world.pause();
+       // Freeze input only, do NOT pause matter.world (avoids delayedCall stall)
        if (this.input.keyboard) this.input.keyboard.enabled = false;
        this.player.setVelocity(0, 0);
        SaveManager.updateLevel(this.currentLevel + 1);
@@ -472,11 +435,10 @@ export class GameScene extends Phaser.Scene {
 
        this.tweens.add({ targets: transText, alpha: 1, duration: 400 });
 
-        // Always use standard robust fadeOut transition to prevent persistent filter white screens!
-        this.cameras.main.fadeOut(1200, 0, 0, 0);
+       // Fade to black then restart — use timer as primary (not fade event which can be cancelled)
+       this.cameras.main.fadeOut(1000, 0, 0, 0);
        
-       // Use a fallback timer in case fadeOut gets cancelled by a rogue camera effect
-       this.time.delayedCall(1300, () => {
+       this.time.delayedCall(1100, () => {
          if (this.input.keyboard) this.input.keyboard.enabled = true;
          this.scene.restart({ level: this.currentLevel + 1 });
        });
@@ -547,18 +509,17 @@ export class GameScene extends Phaser.Scene {
       this.vfxManager.emitHitParticle(x, y, count, type as any);
   }
 
-  /** Freeze the physics world for a few frames to add weight to hits */
-  public hitstop(durationMs: number = 60) {
+  /** Freeze the physics world for a few frames to add weight to hits.
+   * NOTE: We deliberately do NOT pause/resume Matter.world here.
+   * matter.world.pause() interferes with state-machine timers and level transitions.
+   * The visual "hitstop" effect is achieved via the VFX only (camera shake).
+   */
+  public hitstop(_durationMs: number = 60) {
     if (this.isHitstopping) return;
     this.isHitstopping = true;
-
-    this.matter.world.pause();
-    this.vfxManager.hitstopFilter(durationMs);
-    this.time.delayedCall(durationMs, () => {
+    this.vfxManager.hitstopFilter(_durationMs);
+    this.time.delayedCall(_durationMs, () => {
       this.isHitstopping = false;
-      if (this.matter && this.matter.world) {
-        this.matter.world.resume();
-      }
     });
   }
 

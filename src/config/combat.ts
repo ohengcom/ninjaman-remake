@@ -28,11 +28,11 @@ export const PLAYER_ATTACKS = {
 
 /** Player movement parameters */
 export const PLAYER_MOVEMENT = {
-  runSpeed: 7.5,
-  airSpeed: 5.5,
+  runSpeed: 3.5,      // 3.5 px/frame @ 60fps = ~210px/s; feels like classic beat-em-up pacing
+  airSpeed: 3.0,
   jumpVelocity: -11.0,
   doubleJumpVelocity: -10.0,
-  dashSpeed: 16.0,
+  dashSpeed: 10.0,    // Balanced with runSpeed
   dashDuration: 300,
   maxJumps: 2,
   doubleTapWindow: 300,
