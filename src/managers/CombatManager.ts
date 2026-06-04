@@ -15,16 +15,31 @@ export class CombatManager {
     this.scene = scene;
   }
 
+  private getPlayerAttackRect(attacker: Player, type: string): Phaser.Geom.Rectangle {
+    const dir = attacker.flipX ? -1 : 1;
+    const comboBox = PLAYER_ATTACKS.hitboxes.combo[attacker.comboStep] ?? PLAYER_ATTACKS.hitboxes.combo[0];
+    const box = type === 'uppercut'
+      ? PLAYER_ATTACKS.hitboxes.uppercut
+      : type === 'dive'
+        ? PLAYER_ATTACKS.hitboxes.dive
+        : type === 'dive_land'
+          ? PLAYER_ATTACKS.hitboxes.dive_land
+          : comboBox;
+
+    const x = dir > 0 ? attacker.x + 10 : attacker.x - box.reach - 10;
+    const y = attacker.y + box.offsetY - box.height / 2;
+    return new Phaser.Geom.Rectangle(x, y, box.reach, box.height);
+  }
+
   public resolvePlayerAttack(attacker: Player, type: string, enemies: Phaser.GameObjects.Group, boss: Boss | null) {
-    let reach: number = PLAYER_ATTACKS.combo.reach;
     let baseDamage: number = PLAYER_ATTACKS.combo.baseDamage;
 
-    if (type === 'uppercut') { reach = PLAYER_ATTACKS.uppercut.reach; baseDamage = PLAYER_ATTACKS.uppercut.baseDamage; }
-    if (type === 'dive') { reach = PLAYER_ATTACKS.dive.reach; baseDamage = PLAYER_ATTACKS.dive.baseDamage; }
+    if (type === 'uppercut') { baseDamage = PLAYER_ATTACKS.uppercut.baseDamage; }
+    if (type === 'dive' || type === 'dive_land') { baseDamage = PLAYER_ATTACKS.dive.baseDamage; }
     if (type === 'combo') { baseDamage = PLAYER_ATTACKS.combo.baseDamage + (attacker.comboStep * PLAYER_ATTACKS.combo.damagePerStep); }
 
     const dir = attacker.flipX ? -1 : 1;
-    const attackRect = new Phaser.Geom.Rectangle(dir > 0 ? attacker.x : attacker.x - reach, attacker.y - attacker.height / 2, reach, attacker.height);
+    const attackRect = this.getPlayerAttackRect(attacker, type);
 
     let hitAnything = false;
     let lastHitX = attacker.x;

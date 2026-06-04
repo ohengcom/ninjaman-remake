@@ -15,46 +15,41 @@ export class MainMenuScene extends Phaser.Scene {
     const hudHeader = document.querySelector('.hud-header') as HTMLElement;
     if (hudHeader) hudHeader.style.display = 'none';
 
-    // Dramatic vignette overlay
     const vignette = this.add.graphics();
-    vignette.fillStyle(0x000000, 0.4);
+    vignette.fillStyle(0x000000, 0.48);
     vignette.fillRect(0, 0, w, h);
 
-    // Title with anime-style glow
     const title = this.add.text(w / 2, h / 2 - 120, 'NINJA MAN', {
       fontFamily: 'Orbitron, Impact, sans-serif',
       fontSize: '72px',
       color: '#ffffff',
-      stroke: '#00d4ff',
+      stroke: '#e94560',
       strokeThickness: 4,
-      shadow: { blur: 20, color: 'rgba(0, 212, 255, 0.6)', fill: true, offsetX: 0, offsetY: 0 }
+      shadow: { blur: 20, color: 'rgba(233, 69, 96, 0.55)', fill: true, offsetX: 0, offsetY: 0 },
     }).setOrigin(0.5);
 
-    // Subtitle
-    const subtitle = this.add.text(w / 2, h / 2 - 55, '影の道', {
+    const subtitle = this.add.text(w / 2, h / 2 - 55, 'PATH OF SHADOW', {
       fontFamily: 'serif',
       fontSize: '28px',
-      color: '#ff6b8a',
-      shadow: { blur: 12, color: 'rgba(255, 107, 138, 0.5)', fill: true, offsetX: 0, offsetY: 0 }
+      color: '#f8f1e4',
+      shadow: { blur: 12, color: 'rgba(248, 241, 228, 0.35)', fill: true, offsetX: 0, offsetY: 0 },
     }).setOrigin(0.5);
 
-    // Floating animation for title
     this.tweens.add({
       targets: [title, subtitle],
       y: '-=8',
       duration: 2500,
       yoyo: true,
       repeat: -1,
-      ease: 'Sine.easeInOut'
+      ease: 'Sine.easeInOut',
     });
 
-    // Start prompt with pulsing glow
     const startText = this.add.text(w / 2, h / 2 + 120, '[ PRESS SPACE TO BEGIN ]', {
       fontFamily: 'Orbitron, Inter, sans-serif',
       fontSize: '22px',
-      color: '#00d4ff',
+      color: '#f8f1e4',
       fontStyle: 'bold',
-      shadow: { blur: 8, color: 'rgba(0, 212, 255, 0.4)', fill: true, offsetX: 0, offsetY: 0 }
+      shadow: { blur: 8, color: 'rgba(233, 69, 96, 0.55)', fill: true, offsetX: 0, offsetY: 0 },
     }).setOrigin(0.5);
 
     this.tweens.add({
@@ -63,49 +58,40 @@ export class MainMenuScene extends Phaser.Scene {
       duration: 1000,
       yoyo: true,
       repeat: -1,
-      ease: 'Sine.easeInOut'
+      ease: 'Sine.easeInOut',
     });
 
-    // Version/credit text
-    this.add.text(w / 2, h - 40, 'v3.6.0 - Remake', {
+    this.add.text(w / 2, h - 40, 'v3.6.0 - Prototype', {
       fontFamily: 'Inter, sans-serif',
       fontSize: '14px',
-      color: '#666',
+      color: '#d9d0c0',
     }).setOrigin(0.5);
 
-    // Start on SPACE or click
     const startGame = async () => {
-      console.log('startGame triggered!');
       this.input.keyboard?.off('keydown-SPACE', startGame);
       this.input.off('pointerdown', startGame);
 
-      console.log('Lazy loading scenes...');
-      // --- LAZY LOAD SCENES ---
-      // This forces Vite to code-split the massive gameplay chunk
       try {
         if (!this.scene.get('GameScene')) {
-            const [
-                { GameScene },
-                { HUDScene },
-                { GameOverScene },
-                { PauseScene }
-            ] = await Promise.all([
-                import('./GameScene.js'),
-                import('./HUDScene.js'),
-                import('./GameOverScene.js'),
-                import('./PauseScene.js')
-            ]);
-            console.log('Lazy loading completed successfully!');
-            this.scene.add('GameScene', GameScene, false);
-            this.scene.add('HUDScene', HUDScene, false);
-            this.scene.add('GameOverScene', GameOverScene, false);
-            this.scene.add('PauseScene', PauseScene, false);
+          const [
+            { GameScene },
+            { HUDScene },
+            { GameOverScene },
+            { PauseScene },
+          ] = await Promise.all([
+            import('./GameScene.js'),
+            import('./HUDScene.js'),
+            import('./GameOverScene.js'),
+            import('./PauseScene.js'),
+          ]);
+          this.scene.add('GameScene', GameScene, false);
+          this.scene.add('HUDScene', HUDScene, false);
+          this.scene.add('GameOverScene', GameOverScene, false);
+          this.scene.add('PauseScene', PauseScene, false);
         }
       } catch (err) {
         console.error('LAZY LOAD SCENES FAILED:', err);
       }
-
-      console.log('Starting GameScene...');
 
       if (this.sys.game.config.renderType === Phaser.CANVAS) {
         this.cameras.main.fadeOut(800, 0, 0, 0);
@@ -126,10 +112,10 @@ export class MainMenuScene extends Phaser.Scene {
             ease: 'Quad.easeIn',
             onComplete: () => {
               this.scene.start('GameScene', { level: 1 });
-            }
+            },
           });
         } catch (e) {
-          console.warn("Wipe filter failed on MainMenuScene, falling back to fade:", e);
+          console.warn('Wipe filter failed on MainMenuScene, falling back to fade:', e);
           this.cameras.main.fadeOut(800, 0, 0, 0);
           this.cameras.main.once('camerafadeoutcomplete', () => {
             this.scene.start('GameScene', { level: 1 });

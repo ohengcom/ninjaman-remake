@@ -67,7 +67,7 @@ export class HUDScene extends Phaser.Scene {
     if (this.domScoreValue) this.domScoreValue.innerText = '0';
     if (this.domLevelValue) {
       const cfg = getLevelConfig(this.currentLevel);
-      this.domLevelValue.innerText = `SECTOR ${this.currentLevel}: ${cfg ? cfg.name : 'MYSTICAL FOREST'}`;
+      this.domLevelValue.innerText = `ACT ${this.currentLevel}: ${cfg ? cfg.name : 'MYSTICAL FOREST'}`;
     }
     if (this.domStyleContainer) {
       this.domStyleContainer.classList.remove('active');
@@ -146,7 +146,7 @@ export class HUDScene extends Phaser.Scene {
     this.currentLevel = level;
     if (this.domLevelValue) {
       const cfg = getLevelConfig(this.currentLevel);
-      this.domLevelValue.innerText = `SECTOR ${this.currentLevel}: ${cfg ? cfg.name : 'UNKNOWN'}`;
+      this.domLevelValue.innerText = `ACT ${this.currentLevel}: ${cfg ? cfg.name : 'UNKNOWN'}`;
     }
   };
 

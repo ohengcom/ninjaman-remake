@@ -19,6 +19,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   public attackKey!: Phaser.Input.Keyboard.Key;
   public defendKey!: Phaser.Input.Keyboard.Key;
   public waveKey!: Phaser.Input.Keyboard.Key;
+  public dashKey!: Phaser.Input.Keyboard.Key;
   private pad: Phaser.Input.Gamepad.Gamepad | null = null;
   
   public health: number = 100;
@@ -37,6 +38,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   private lastTapLeftTime: number = 0;
   private lastTapRightTime: number = 0;
   private dashDir: number = 1;
+  private lastDashTime: number = -Infinity;
 
   private attackJustPressed: boolean = false;
   private waveJustPressed: boolean = false;
@@ -44,8 +46,8 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   private leftJustPressed: boolean = false;
   private rightJustPressed: boolean = false;
   private dashJustPressed: boolean = false;
-  private padButtonDown = { A: false, B: false, X: false, Y: false };
-  private padButtonJustPressed = { A: false, B: false, X: false, Y: false };
+  private padButtonDown = { A: false, B: false, X: false, Y: false, R1: false };
+  private padButtonJustPressed = { A: false, B: false, X: false, Y: false, R1: false };
 
   private inputBuffer: { key: string, time: number }[] = [];
   private static readonly BUFFER_TIMEOUT = PLAYER_MOVEMENT.motionBufferTimeout;
@@ -71,6 +73,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     this.attackKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.J);
     this.defendKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.K);
     this.waveKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.L);
+    this.dashKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
 
     // Gamepad support
     if (scene.input.gamepad) {
@@ -120,12 +123,22 @@ export class Player extends Phaser.Physics.Matter.Sprite {
 
   private checkDashInput(): boolean {
     const time = this.scene.time.now;
+    if (time - this.lastDashTime < PLAYER_MOVEMENT.dashCooldown) return false;
+
+    if (Phaser.Input.Keyboard.JustDown(this.dashKey) || this.padButtonJustPressed.R1) {
+      if (this.isLeftDown()) this.dashDir = -1;
+      else if (this.isRightDown()) this.dashDir = 1;
+      else this.dashDir = this.flipX ? -1 : 1;
+      this.lastDashTime = time;
+      return true;
+    }
+
     if (this.leftJustPressed) {
-      if (time - this.lastTapLeftTime < PLAYER_MOVEMENT.doubleTapWindow) { this.dashDir = -1; return true; }
+      if (time - this.lastTapLeftTime < PLAYER_MOVEMENT.doubleTapWindow) { this.dashDir = -1; this.lastDashTime = time; return true; }
       this.lastTapLeftTime = time;
     }
     if (this.rightJustPressed) {
-      if (time - this.lastTapRightTime < PLAYER_MOVEMENT.doubleTapWindow) { this.dashDir = 1; return true; }
+      if (time - this.lastTapRightTime < PLAYER_MOVEMENT.doubleTapWindow) { this.dashDir = 1; this.lastDashTime = time; return true; }
       this.lastTapRightTime = time;
     }
     return false;
@@ -267,17 +280,21 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   private applyBufferedMovement() {
     if (!this.canApplyMovement()) return;
 
-    // Matter.js Body.setVelocity normalizes speed by body.deltaTime/_baseDelta internally,
-    // so this value is frame-rate independent (same speed at 60Hz, 144Hz, 240Hz).
-    const speed = this.isGroundedOrCoyote() ? PLAYER_MOVEMENT.runSpeed : PLAYER_MOVEMENT.airSpeed;
+    const grounded = this.isGroundedOrCoyote();
+    const speed = grounded ? PLAYER_MOVEMENT.runSpeed : PLAYER_MOVEMENT.airSpeed;
+    const accel = grounded ? PLAYER_MOVEMENT.groundAcceleration : PLAYER_MOVEMENT.airAcceleration;
+    const decel = grounded ? PLAYER_MOVEMENT.groundDeceleration : PLAYER_MOVEMENT.airDeceleration;
+    const currentX = this.body!.velocity.x;
+
     if (this.isLeftDown()) {
-      this.setVelocityX(-speed);
+      this.setVelocityX(Phaser.Math.Linear(currentX, -speed, accel));
       this.setFlipX(true);
     } else if (this.isRightDown()) {
-      this.setVelocityX(speed);
+      this.setVelocityX(Phaser.Math.Linear(currentX, speed, accel));
       this.setFlipX(false);
-    } else if (this.isGroundedOrCoyote()) {
-      this.setVelocityX(0);
+    } else {
+      const nextX = Phaser.Math.Linear(currentX, 0, decel);
+      this.setVelocityX(Math.abs(nextX) < 0.04 ? 0 : nextX);
     }
   }
 
@@ -549,12 +566,14 @@ export class Player extends Phaser.Physics.Matter.Sprite {
 
   private handleAirMovement() {
     const airSpeed = PLAYER_MOVEMENT.airSpeed;
+    const currentX = this.body!.velocity.x;
     if (this.isLeftDown()) {
-      this.setVelocityX(-airSpeed); this.setFlipX(true);
+      this.setVelocityX(Phaser.Math.Linear(currentX, -airSpeed, PLAYER_MOVEMENT.airAcceleration)); this.setFlipX(true);
     } else if (this.isRightDown()) {
-      this.setVelocityX(airSpeed); this.setFlipX(false);
+      this.setVelocityX(Phaser.Math.Linear(currentX, airSpeed, PLAYER_MOVEMENT.airAcceleration)); this.setFlipX(false);
     } else {
-      this.setVelocityX(0);
+      const nextX = Phaser.Math.Linear(currentX, 0, PLAYER_MOVEMENT.airDeceleration);
+      this.setVelocityX(Math.abs(nextX) < 0.04 ? 0 : nextX);
     }
   }
 
@@ -628,6 +647,10 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     this.captureGamepadButtons();
     this.dashJustPressed = this.checkDashInput();
 
+    if (Phaser.Input.Keyboard.JustUp(this.cursors.space) && this.body!.velocity.y < PLAYER_MOVEMENT.shortHopVelocity) {
+      this.setVelocityY(PLAYER_MOVEMENT.shortHopVelocity);
+    }
+
     // Buffer action inputs
     if (this.jumpJustPressed || this.padButtonJustPressed.A) {
       if (this.isDownDown() && this.isOnOneWayPlatform && !this.isDroppingThrough) {
@@ -684,12 +707,14 @@ export class Player extends Phaser.Physics.Matter.Sprite {
       B: !!this.pad?.B,
       X: !!this.pad?.X,
       Y: !!this.pad?.Y,
+      R1: !!this.pad?.R1,
     };
     this.padButtonJustPressed = {
       A: this.padButtonDown.A && !previous.A,
       B: this.padButtonDown.B && !previous.B,
       X: this.padButtonDown.X && !previous.X,
       Y: this.padButtonDown.Y && !previous.Y,
+      R1: this.padButtonDown.R1 && !previous.R1,
     };
   }
 }

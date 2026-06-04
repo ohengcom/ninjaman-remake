@@ -24,19 +24,36 @@ export const PLAYER_ATTACKS = {
     damage: 20,
     cooldown: 350,
   },
+  hitboxes: {
+    combo: [
+      { reach: 76, height: 82, offsetY: -6 },
+      { reach: 88, height: 86, offsetY: -8 },
+      { reach: 100, height: 96, offsetY: -12 },
+      { reach: 116, height: 104, offsetY: -12 },
+    ],
+    uppercut: { reach: 70, height: 118, offsetY: -42 },
+    dive: { reach: 82, height: 112, offsetY: 28 },
+    dive_land: { reach: 150, height: 72, offsetY: 34 },
+  },
 } as const;
 
 /** Player movement parameters */
 export const PLAYER_MOVEMENT = {
   runSpeed: 6.0,      // px/physics-step (Matter normalizes by body.deltaTime/_baseDelta so this is frame-rate independent)
   airSpeed: 4.5,
+  groundAcceleration: 0.35,
+  groundDeceleration: 0.55,
+  airAcceleration: 0.22,
+  airDeceleration: 0.08,
   jumpVelocity: -11.0,
+  shortHopVelocity: -5.2,
   doubleJumpVelocity: -10.0,
   dashSpeed: 14.0,
-  dashDuration: 300,
+  dashDuration: 180,
+  dashCooldown: 260,
   actionBufferTime: 150,
   maxJumps: 2,
-  doubleTapWindow: 300,
+  doubleTapWindow: 260,
   motionBufferTimeout: 500,
   comboWindow: 800,
   coyoteTime: 100,

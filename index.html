@@ -6,9 +6,9 @@
     <meta name="theme-color" content="#07070f" />
     <meta
       name="description"
-      content="Cyber Ninja - A modern, high-definition action-platformer built with Phaser 4 + TypeScript + Vite. Experience tactical combat, custom synthetics, and detailed vector aesthetics."
+      content="Ninja Man - A focused action-platformer prototype built with Phaser 4, TypeScript, and Vite."
     />
-    <title>Cyber Ninja - Modern HD Platformer</title>
+    <title>Ninja Man - Shadow Action Platformer</title>
     
     <!-- Google Web Fonts for futuristic and clean typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,7 +33,7 @@
         <header class="hud-header">
           <!-- Integrity (Health) Panel -->
           <div class="integrity-panel">
-            <span class="integrity-label">INTEGRITY</span>
+            <span class="integrity-label">VITALITY</span>
             <div class="bar-container">
               <div id="hud-integrity-bar" class="integrity-bar"></div>
               <span id="hud-hp-numeric" class="hp-numeric">100 / 100</span>
@@ -41,7 +41,7 @@
           </div>
 
           <!-- Sector progression tracker -->
-          <div id="hud-sector-display" class="sector-panel">SECTOR 1: CITY SECTOR</div>
+          <div id="hud-sector-display" class="sector-panel">ACT 1: MYSTICAL FOREST</div>
 
           <!-- Futuristic Score Panel -->
           <div class="score-panel">
@@ -57,7 +57,7 @@
 
         <!-- Boss Health Bar (Top Center) -->
         <div id="hud-boss-panel" class="boss-health-panel">
-          <span class="boss-label">CORE GUARDIAN</span>
+          <span class="boss-label">ONI WARLORD</span>
           <div class="boss-bar-wrapper">
             <div id="hud-boss-bar-fill" class="boss-health-fill"></div>
           </div>
@@ -65,20 +65,20 @@
 
       </div>
 
-      <!-- INTERACTIVE OVERLAY: SYSTEM PAUSED -->
+      <!-- INTERACTIVE OVERLAY: PAUSED -->
       <div id="menu-pause-overlay" class="fullscreen-overlay">
         <div class="pause-panel">
-          <h2 class="pause-title">SYSTEM PAUSED</h2>
-          <p class="close-panel-tip" style="margin-top: 15px;">PRESS [ESC] TO RESUME ACTION</p>
+          <h2 class="pause-title">PAUSED</h2>
+          <p class="close-panel-tip" style="margin-top: 15px;">PRESS [ESC] TO RESUME</p>
         </div>
       </div>
 
       <!-- INTERACTIVE OVERLAY: GAME OVER -->
       <div id="menu-gameover-overlay" class="fullscreen-overlay interactive">
         <div class="terminal-panel gameover-panel">
-          <h2 id="gameover-title" class="gameover-title">SECTOR COMPROMISED</h2>
+          <h2 id="gameover-title" class="gameover-title">SHADOW FALLEN</h2>
           <div class="gameover-score-row">FINAL SCORE: <span id="gameover-score" style="color: var(--accent);">0</span></div>
-          <button id="btn-restart-game" class="restart-btn">REBOOT SYSTEM</button>
+          <button id="btn-restart-game" class="restart-btn">TRY AGAIN</button>
         </div>
       </div>
 
@@ -91,8 +91,8 @@
             <div class="crest-ring ring-inner"></div>
             <span class="crest-icon">✓</span>
           </div>
-          <h2 class="victory-title">SECTOR SECURED</h2>
-          <p class="victory-subtitle">SIMULATION COMPLETION SUCCESSFUL</p>
+          <h2 class="victory-title">NIGHT CLEARED</h2>
+          <p class="victory-subtitle">THE PATH REMAINS OPEN</p>
           
           <div class="victory-stats-card">
             <div class="stat-item">
@@ -118,7 +118,7 @@
     <!-- Footer HUD: Keyboard controllers & procedurally generated Sound switches -->
     <footer class="hud-footer" style="width: min(calc(100vw - 32px), 1280px); flex: 0 0 auto; display: none;">
       <div class="controls-guide">
-        Move <kbd>A</kbd>/<kbd>D</kbd> &nbsp;&middot;&nbsp; Aim <kbd>W</kbd>/<kbd>S</kbd> &nbsp;&middot;&nbsp; Jump <kbd>Space</kbd> &nbsp;&middot;&nbsp; Attack <kbd>J</kbd> &nbsp;&middot;&nbsp; Defend <kbd>K</kbd> &nbsp;&middot;&nbsp; Wave <kbd>L</kbd> &nbsp;&middot;&nbsp; Dash <kbd>Double-Tap</kbd>
+        Move <kbd>A</kbd>/<kbd>D</kbd> &nbsp;&middot;&nbsp; Aim <kbd>W</kbd>/<kbd>S</kbd> &nbsp;&middot;&nbsp; Jump <kbd>Space</kbd> &nbsp;&middot;&nbsp; Attack <kbd>J</kbd> &nbsp;&middot;&nbsp; Defend <kbd>K</kbd> &nbsp;&middot;&nbsp; Wave <kbd>L</kbd> &nbsp;&middot;&nbsp; Dash <kbd>Shift</kbd> / <kbd>Double-Tap</kbd>
       </div>
       <div id="hud-sound-toggle" class="sound-indicator interactive">
         SOUND: <span id="hud-sound-status">OFF</span>

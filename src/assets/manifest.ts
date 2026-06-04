@@ -12,8 +12,6 @@ export const manifest = {
     { key: 'projectile', url: 'assets/sprites/projectile.svg', svgConfig: { width: 40, height: 20 } },
   ],
   spritesheets: [
-    // Player hero — 1024x1024 image, 8 poses in roughly 4x2 grid => 256x512 per frame
-    { key: 'player_hero', url: 'assets/sprites/player_hero.png', frameConfig: { frameWidth: 256, frameHeight: 512 } },
     // Enemy types — 1024x1024 images, 6 poses in 3x2 grid => ~341x512, use 340x512
     { key: 'enemy_guard_sheet', url: 'assets/sprites/enemy_guard.png', frameConfig: { frameWidth: 340, frameHeight: 512 } },
     { key: 'enemy_axe_sheet', url: 'assets/sprites/enemy_axe.png', frameConfig: { frameWidth: 340, frameHeight: 512 } },

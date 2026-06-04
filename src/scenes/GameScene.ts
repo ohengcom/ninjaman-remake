@@ -323,10 +323,10 @@ export class GameScene extends Phaser.Scene {
       }
       
       const transitionX = this.mapWidth - 650;
-      const portal = this.add.text(transitionX - 80, h - 170, '⟫ NEXT SECTOR ⟫', {
-        fontFamily: 'Orbitron, Impact, sans-serif', fontSize: '28px', color: '#00d4ff',
+      const portal = this.add.text(transitionX - 80, h - 170, 'NEXT ACT', {
+        fontFamily: 'Orbitron, Impact, sans-serif', fontSize: '28px', color: '#f8f1e4',
         stroke: '#000', strokeThickness: 3,
-        shadow: { blur: 12, color: 'rgba(0, 212, 255, 0.6)', fill: true, offsetX: 0, offsetY: 0 }
+        shadow: { blur: 12, color: 'rgba(233, 69, 96, 0.55)', fill: true, offsetX: 0, offsetY: 0 }
       }).setOrigin(0.5);
       this.tweens.add({ targets: portal, alpha: 0.2, yoyo: true, repeat: -1, duration: 800 });
 
@@ -337,7 +337,7 @@ export class GameScene extends Phaser.Scene {
       this.boss = new Boss(this, bossX, bossY);
       this.boss.setTarget(this.player);
       
-      const bossWarning = this.add.text(bossX, 100, '⚠ CORE GUARDIAN ⚠', {
+      const bossWarning = this.add.text(bossX, 100, 'ONI WARLORD', {
          fontFamily: 'Orbitron, Impact, sans-serif', fontSize: '40px', color: '#ff4444',
          stroke: '#000', strokeThickness: 4,
          shadow: { blur: 16, color: 'rgba(255, 68, 68, 0.7)', fill: true, offsetX: 0, offsetY: 0 }
@@ -361,8 +361,8 @@ export class GameScene extends Phaser.Scene {
 
     // Add ambient level lights
     if (this.currentLevel === 1) {
-      this.lights.addLight(400, 200, 500, 0x00d4ff, 1.2);
-      this.lights.addLight(1200, 200, 500, 0x00ff88, 1.0);
+      this.lights.addLight(400, 200, 500, 0xffd6a5, 1.1);
+      this.lights.addLight(1200, 200, 500, 0x8fd694, 0.9);
     } else if (this.currentLevel === 2) {
       this.lights.addLight(600, 100, 600, 0xffaa00, 1.5);
       this.lights.addLight(1800, 100, 600, 0xff4488, 1.2);
@@ -371,8 +371,8 @@ export class GameScene extends Phaser.Scene {
       this.lights.addLight(800, 250, 400, 0x00d4ff, 1.6);
     }
 
-    // High tech cyan light following the player
-    this.playerLight = this.lights.addLight(this.player.x, this.player.y, 250, 0x00ffff, 1.5);
+    // Small moonlit accent following the player.
+    this.playerLight = this.lights.addLight(this.player.x, this.player.y, 230, 0xf8f1e4, 1.1);
 
     this.events.on(GAME_EVENTS.PLAYER_ATTACK, this.onPlayerAttack);
     this.events.on(GAME_EVENTS.PLAYER_PARRY, this.onPlayerParry);
@@ -422,8 +422,6 @@ export class GameScene extends Phaser.Scene {
 
     if (!this.levelCfg.isBossLevel && this.player.x > this.mapWidth - 650 && !this.isTransitioning) {
        this.isTransitioning = true;
-       console.log('Transitioning to next level!');
-       
        // Freeze input only, do NOT pause matter.world (avoids delayedCall stall)
        if (this.input.keyboard) this.input.keyboard.enabled = false;
        this.player.setVelocity(0, 0);
