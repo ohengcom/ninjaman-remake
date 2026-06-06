@@ -3,6 +3,12 @@ import { manifest } from '../assets/manifest.js';
 import { registerAnimations } from '../animations/AnimationDefs.js';
 import { SoundManager } from '../managers/SoundManager.js';
 
+const HIGH_QUALITY_TEXTURE_KEYS = [
+  ...manifest.images.map((img) => img.key),
+  ...manifest.spritesheets.map((sheet) => sheet.key),
+  ...manifest.atlases.map((atlas) => atlas.key),
+] as const;
+
 export class BootScene extends Phaser.Scene {
   constructor() {
     super({ key: 'BootScene' });
@@ -145,6 +151,10 @@ export class BootScene extends Phaser.Scene {
   }
 
   create(): void {
+    for (const key of HIGH_QUALITY_TEXTURE_KEYS) {
+      this.textures.get(key).setFilter(Phaser.Textures.FilterMode.LINEAR);
+    }
+
     // Bind Phaser Sound Manager globally
     SoundManager.setSoundManager(this.sound);
 

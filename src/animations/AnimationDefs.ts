@@ -5,17 +5,21 @@ import Phaser from 'phaser';
  * Called once from BootScene.create().
  */
 export function registerAnimations(scene: Phaser.Scene): void {
-  // ─── Player animations (knight atlas - kept for rich attack animations) ───
-  scene.anims.create({ key: 'player_idle', frames: [{ key: 'knight', frame: 'guard/frame0001' }], frameRate: 1, repeat: 0 });
-  scene.anims.create({ key: 'player_run', frames: scene.anims.generateFrameNames('knight', { prefix: 'run/frame', start: 0, end: 7, zeroPad: 4 }), frameRate: 15, repeat: -1 });
-  scene.anims.create({ key: 'player_jump', frames: scene.anims.generateFrameNames('knight', { prefix: 'jump_loop/frame', start: 0, end: 1, zeroPad: 4 }), frameRate: 10, repeat: -1 });
-  scene.anims.create({ key: 'player_fall', frames: scene.anims.generateFrameNames('knight', { prefix: 'fall_loop/frame', start: 0, end: 1, zeroPad: 4 }), frameRate: 10, repeat: -1 });
-  scene.anims.create({ key: 'player_attack_A', frames: scene.anims.generateFrameNames('knight', { prefix: 'attack_A/frame', start: 0, end: 12, zeroPad: 4 }), frameRate: 20, repeat: 0 });
-  scene.anims.create({ key: 'player_attack_B', frames: scene.anims.generateFrameNames('knight', { prefix: 'attack_B/frame', start: 0, end: 9, zeroPad: 4 }), frameRate: 20, repeat: 0 });
-  scene.anims.create({ key: 'player_attack_C', frames: scene.anims.generateFrameNames('knight', { prefix: 'attack_C/frame', start: 0, end: 12, zeroPad: 4 }), frameRate: 20, repeat: 0 });
-  scene.anims.create({ key: 'player_hurt', frames: [{ key: 'knight', frame: 'guard/frame0001' }], frameRate: 10, repeat: 0 });
-  // Alias for generic player_attack used by wave state
-  scene.anims.create({ key: 'player_attack', frames: scene.anims.generateFrameNames('knight', { prefix: 'attack_A/frame', start: 0, end: 5, zeroPad: 4 }), frameRate: 20, repeat: 0 });
+  // ─── Redesigned HD hero animations (256px spritesheet frames) ───
+  scene.anims.create({ key: 'player_idle', frames: scene.anims.generateFrameNumbers('player_hero_hd', { start: 0, end: 7 }), frameRate: 8, repeat: -1 });
+  scene.anims.create({ key: 'player_run', frames: scene.anims.generateFrameNumbers('player_hero_hd', { start: 8, end: 15 }), frameRate: 14, repeat: -1 });
+  scene.anims.create({ key: 'player_jump', frames: scene.anims.generateFrameNumbers('player_hero_hd', { start: 16, end: 21 }), frameRate: 12, repeat: 0 });
+  scene.anims.create({ key: 'player_fall', frames: scene.anims.generateFrameNumbers('player_hero_hd', { start: 22, end: 27 }), frameRate: 10, repeat: -1 });
+  scene.anims.create({ key: 'player_attack_A', frames: scene.anims.generateFrameNumbers('player_hero_hd', { start: 28, end: 35 }), frameRate: 24, repeat: 0 });
+  scene.anims.create({ key: 'player_attack_B', frames: scene.anims.generateFrameNumbers('player_hero_hd', { start: 36, end: 43 }), frameRate: 24, repeat: 0 });
+  scene.anims.create({ key: 'player_attack_C', frames: scene.anims.generateFrameNumbers('player_hero_hd', { start: 44, end: 51 }), frameRate: 26, repeat: 0 });
+  scene.anims.create({ key: 'player_attack_D', frames: scene.anims.generateFrameNumbers('player_hero_hd', { frames: [44, 45, 46, 47, 48, 49, 50, 51, 50, 51] }), frameRate: 30, repeat: 0 });
+  scene.anims.create({ key: 'player_wave_cast', frames: scene.anims.generateFrameNumbers('player_hero_hd', { start: 52, end: 57 }), frameRate: 18, repeat: 0 });
+  scene.anims.create({ key: 'player_uppercut', frames: scene.anims.generateFrameNumbers('player_hero_hd', { frames: [16, 17, 18, 58, 58, 21] }), frameRate: 18, repeat: 0 });
+  scene.anims.create({ key: 'player_dive', frames: scene.anims.generateFrameNumbers('player_hero_hd', { frames: [22, 23, 59, 59, 27] }), frameRate: 16, repeat: -1 });
+  scene.anims.create({ key: 'player_guard', frames: scene.anims.generateFrameNumbers('player_hero_hd', { start: 52, end: 54 }), frameRate: 8, repeat: -1 });
+  scene.anims.create({ key: 'player_hurt', frames: scene.anims.generateFrameNumbers('player_hero_hd', { frames: [59, 27] }), frameRate: 8, repeat: 0 });
+  scene.anims.create({ key: 'player_attack', frames: scene.anims.generateFrameNumbers('player_hero_hd', { start: 28, end: 33 }), frameRate: 22, repeat: 0 });
 
   // ─── Guard enemy animations (enemy_guard_sheet spritesheet: 6 frames) ───
   scene.anims.create({ key: 'guard_idle', frames: [{ key: 'enemy_guard_sheet', frame: 0 }], frameRate: 1, repeat: 0 });

@@ -6,6 +6,7 @@ import { GAME_EVENTS } from '../events.js';
 
 const PLAYER_RENDER = {
   displaySize: 200,
+  frameSize: 256,
   bodyWidth: 34,
   bodyHeight: 96,
   bodyOffsetX: 30,
@@ -56,7 +57,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   private lastGroundContactTime: number = 0;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene.matter.world, x, y, 'knight');
+    super(scene.matter.world, x, y, 'player_hero_hd');
     scene.add.existing(this);
 
     this.applyRenderSize();
@@ -307,14 +308,14 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   }
 
   private applyRenderSize() {
-    const baseScale = PLAYER_RENDER.displaySize / 79;
+    const baseScale = PLAYER_RENDER.displaySize / PLAYER_RENDER.frameSize;
     this.setScale(baseScale, baseScale);
     this.setRectangle(PLAYER_RENDER.bodyWidth, PLAYER_RENDER.bodyHeight, {
       friction: 0,
       frictionStatic: 0,
       frictionAir: 0.01,
     });
-    this.setOrigin(0.62, 0.76); // Offset X for scarf, Y for feet. Must be called AFTER setRectangle!
+    this.setOrigin(0.5, 0.875); // Feet are drawn near the bottom of each HD frame.
     this.setFixedRotation();
   }
 
@@ -324,10 +325,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
 
   public setFlipX(value: boolean) {
     super.setFlipX(value);
-    // The ninja sprite is off-center (scarf trails behind), so we must adjust
-    // the visual origin when flipping to keep the physics body aligned with the feet!
-    const originX = value ? 0.38 : 0.62;
-    this.setOrigin(originX, 0.76);
+    this.setOrigin(0.5, 0.875);
     return this;
   }
 
@@ -385,7 +383,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
       .addState({
         name: 'defend',
         onEnter: (p) => {
-          p.playAnimation('player_idle');
+          p.playAnimation('player_guard');
           p.setVelocityX(0);
           p.isBlocking = true;
           p.setTint(0x80d4ff); // Beautiful cyan-blue protective shield aura!
@@ -428,18 +426,18 @@ export class Player extends Phaser.Physics.Matter.Sprite {
       .addState({
         name: 'attack_combo',
         onEnter: (p) => {
-          const comboAnims = ['player_attack_A', 'player_attack_B', 'player_attack_C', 'player_attack_A'];
+          const comboAnims = ['player_attack_A', 'player_attack_B', 'player_attack_C', 'player_attack_D'];
           const comboMomentum = [
             PLAYER_ATTACKS.combo.forwardMomentum,
-            PLAYER_ATTACKS.combo.forwardMomentum * 0.5,
-            PLAYER_ATTACKS.combo.forwardMomentum * 1.5,
-            PLAYER_ATTACKS.combo.forwardMomentum * 2,
+            PLAYER_ATTACKS.combo.forwardMomentum * 0.75,
+            PLAYER_ATTACKS.combo.forwardMomentum * 1.55,
+            PLAYER_ATTACKS.combo.forwardMomentum * 2.35,
           ];
           const comboRecovery = [
             PLAYER_ATTACKS.combo.recovery,
-            PLAYER_ATTACKS.combo.recovery,
-            PLAYER_ATTACKS.combo.recovery * 1.2,
-            PLAYER_ATTACKS.combo.recovery * 1.8,
+            PLAYER_ATTACKS.combo.recovery + 35,
+            PLAYER_ATTACKS.combo.recovery + 70,
+            PLAYER_ATTACKS.combo.recovery + 190,
           ];
           const comboShake: [number, number][] = [
             [80, 0.004],
@@ -491,7 +489,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
       .addState({
         name: 'attack_wave',
         onEnter: (p) => {
-          p.playAnimation('player_attack');
+          p.playAnimation('player_wave_cast');
           p.setVelocityX(0);
           p.scene.cameras.main.shake(100, 0.005);
           p.scene.events.emit(GAME_EVENTS.PLAYER_CAST_WAVE, p);
@@ -506,7 +504,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
       .addState({
         name: 'attack_uppercut',
         onEnter: (p) => {
-          p.playAnimation('player_jump');
+          p.playAnimation('player_uppercut');
           p.setVelocityY(PLAYER_ATTACKS.uppercut.launchVelocity);
           p.setVelocityX(0);
           p.scene.cameras.main.shake(150, 0.01);
@@ -520,7 +518,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
       .addState({
         name: 'attack_dive',
         onEnter: (p) => {
-          p.playAnimation('player_fall');
+          p.playAnimation('player_dive');
           p.setVelocityY(PLAYER_ATTACKS.dive.downVelocity);
           p.setVelocityX(p.flipX ? -PLAYER_ATTACKS.dive.forwardVelocity : PLAYER_ATTACKS.dive.forwardVelocity);
           p.scene.events.emit(GAME_EVENTS.PLAYER_ATTACK, p, 'dive');

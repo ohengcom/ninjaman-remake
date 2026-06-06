@@ -1,11 +1,11 @@
 /** Player attack parameters */
 export const PLAYER_ATTACKS = {
   combo: {
-    reach: 80,
-    baseDamage: 10,
-    damagePerStep: 5,
-    forwardMomentum: 2.5,
-    recovery: 200,
+    reach: 90,
+    baseDamage: 9,
+    damagePerStep: 6,
+    forwardMomentum: 3.0,
+    recovery: 170,
   },
   uppercut: {
     reach: 60,
@@ -26,10 +26,10 @@ export const PLAYER_ATTACKS = {
   },
   hitboxes: {
     combo: [
-      { reach: 76, height: 82, offsetY: -6 },
-      { reach: 88, height: 86, offsetY: -8 },
-      { reach: 100, height: 96, offsetY: -12 },
-      { reach: 116, height: 104, offsetY: -12 },
+      { reach: 84, height: 78, offsetY: -8 },
+      { reach: 104, height: 90, offsetY: -14 },
+      { reach: 128, height: 104, offsetY: -16 },
+      { reach: 158, height: 118, offsetY: -18 },
     ],
     uppercut: { reach: 70, height: 118, offsetY: -42 },
     dive: { reach: 82, height: 112, offsetY: 28 },
@@ -55,7 +55,7 @@ export const PLAYER_MOVEMENT = {
   maxJumps: 2,
   doubleTapWindow: 260,
   motionBufferTimeout: 500,
-  comboWindow: 800,
+  comboWindow: 620,
   coyoteTime: 100,
 } as const;
 
