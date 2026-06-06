@@ -12,15 +12,19 @@ test('Transition Test', async ({ page }) => {
   await page.goto('/');
   
   await page.waitForSelector('#game-container canvas');
-  const overlay = page.locator('.game-ui-overlay');
   await page.waitForTimeout(5000);
 
-  for (let attempt = 0; attempt < 10; attempt++) {
-    await page.keyboard.press('Space');
-    await page.locator('#game-container').click();
-    await page.waitForTimeout(1000);
-    if (await overlay.isVisible()) break;
-  }
+  await page.evaluate(async () => {
+    if (!window.startGameForTests) throw new Error('Missing startGameForTests hook');
+    await window.startGameForTests();
+  });
+
+  await expect.poll(async () => page.evaluate(() => {
+    if (!window.game) return false;
+    return window.game.scene.isActive('GameScene');
+  }), { timeout: 10000 }).toBe(true);
+
+  const overlay = page.locator('.game-ui-overlay');
   await expect(overlay).toBeVisible({ timeout: 45000 });
   
   await page.evaluate(() => {

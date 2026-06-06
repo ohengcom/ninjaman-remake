@@ -5,6 +5,8 @@ import Phaser from 'phaser';
  * Called once from BootScene.create().
  */
 export function registerAnimations(scene: Phaser.Scene): void {
+  if (scene.anims.exists('player_idle')) return;
+
   // ─── Redesigned HD hero animations (256px spritesheet frames) ───
   scene.anims.create({ key: 'player_idle', frames: scene.anims.generateFrameNumbers('player_hero_hd', { start: 0, end: 7 }), frameRate: 8, repeat: -1 });
   scene.anims.create({ key: 'player_run', frames: scene.anims.generateFrameNumbers('player_hero_hd', { start: 8, end: 15 }), frameRate: 14, repeat: -1 });

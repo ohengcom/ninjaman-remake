@@ -6,6 +6,7 @@ declare global {
   interface Window {
     game?: Phaser.Game;
     Phaser?: typeof Phaser;
+    startGameForTests?: () => Promise<void>;
   }
 }
 

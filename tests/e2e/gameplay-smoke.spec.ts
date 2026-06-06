@@ -22,20 +22,21 @@ test.describe('Gameplay Smoke', () => {
     await page.waitForSelector('#game-container canvas');
     await page.waitForTimeout(5000);
 
+    await page.evaluate(async () => {
+      if (!window.startGameForTests) throw new Error('Missing startGameForTests hook');
+      await window.startGameForTests();
+    });
+
+    await expect.poll(async () => page.evaluate(() => {
+      if (!window.game) return false;
+      return window.game.scene.isActive('GameScene');
+    }), { timeout: 10000 }).toBe(true);
+
     const overlay = page.locator('.game-ui-overlay');
-
-    // Proven startup loop that guarantees entry into GameScene
-    for (let attempt = 0; attempt < 10; attempt++) {
-      await page.keyboard.press('Space');
-      await page.locator('#game-container').click();
-      await page.waitForTimeout(1000);
-      if (await overlay.isVisible()) break;
-    }
-
     await expect(overlay).toBeVisible({ timeout: 45000 });
     await expect(page.locator('#hud-integrity-bar')).toBeVisible();
     await expect(page.locator('#hud-score-value')).toHaveText(/\d+/);
-    await expect(page.locator('#hud-sector-display')).toContainText('SECTOR');
+    await expect(page.locator('#hud-sector-display')).toContainText(/ACT 1: MYSTICAL FOREST/);
 
     // Hold D to walk right, press J to attack, repeat to hit crates/barrels/enemies
     console.log('--- STARTING PLAYGROUND SIMULATION ---');

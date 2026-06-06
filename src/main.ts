@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { gameConfig } from './config.js';
 import { BootScene } from './scenes/BootScene.js';
+import { registerAnimations } from './animations/AnimationDefs.js';
 
 import { MainMenuScene } from './scenes/MainMenuScene.js';
 import { SoundManager } from './managers/SoundManager.js';
@@ -16,6 +17,36 @@ const exposeTestHooks = () => {
   if (import.meta.env.DEV || import.meta.env.MODE === 'test') {
     window.Phaser = Phaser;
     if (game) window.game = game;
+    window.startGameForTests = async () => {
+      if (!game) throw new Error('Game is not initialized');
+      const scenePlugin = game.scene;
+
+      if (!scenePlugin.getScene('GameScene')) {
+        const [
+          { GameScene },
+          { HUDScene },
+          { GameOverScene },
+          { PauseScene },
+        ] = await Promise.all([
+          import('./scenes/GameScene.js'),
+          import('./scenes/HUDScene.js'),
+          import('./scenes/GameOverScene.js'),
+          import('./scenes/PauseScene.js'),
+        ]);
+        scenePlugin.add('GameScene', GameScene, false);
+        scenePlugin.add('HUDScene', HUDScene, false);
+        scenePlugin.add('GameOverScene', GameOverScene, false);
+        scenePlugin.add('PauseScene', PauseScene, false);
+      }
+
+      const bootScene = scenePlugin.getScene('BootScene');
+      if (bootScene && !game.anims.exists('player_idle')) {
+        registerAnimations(bootScene);
+      }
+
+      scenePlugin.stop('MainMenuScene');
+      scenePlugin.start('GameScene', { level: 1 });
+    };
   }
 };
 
@@ -41,6 +72,7 @@ if (import.meta.hot) {
     game?.destroy(true);
     game = null;
     delete window.game;
+    delete window.startGameForTests;
     Reflect.deleteProperty(window, 'Phaser');
   });
 }
