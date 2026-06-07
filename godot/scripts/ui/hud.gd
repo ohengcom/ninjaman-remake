@@ -5,8 +5,10 @@ var health_back: ColorRect
 var score_label: Label
 var sector_label: Label
 var message_label: Label
+var pause_label: Label
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	_build_ui()
 	update_health(100, 100)
 	update_score(0)
@@ -31,6 +33,10 @@ func show_message(text: String, duration := 1.5) -> void:
 	var tween := create_tween()
 	tween.tween_interval(duration)
 	tween.tween_property(message_label, "modulate:a", 0.0, 0.35)
+
+func set_pause_visible(paused: bool) -> void:
+	if is_instance_valid(pause_label):
+		pause_label.visible = paused
 
 func _build_ui() -> void:
 	var root := Control.new()
@@ -68,3 +74,13 @@ func _build_ui() -> void:
 	message_label.add_theme_font_size_override("font_size", 24)
 	message_label.modulate = Color(0.75, 0.95, 1.0, 0.0)
 	root.add_child(message_label)
+
+	pause_label = Label.new()
+	pause_label.text = "PAUSED"
+	pause_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	pause_label.position = Vector2(480, 310)
+	pause_label.size = Vector2(320, 80)
+	pause_label.add_theme_font_size_override("font_size", 54)
+	pause_label.add_theme_color_override("font_color", Color(1.0, 0.32, 0.42))
+	pause_label.visible = false
+	root.add_child(pause_label)

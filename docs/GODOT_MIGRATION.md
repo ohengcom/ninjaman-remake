@@ -14,7 +14,7 @@
 
 ## 当前原型内容
 
-- `scenes/Main.tscn`：入口场景，注册输入并加载关卡。
+- `scenes/Main.tscn`：入口场景，注册输入，显示主菜单，并负责菜单/关卡切换。
 - `scenes/levels/Level01.tscn`：第一关 vertical slice，包含数据驱动平台/敌人布局、出口、相机和 HUD。
 - `scenes/player/Player.tscn`：玩家移动、跳跃、二段跳、dash、近战、波动弹、受击、死亡信号。
 - `scenes/enemies/EnemyGuard.tscn`：基础敌人模板，通过 `configure()` 支持 guard/axe/ninja 三种参数和外观。
@@ -22,6 +22,8 @@
 - `scenes/combat/WaveProjectile.tscn`：波动弹。
 - `scenes/vfx/HitVfx.tscn`：非方块命中特效。
 - `scenes/ui/Hud.tscn`：血量、分数、提示消息。
+- `scenes/ui/MainMenu.tscn`：Godot 原型主菜单。
+- `scripts/autoload/game_state.gd`：全局运行状态、分数、关卡进度。
 
 ## 运行方式
 
@@ -29,7 +31,17 @@
 2. 用 Godot 打开 `godot/project.godot`。
 3. 运行主场景 `res://scenes/Main.tscn`。
 
-当前机器没有检测到 `godot` CLI 在 PATH 中，所以本轮只能做文本项目和脚本静态构建，无法在命令行直接运行 Godot 校验。
+当前机器已通过 `winget` 安装 Godot 4.6.3。当前 shell 的 `godot` alias 可能尚未刷新，可直接运行：
+
+```powershell
+& "C:\Users\lixia\AppData\Local\Microsoft\WinGet\Packages\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\Godot_v4.6.3-stable_win64_console.exe" --version
+```
+
+已通过 headless editor 打开项目并完成脚本注册/资源导入：
+
+```powershell
+& "C:\Users\lixia\AppData\Local\Microsoft\WinGet\Packages\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\Godot_v4.6.3-stable_win64_console.exe" --headless --editor --quit --path "C:\Users\lixia\OneDrive\Projects\ninjaman\godot"
+```
 
 ## 控制
 
@@ -39,6 +51,7 @@
 - `J`：近战攻击
 - `L`：波动弹
 - `Esc`：暂停/继续
+- 菜单中 `Space` 或 `J`：开始
 
 ## 当前玩法循环
 
@@ -48,6 +61,7 @@
 - 玩家受伤会更新 HUD 血条。
 - 玩家死亡后自动重开当前场景。
 - 到达出口区域后显示 `ACT CLEAR` 并加分。
+- 完成关卡后通过 `Main` 回到主菜单，预留多关卡切换钩子。
 
 ## 下一步迁移计划
 

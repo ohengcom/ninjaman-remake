@@ -1,5 +1,8 @@
 extends Node2D
 
+signal level_completed
+signal return_to_menu_requested
+
 const PlayerScene := preload("res://scenes/player/Player.tscn")
 const EnemyScene := preload("res://scenes/enemies/EnemyGuard.tscn")
 const BossScene := preload("res://scenes/enemies/BossOni.tscn")
@@ -46,12 +49,15 @@ func _ready() -> void:
 	_spawn_player()
 	_spawn_enemies()
 	exit_area.body_entered.connect(_on_exit_body_entered)
+	score = GameState.score
+	hud.update_score(score)
 
 func _process(_delta: float) -> void:
 	if is_instance_valid(player):
 		camera.global_position = camera.global_position.lerp(player.global_position + Vector2(260, -120), 0.08)
 	if Input.is_action_just_pressed("pause"):
 		get_tree().paused = not get_tree().paused
+		hud.set_pause_visible(get_tree().paused)
 
 func _build_backdrop() -> void:
 	var sky := ColorRect.new()
@@ -150,7 +156,7 @@ func _build_exit() -> void:
 	exit_area.add_child(marker)
 
 func _on_enemy_defeated(points: int, point: Vector2) -> void:
-	score += points
+	score = GameState.add_score(points)
 	hud.update_score(score)
 	_on_hit_landed(point)
 
@@ -163,12 +169,14 @@ func _on_player_died() -> void:
 	is_finished = true
 	hud.show_message("YOU DIED - RESTARTING", 1.2)
 	await get_tree().create_timer(1.2).timeout
+	GameState.restart_current_level()
 	get_tree().reload_current_scene()
 
 func _on_exit_body_entered(body: Node) -> void:
 	if is_finished or body != player:
 		return
 	is_finished = true
-	score += 1000
+	score = GameState.add_score(1000)
 	hud.update_score(score)
 	hud.show_message("ACT CLEAR", 2.0)
+	level_completed.emit()
