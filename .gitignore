@@ -11,3 +11,5 @@ playwright/.cache/
 __pycache__/
 *.pyc
 scratch/
+godot/.godot/
+godot/exported/
