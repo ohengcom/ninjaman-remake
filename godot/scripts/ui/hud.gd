@@ -1,0 +1,70 @@
+extends CanvasLayer
+
+var health_bar: ColorRect
+var health_back: ColorRect
+var score_label: Label
+var sector_label: Label
+var message_label: Label
+
+func _ready() -> void:
+	_build_ui()
+	update_health(100, 100)
+	update_score(0)
+	show_message("NINJA MAN: GODOT PROTOTYPE", 2.0)
+
+func update_health(current: int, max_health: int) -> void:
+	if not is_instance_valid(health_bar):
+		return
+	var ratio := clampf(float(current) / maxf(1.0, float(max_health)), 0.0, 1.0)
+	health_bar.size = Vector2(280.0 * ratio, health_bar.size.y)
+	health_bar.color = Color(0.1, 0.85, 0.48) if ratio > 0.35 else Color(0.95, 0.18, 0.18)
+
+func update_score(score: int) -> void:
+	if is_instance_valid(score_label):
+		score_label.text = "SCORE %06d" % score
+
+func show_message(text: String, duration := 1.5) -> void:
+	if not is_instance_valid(message_label):
+		return
+	message_label.text = text
+	message_label.modulate.a = 1.0
+	var tween := create_tween()
+	tween.tween_interval(duration)
+	tween.tween_property(message_label, "modulate:a", 0.0, 0.35)
+
+func _build_ui() -> void:
+	var root := Control.new()
+	root.name = "Root"
+	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(root)
+
+	health_back = ColorRect.new()
+	health_back.color = Color(0.02, 0.02, 0.03, 0.82)
+	health_back.position = Vector2(28, 24)
+	health_back.size = Vector2(292, 28)
+	root.add_child(health_back)
+
+	health_bar = ColorRect.new()
+	health_bar.color = Color(0.1, 0.85, 0.48)
+	health_bar.position = Vector2(34, 30)
+	health_bar.size = Vector2(280, 16)
+	root.add_child(health_bar)
+
+	sector_label = Label.new()
+	sector_label.text = "ACT 1: FOREST TESTBED"
+	sector_label.position = Vector2(28, 60)
+	sector_label.add_theme_font_size_override("font_size", 18)
+	root.add_child(sector_label)
+
+	score_label = Label.new()
+	score_label.position = Vector2(1030, 28)
+	score_label.add_theme_font_size_override("font_size", 22)
+	root.add_child(score_label)
+
+	message_label = Label.new()
+	message_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	message_label.position = Vector2(360, 94)
+	message_label.size = Vector2(560, 40)
+	message_label.add_theme_font_size_override("font_size", 24)
+	message_label.modulate = Color(0.75, 0.95, 1.0, 0.0)
+	root.add_child(message_label)

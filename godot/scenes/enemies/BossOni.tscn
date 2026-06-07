@@ -1,0 +1,28 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/boss_oni.gd" id="1_boss"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_boss"]
+size = Vector2(86, 142)
+
+[node name="BossOni" type="CharacterBody2D"]
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("1_boss")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -80)
+scale = Vector2(1.2, 1.2)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+
+[node name="AnimationTree" type="AnimationTree" parent="."]
+active = false
+
+[node name="Skeleton2D" type="Skeleton2D" parent="."]
+position = Vector2(0, -78)
+
+[node name="Root" type="Bone2D" parent="Skeleton2D"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -71)
+shape = SubResource("RectangleShape2D_boss")

@@ -2,6 +2,8 @@ extends CharacterBody2D
 
 signal wave_cast(origin: Vector2, direction: int)
 signal hit_landed(point: Vector2)
+signal health_changed(current: int, max_health: int)
+signal died
 
 const GRAVITY := 1800.0
 const RUN_SPEED := 360.0
@@ -24,7 +26,9 @@ var jumps_used := 0
 var dash_timer := 0.0
 var attack_timer := 0.0
 var wave_cooldown := 0.0
-var health := 100
+var max_health := 100
+var health := max_health
+var is_dead := false
 
 func _ready() -> void:
 	_build_sprite_frames()
@@ -35,6 +39,10 @@ func _ready() -> void:
 	add_to_group("player")
 
 func _physics_process(delta: float) -> void:
+	if is_dead:
+		velocity.y += GRAVITY * delta
+		move_and_slide()
+		return
 	_apply_timers(delta)
 	_handle_facing()
 	_handle_jump()
@@ -96,7 +104,9 @@ func _apply_movement(delta: float) -> void:
 	velocity.x = move_toward(velocity.x, input_x * speed, speed * 10.0 * delta)
 
 func _update_animation() -> void:
-	if attack_timer > 0.0 or sprite.animation == "wave":
+	if attack_timer > 0.0:
+		return
+	if sprite.animation == "wave" and sprite.is_playing():
 		return
 	if not is_on_floor():
 		sprite.play("jump" if velocity.y < 0.0 else "fall")
@@ -106,10 +116,16 @@ func _update_animation() -> void:
 		sprite.play("idle")
 
 func take_damage(amount: int, from_x: float) -> void:
+	if is_dead:
+		return
 	health -= amount
+	health_changed.emit(health, max_health)
 	velocity.x = 280.0 * sign(global_position.x - from_x)
 	velocity.y = -210.0
 	sprite.play("hurt")
+	if health <= 0:
+		is_dead = true
+		died.emit()
 
 func _on_attack_body_entered(body: Node) -> void:
 	if attack_timer <= 0.0 or not body.has_method("take_damage"):
