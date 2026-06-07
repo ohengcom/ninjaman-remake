@@ -9,6 +9,7 @@ export class Boss extends Phaser.Physics.Matter.Sprite {
   public maxHealth: number = BOSS_STATS.health;
   private target: Phaser.Physics.Matter.Sprite | null = null;
   private isInvulnerable = false;
+  private isDying = false;
   private phase: number = 1;
   private bossTimers: Phaser.Time.TimerEvent[] = [];
 
@@ -49,6 +50,12 @@ export class Boss extends Phaser.Physics.Matter.Sprite {
     this.setFixedRotation();
     this.setIgnoreGravity(false); // Enable gravity so the Boss stands/falls naturally
     this.setMass(10000);
+  }
+
+  public getBodyHalfHeight(): number {
+    const body = this.body as MatterJS.BodyType | null;
+    if (!body) return (210 * this.baseScaleY) / 2;
+    return (body.bounds.max.y - body.bounds.min.y) / 2;
   }
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
@@ -255,9 +262,14 @@ export class Boss extends Phaser.Physics.Matter.Sprite {
   }
 
   public takeDamage(amount: number, _dirX: number) {
-    if (this.isInvulnerable || this.health <= 0) return;
+    if (this.isInvulnerable || this.health <= 0 || this.isDying) return;
     this.health -= amount;
     this.scene.events.emit(GAME_EVENTS.UPDATE_BOSS_HEALTH, this.health, this.maxHealth);
+    if (this.health <= 0) {
+      this.startDeathSequence();
+      return;
+    }
+
     this.checkPhaseTransition();
     
     // Flash white on hit
@@ -266,28 +278,32 @@ export class Boss extends Phaser.Physics.Matter.Sprite {
     this.isInvulnerable = true;
     
     this.addBossTimer(this.scene.time.delayedCall(BOSS_STATS.invulnerabilityDuration, () => {
-      if (!this.active) return;
+      if (!this.active || this.isDying) return;
       this.applyBossVisuals();
       this.isInvulnerable = false;
-      if (this.health <= 0) {
-        this.clearBossTimers();
-        this.stateMachine.destroy();
-        // Death sequence
-        this.play({ key: 'boss_die', repeat: 0 }, true);
-        this.scene.cameras.main.shake(800, 0.05);
-        this.scene.tweens.add({
-          targets: this,
-          alpha: 0,
-          y: this.y + 50,
-          duration: 1000,
-          delay: 500,
-          onComplete: () => {
-            this.setActive(false);
-            this.setVisible(false);
-          }
-        });
-      }
     }));
+  }
+
+  private startDeathSequence() {
+    this.isDying = true;
+    this.health = 0;
+    this.clearBossTimers();
+    this.stateMachine.destroy();
+    this.setVelocity(0, 0);
+    this.setSensor(true);
+    this.play({ key: 'boss_die', repeat: 0 }, true);
+    this.scene.cameras.main.shake(800, 0.05);
+    this.setActive(false);
+    this.scene.tweens.add({
+      targets: this,
+      alpha: 0,
+      y: this.y + 50,
+      duration: 1000,
+      delay: 500,
+      onComplete: () => {
+        this.setVisible(false);
+      }
+    });
   }
 
   override destroy(fromScene?: boolean) {

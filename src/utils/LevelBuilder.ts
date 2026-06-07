@@ -108,7 +108,7 @@ export class LevelBuilder {
       for (let i = 0; i < tiles; i++) {
         if (i > levelCfg.platformStartTile && i % levelCfg.platformInterval === 0) {
           const px = i * tileSize + 32;
-          const py = h - 160 - rng.next() * 80;
+          const py = h - 250 - rng.next() * 95;
           const platWidth = 120 + rng.next() * 60;
           const platHeight = 32;
           

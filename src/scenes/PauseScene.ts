@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 
 export class PauseScene extends Phaser.Scene {
   private domPauseOverlay: HTMLElement | null = null;
+  private readonly onEsc = () => this.resumeGame();
 
   constructor() {
     super({ key: 'PauseScene' });
@@ -13,7 +14,7 @@ export class PauseScene extends Phaser.Scene {
       this.domPauseOverlay.style.display = 'flex';
     }
 
-    this.input.keyboard!.once('keydown-ESC', () => this.resumeGame());
+    this.input.keyboard!.once('keydown-ESC', this.onEsc);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup, this);
   }
 
@@ -29,5 +30,6 @@ export class PauseScene extends Phaser.Scene {
     if (this.domPauseOverlay) {
       this.domPauseOverlay.style.display = 'none';
     }
+    this.input.keyboard?.off('keydown-ESC', this.onEsc);
   }
 }

@@ -37,6 +37,7 @@ export class GameScene extends Phaser.Scene {
   private mapWidth: number = 0;
   private isTransitioning: boolean = false;
   private isHitstopping: boolean = false;
+  private isEnding: boolean = false;
 
   private combatManager!: CombatManager;
   public vfxManager!: VfxManager;
@@ -209,10 +210,14 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    // Condition 3: Player's feet are below the platform top surface (give it a small tolerance)
+    // Condition 3: collide only when the player approached the top from above.
+    // Checking the previous bottom prevents fast falling from tunneling through.
     const playerBottom = playerBody.bounds.max.y;
+    const playerHalfHeight = playerBody.bounds.max.y - playerBody.position.y;
+    const previousBottom = (playerBody.positionPrev?.y ?? playerBody.position.y) + playerHalfHeight;
     const platTop = platBody.bounds.min.y;
-    if (playerBottom > platTop + 4) {
+    const cameFromAbove = previousBottom <= platTop + 18;
+    if (!cameFromAbove && playerBottom > platTop + 6) {
       pair.isActive = false;
     }
   }
@@ -226,6 +231,7 @@ export class GameScene extends Phaser.Scene {
     this.currentLevel = data.level || saveData.unlockedLevel;
     this.score = 0;
     this.isTransitioning = false;
+    this.isEnding = false;
   }
 
   create(): void {
@@ -247,9 +253,8 @@ export class GameScene extends Phaser.Scene {
     this.currentStyle = '';
     const h = this.cameras.main.height;
     const groundTop = h - 48;
-    const playerHalfHeight = 48; // PLAYER_RENDER.bodyHeight / 2
     this.lastSafeX = 200;
-    this.lastSafeY = groundTop - playerHalfHeight;
+    this.lastSafeY = groundTop - 48;
     this.boss = null;
     this.isTransitioning = false;
 
@@ -315,7 +320,7 @@ export class GameScene extends Phaser.Scene {
       const [minSpacing, maxSpacing] = this.levelCfg.enemySpacing;
       for (let x = this.levelCfg.enemyStartX; x < this.mapWidth - 800; x += minSpacing + this.rng.next() * (maxSpacing - minSpacing)) {
         const type = this.rng.pick(types);
-        const enemy = this.enemies.get(x, groundTop - 90, type) as Enemy;
+        const enemy = this.enemies.get(x, groundTop, type) as Enemy;
         if (enemy) {
             enemy.spawnOnGround(x, groundTop, type);
             enemy.setTarget(this.player);
@@ -333,8 +338,8 @@ export class GameScene extends Phaser.Scene {
     } else {
       // Boss level: spawn boss on the ground, close to player
       const bossX = Math.min(this.mapWidth - 400, 800);
-      const bossY = h - 168; // ground level (h-48) minus half boss height (120)
-      this.boss = new Boss(this, bossX, bossY);
+      this.boss = new Boss(this, bossX, groundTop - 80);
+      this.boss.setPosition(bossX, groundTop - this.boss.getBodyHalfHeight());
       this.boss.setTarget(this.player);
       
       const bossWarning = this.add.text(bossX, 100, 'ONI WARLORD', {
@@ -398,6 +403,8 @@ export class GameScene extends Phaser.Scene {
   }
 
   update(_time: number, _delta: number): void {
+    if (this.isEnding) return;
+
     if (this.playerLight) {
         this.playerLight.x = this.player.x;
         this.playerLight.y = this.player.y;
@@ -449,6 +456,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     if (this.levelCfg.isBossLevel && this.boss && !this.boss.active) {
+       this.isEnding = true;
        this.boss = null;
        this.matter.world.pause(); // Stop physics so boss doesn't hurt player after death
        if (this.input.keyboard) this.input.keyboard.enabled = false;
@@ -545,7 +553,13 @@ export class GameScene extends Phaser.Scene {
   }
 
   private handlePlayerDeath() {
+    if (this.isEnding) return;
+    this.isEnding = true;
     this.player.setVelocityX(0);
+    this.player.setVelocityY(0);
+    this.player.setSensor(true);
+    if (this.input.keyboard) this.input.keyboard.enabled = false;
+    this.enemies?.getChildren().forEach((enemy: any) => enemy.setVelocity?.(0, 0));
     this.cameras.main.shake(500, 0.03);
     this.vfxManager.deathFilter();
     

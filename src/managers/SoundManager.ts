@@ -14,7 +14,11 @@ export class SoundManager {
     }
 
     public static init() {
-        // Keeps the same signature for compatibility with main.ts, but handled dynamically in Phaser
+        const sound = this.soundManager as any;
+        const context = sound?.context;
+        if (context?.state === 'suspended') {
+            context.resume().catch?.(() => {});
+        }
     }
 
     public static toggle(level: number = 1) {

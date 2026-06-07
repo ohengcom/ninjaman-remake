@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { manifest } from '../assets/manifest.js';
+import { asset, manifest } from '../assets/manifest.js';
 import { registerAnimations } from '../animations/AnimationDefs.js';
 import { SoundManager } from '../managers/SoundManager.js';
 
@@ -43,12 +43,12 @@ export class BootScene extends Phaser.Scene {
     }
 
     // Load normal maps for character spritesheets and atlas to enable 2D dynamic lights
-    this.load.image('knight_n', 'assets/sprites/knight_n.png');
-    this.load.image('enemy_guard_sheet_n', 'assets/sprites/enemy_guard_n.png');
-    this.load.image('enemy_axe_sheet_n', 'assets/sprites/enemy_axe_n.png');
-    this.load.image('enemy_ninja_sheet_n', 'assets/sprites/enemy_ninja_n.png');
-    this.load.image('enemy_sniper_sheet_n', 'assets/sprites/enemy_sniper_n.png');
-    this.load.image('boss_oni_sheet_n', 'assets/sprites/boss_oni_n.png');
+    this.load.image('knight_n', asset('assets/sprites/knight_n.png'));
+    this.load.image('enemy_guard_sheet_n', asset('assets/sprites/enemy_guard_n.png'));
+    this.load.image('enemy_axe_sheet_n', asset('assets/sprites/enemy_axe_n.png'));
+    this.load.image('enemy_ninja_sheet_n', asset('assets/sprites/enemy_ninja_n.png'));
+    this.load.image('enemy_sniper_sheet_n', asset('assets/sprites/enemy_sniper_n.png'));
+    this.load.image('boss_oni_sheet_n', asset('assets/sprites/boss_oni_n.png'));
 
     // Loading screen
     const w = this.cameras.main.width;

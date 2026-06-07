@@ -79,6 +79,8 @@ export class Enemy extends Phaser.Physics.Matter.Sprite {
       this.currentLaser.destroy();
       this.currentLaser = null;
     }
+    this.scene?.tweens?.killTweensOf(this);
+    this.stateMachine?.destroy();
     super.destroy(fromScene);
   }
 
@@ -96,6 +98,7 @@ export class Enemy extends Phaser.Physics.Matter.Sprite {
   }
 
   public spawn(x: number, y: number, type: EnemyType) {
+    this.scene.tweens.killTweensOf(this);
     this.enemyType = type;
     this.setTexture(ENEMY_TEXTURES[type]);
     this.setPosition(x, y);
@@ -312,6 +315,7 @@ export class Enemy extends Phaser.Physics.Matter.Sprite {
         name: 'dying',
         onEnter: (e) => {
           e.play({ key: e.animKey('die'), repeat: 0 }, true);
+          e.scene.tweens.killTweensOf(e);
           e.setVelocityX(0);
           e.setVelocityY(0);
           // Fade out and disable after death animation
@@ -321,7 +325,7 @@ export class Enemy extends Phaser.Physics.Matter.Sprite {
             duration: 600,
             delay: 200,
             onComplete: () => {
-              e.scene.matter.world.remove(e.body as MatterJS.BodyType);
+              e.removeBodyFromWorld();
               e.setActive(false);
               e.setVisible(false);
               e.setAlpha(1); // Reset for reuse from pool
@@ -392,6 +396,13 @@ export class Enemy extends Phaser.Physics.Matter.Sprite {
     const worldBodies = (this.scene.matter.world.localWorld as unknown as { bodies: MatterJS.BodyType[] }).bodies;
     if (this.body && !worldBodies.includes(this.body as MatterJS.BodyType)) {
       this.scene.matter.world.add(this.body as MatterJS.BodyType);
+    }
+  }
+
+  private removeBodyFromWorld() {
+    const worldBodies = (this.scene.matter.world.localWorld as unknown as { bodies: MatterJS.BodyType[] }).bodies;
+    if (this.body && worldBodies.includes(this.body as MatterJS.BodyType)) {
+      this.scene.matter.world.remove(this.body as MatterJS.BodyType);
     }
   }
 

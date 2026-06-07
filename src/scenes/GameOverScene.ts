@@ -10,6 +10,7 @@ export class GameOverScene extends Phaser.Scene {
   private domVictoryOverlay: HTMLElement | null = null;
   private domVictoryScore: HTMLElement | null = null;
   private domBtnVictoryRestart: HTMLElement | null = null;
+  private readonly onSpaceRestart = () => this.restartGame();
 
   constructor() {
     super({ key: 'GameOverScene' });
@@ -71,9 +72,7 @@ export class GameOverScene extends Phaser.Scene {
       };
     }
 
-    this.input.keyboard!.once('keydown-SPACE', () => {
-      this.restartGame();
-    });
+    this.input.keyboard!.once('keydown-SPACE', this.onSpaceRestart);
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup, this);
   }
@@ -138,5 +137,6 @@ export class GameOverScene extends Phaser.Scene {
     if (this.domBtnVictoryRestart) {
       this.domBtnVictoryRestart.onclick = null;
     }
+    this.input.keyboard?.off('keydown-SPACE', this.onSpaceRestart);
   }
 }

@@ -1,5 +1,5 @@
-const ASSET_VERSION = '3.7.0';
-const asset = (url: string) => `${url}?v=${ASSET_VERSION}`;
+export const ASSET_VERSION = '3.7.0';
+export const asset = (url: string) => `${url}?v=${ASSET_VERSION}`;
 
 export const manifest = {
   images: [

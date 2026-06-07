@@ -38,6 +38,26 @@ test.describe('Gameplay Smoke', () => {
     await expect(page.locator('#hud-score-value')).toHaveText(/\d+/);
     await expect(page.locator('#hud-sector-display')).toContainText(/ACT 1: MYSTICAL FOREST/);
 
+    const levelOnePhysics = await page.evaluate(() => {
+      const gameScene = window.game?.scene.scenes.find((s: any) => s.scene.key === 'GameScene') as any;
+      if (!gameScene?.player) throw new Error('Missing GameScene player');
+      const groundTop = gameScene.cameras.main.height - 48;
+      const playerBottom = gameScene.player.body.bounds.max.y;
+      const firstEnemy = gameScene.enemies.getChildren().find((enemy: any) => enemy.active);
+      const enemyBottom = firstEnemy?.body.bounds.max.y ?? groundTop;
+      const oneWayPlatforms = gameScene.matter.world.localWorld.bodies
+        .filter((body: any) => body.isStatic && body.gameObject?.getData?.('isOneWay'));
+      const highestPlatformTop = Math.min(...oneWayPlatforms.map((body: any) => body.bounds.min.y));
+      return {
+        playerGroundDelta: Math.abs(playerBottom - groundTop),
+        enemyGroundDelta: Math.abs(enemyBottom - groundTop),
+        platformAboveHead: highestPlatformTop < playerBottom - 140,
+      };
+    });
+    expect(levelOnePhysics.playerGroundDelta).toBeLessThanOrEqual(2);
+    expect(levelOnePhysics.enemyGroundDelta).toBeLessThanOrEqual(2);
+    expect(levelOnePhysics.platformAboveHead).toBe(true);
+
     // Hold D to walk right, press J to attack, repeat to hit crates/barrels/enemies
     console.log('--- STARTING PLAYGROUND SIMULATION ---');
     
@@ -76,6 +96,40 @@ test.describe('Gameplay Smoke', () => {
     await page.waitForTimeout(3000);
 
     await expect(page.locator('#game-container canvas')).toBeVisible();
+
+    await page.evaluate(async () => {
+      if (!window.game) throw new Error('Missing game test hook');
+      const game = window.game;
+      game.scene.stop('HUDScene');
+      game.scene.stop('GameScene');
+      game.scene.start('GameScene', { level: 3 });
+    });
+    await expect.poll(async () => page.evaluate(() => {
+      const gameScene = window.game?.scene.scenes.find((s: any) => s.scene.key === 'GameScene') as any;
+      return gameScene?.currentLevel;
+    }), { timeout: 10000 }).toBe(3);
+
+    const bossGroundDelta = await page.evaluate(() => {
+      const gameScene = window.game?.scene.scenes.find((s: any) => s.scene.key === 'GameScene') as any;
+      if (!gameScene?.boss) throw new Error('Missing boss');
+      const groundTop = gameScene.cameras.main.height - 48;
+      return Math.abs(gameScene.boss.body.bounds.max.y - groundTop);
+    });
+    expect(bossGroundDelta).toBeLessThanOrEqual(2);
+
+    await page.evaluate(() => {
+      const gameScene = window.game?.scene.scenes.find((s: any) => s.scene.key === 'GameScene') as any;
+      if (!gameScene) throw new Error('Missing GameScene');
+      const projectile = gameScene.projectiles.get(120, 120);
+      projectile.fire(120, 120, 1, 10, 5, 'projectile');
+      projectile.hit();
+      projectile.hit();
+    });
+
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#menu-pause-overlay')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#menu-pause-overlay')).toBeHidden();
     
     // Verify we have transitioned (either Sector 2 HUD is loaded or no white screen/errors occurred)
     console.log('--- ENDING PLAYGROUND SIMULATION ---');

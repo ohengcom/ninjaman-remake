@@ -48,7 +48,7 @@ export class Projectile extends Phaser.Physics.Matter.Sprite {
         this.lifetimeTimer = this.scene.time.delayedCall(PROJECTILE_CONFIG.lifetime, () => {
             this.lifetimeTimer = null;
             if (this.active) {
-                this.scene.matter.world.remove(this.body as MatterJS.BodyType);
+                this.removeBodyFromWorld();
                 this.setActive(false);
                 this.setVisible(false);
             }
@@ -58,9 +58,15 @@ export class Projectile extends Phaser.Physics.Matter.Sprite {
     public hit() {
         this.lifetimeTimer?.remove(false);
         this.lifetimeTimer = null;
-        this.scene.matter.world.remove(this.body as MatterJS.BodyType);
+        this.removeBodyFromWorld();
         this.setActive(false);
         this.setVisible(false);
+    }
+
+    private removeBodyFromWorld(): void {
+        if (this.isBodyInWorld()) {
+            this.scene.matter.world.remove(this.body as MatterJS.BodyType);
+        }
     }
 
     private isBodyInWorld(): boolean {
