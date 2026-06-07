@@ -11,6 +11,29 @@ export class VfxManager {
     this.scene = scene;
   }
 
+  private ensureParticleTextures(): void {
+    const makeCircle = (key: string, size: number, radius: number, alpha: number) => {
+      if (this.scene.textures.exists(key)) return;
+      const g = this.scene.make.graphics({ x: 0, y: 0 }, false);
+      g.fillStyle(0xffffff, alpha);
+      g.fillCircle(size / 2, size / 2, radius);
+      g.generateTexture(key, size, size);
+      g.destroy();
+    };
+
+    makeCircle('vfx_hit_dot', 18, 7, 1);
+    makeCircle('vfx_spark_dot', 14, 5, 1);
+    makeCircle('vfx_dust_dot', 24, 10, 0.75);
+
+    if (!this.scene.textures.exists('vfx_slash_streak')) {
+      const g = this.scene.make.graphics({ x: 0, y: 0 }, false);
+      g.fillStyle(0xffffff, 0.95);
+      g.fillEllipse(18, 8, 34, 10);
+      g.generateTexture('vfx_slash_streak', 36, 16);
+      g.destroy();
+    }
+  }
+
   public initAtmosphere() {
     // Subtle ambient glow + vignette for cinematic feel - safely check for custom filters support
     try {
@@ -25,8 +48,10 @@ export class VfxManager {
   }
 
   public createAmbientMotes(mapWidth: number, mapHeight: number) {
+    this.ensureParticleTextures();
+
     // Firefly/petal layer (slow, dreamy)
-    this.scene.add.particles(this.scene.cameras.main.width / 2, mapHeight / 2, 'vfx_particles', {
+    this.scene.add.particles(this.scene.cameras.main.width / 2, mapHeight / 2, 'vfx_spark_dot', {
       x: { min: 0, max: mapWidth },
       y: { min: 0, max: mapHeight },
       scale: { start: 0.06, end: 0 },
@@ -41,7 +66,7 @@ export class VfxManager {
     }).setScrollFactor(0.3).setDepth(-5);
 
     // Front sparkle layer
-    this.scene.add.particles(this.scene.cameras.main.width / 2, mapHeight / 2, 'vfx_particles', {
+    this.scene.add.particles(this.scene.cameras.main.width / 2, mapHeight / 2, 'vfx_spark_dot', {
       x: { min: 0, max: mapWidth },
       y: { min: 0, max: mapHeight },
       scale: { start: 0.08, end: 0 },
@@ -57,8 +82,10 @@ export class VfxManager {
   }
 
   public createHitParticles() {
+    this.ensureParticleTextures();
+
     // Impact burst particles (red/orange for hits)
-    this.hitParticles = this.scene.add.particles(0, 0, 'vfx_particles', {
+    this.hitParticles = this.scene.add.particles(0, 0, 'vfx_hit_dot', {
       speed: { min: 150, max: 500 },
       angle: { min: 0, max: 360 },
       scale: { start: 0.2, end: 0 },
@@ -70,7 +97,7 @@ export class VfxManager {
     });
 
     // Upward spark fountain (gold/white for special hits)
-    this.sparkParticles = this.scene.add.particles(0, 0, 'vfx_particles', {
+    this.sparkParticles = this.scene.add.particles(0, 0, 'vfx_spark_dot', {
       speed: { min: 250, max: 600 },
       angle: { min: -130, max: -50 },
       scale: { start: 0.12, end: 0 },
@@ -82,7 +109,7 @@ export class VfxManager {
     });
 
     // Ground dust cloud
-    this.dustParticles = this.scene.add.particles(0, 0, 'vfx_particles', {
+    this.dustParticles = this.scene.add.particles(0, 0, 'vfx_dust_dot', {
       speed: { min: 30, max: 100 },
       angle: { min: -30, max: 210 },
       scale: { start: 0.25, end: 0 },
@@ -95,7 +122,7 @@ export class VfxManager {
     });
 
     // Slash trail (for melee attacks)
-    this.slashTrail = this.scene.add.particles(0, 0, 'vfx_particles', {
+    this.slashTrail = this.scene.add.particles(0, 0, 'vfx_slash_streak', {
       speed: { min: 20, max: 80 },
       angle: { min: 0, max: 360 },
       scale: { start: 0.15, end: 0 },
@@ -346,7 +373,9 @@ export class VfxManager {
 
   /** 跟隨玩家的攻擊拖尾粒子 */
   public createAttackTrail(player: Phaser.Physics.Matter.Sprite): Phaser.GameObjects.Particles.ParticleEmitter {
-    return this.scene.add.particles(0, 0, 'vfx_particles', {
+    this.ensureParticleTextures();
+
+    return this.scene.add.particles(0, 0, 'vfx_slash_streak', {
       follow: player,
       followOffset: { x: 0, y: 0 },
       speed: { min: 20, max: 80 },
@@ -362,9 +391,11 @@ export class VfxManager {
 
   /** Boss 進入新階段的粒子爆發 */
   public bossPhaseParticleBurst(x: number, y: number, phase: number) {
+    this.ensureParticleTextures();
+
     const colors = phase === 3 ? [0xff4444, 0xff8844] : [0xffd43b, 0xffaa00];
 
-    this.scene.add.particles(x, y, 'vfx_particles', {
+    this.scene.add.particles(x, y, 'vfx_spark_dot', {
       speed: { min: 200, max: 600 },
       angle: { min: 0, max: 360 },
       scale: { start: 0.3, end: 0 },
