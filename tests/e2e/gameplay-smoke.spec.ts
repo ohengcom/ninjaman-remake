@@ -4,6 +4,7 @@ test.describe('Gameplay Smoke', () => {
   test('enters gameplay and handles core inputs without runtime errors', async ({ page }) => {
     test.setTimeout(90000);
     const runtimeErrors: string[] = [];
+    const playerSheetRequests: string[] = [];
 
     page.on('pageerror', (error) => {
       console.error('Browser runtime error caught:', error.message, error.stack);
@@ -16,6 +17,10 @@ test.describe('Gameplay Smoke', () => {
       } else {
         console.log('Browser console:', message.text());
       }
+    });
+    page.on('request', (request) => {
+      const url = request.url();
+      if (url.includes('player_hero_hd.png')) playerSheetRequests.push(url);
     });
 
     await page.goto('/');
@@ -43,20 +48,31 @@ test.describe('Gameplay Smoke', () => {
       if (!gameScene?.player) throw new Error('Missing GameScene player');
       const groundTop = gameScene.cameras.main.height - 48;
       const playerBottom = gameScene.player.body.bounds.max.y;
+      const playerTop = gameScene.player.body.bounds.min.y;
       const firstEnemy = gameScene.enemies.getChildren().find((enemy: any) => enemy.active);
       const enemyBottom = firstEnemy?.body.bounds.max.y ?? groundTop;
       const oneWayPlatforms = gameScene.matter.world.localWorld.bodies
         .filter((body: any) => body.isStatic && body.gameObject?.getData?.('isOneWay'));
-      const highestPlatformTop = Math.min(...oneWayPlatforms.map((body: any) => body.bounds.min.y));
+      const platformGaps = oneWayPlatforms.map((body: any) => groundTop - body.bounds.min.y);
+      const nearestPlatformGap = Math.min(...platformGaps);
+      const platformWithHeadroom = oneWayPlatforms.some((body: any) => body.bounds.max.y > playerTop + 8);
       return {
         playerGroundDelta: Math.abs(playerBottom - groundTop),
         enemyGroundDelta: Math.abs(enemyBottom - groundTop),
-        platformAboveHead: highestPlatformTop < playerBottom - 140,
+        platformCount: oneWayPlatforms.length,
+        nearestPlatformGap,
+        platformWithHeadroom,
+        hasPlayerGuardAnimation: gameScene.anims.exists('player_guard'),
       };
     });
     expect(levelOnePhysics.playerGroundDelta).toBeLessThanOrEqual(2);
     expect(levelOnePhysics.enemyGroundDelta).toBeLessThanOrEqual(2);
-    expect(levelOnePhysics.platformAboveHead).toBe(true);
+    expect(levelOnePhysics.platformCount).toBeGreaterThan(0);
+    expect(levelOnePhysics.nearestPlatformGap).toBeGreaterThanOrEqual(78);
+    expect(levelOnePhysics.nearestPlatformGap).toBeLessThanOrEqual(116);
+    expect(levelOnePhysics.platformWithHeadroom).toBe(true);
+    expect(levelOnePhysics.hasPlayerGuardAnimation).toBe(true);
+    expect(playerSheetRequests.some((url) => url.includes('v=3.7.0'))).toBe(true);
 
     // Hold D to walk right, press J to attack, repeat to hit crates/barrels/enemies
     console.log('--- STARTING PLAYGROUND SIMULATION ---');

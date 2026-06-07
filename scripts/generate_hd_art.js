@@ -1,4 +1,5 @@
 import { Jimp } from 'jimp';
+import { generatePlayerHeroSheet } from './generate_player_hero.js';
 
 const WIDTH = 1920;
 const HEIGHT = 1080;
@@ -410,6 +411,6 @@ function drawEnemyFrame(target, type, frameIndex) {
 await makeForest();
 await makeBeach();
 await makeCastle();
-await makeHeroSheet();
+await generatePlayerHeroSheet();
 
-console.log('Generated HD backgrounds and player spritesheet. Use generate_realistic_enemies.js for enemy and boss sheets.');
+console.log('Generated HD backgrounds and SVG-rendered player spritesheet. Use generate_realistic_enemies.js for enemy and boss sheets.');

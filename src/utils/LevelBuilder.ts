@@ -1,6 +1,17 @@
 import Phaser from 'phaser';
+import { GAME_CONFIG } from '../config.js';
+import { PLAYER_MOVEMENT } from '../config/combat.js';
 import { LevelConfig } from '../config/levels.js';
 import { SeededRandom } from '../utils/SeededRandom.js';
+
+const GROUND_HEIGHT = 48;
+
+function getDoubleJumpReach(): number {
+  const gravity = GAME_CONFIG.PHYSICS.MATTER_GRAVITY_Y;
+  const primaryJump = Math.abs(PLAYER_MOVEMENT.jumpVelocity);
+  const secondJump = Math.abs(PLAYER_MOVEMENT.doubleJumpVelocity);
+  return ((primaryJump * primaryJump) + (secondJump * secondJump)) / (2 * gravity);
+}
 
 /** Level theme colors for procedural decoration */
 const LEVEL_THEMES: Record<number, { groundColor: number; platformColor: number; groundTopColor: number; accentColor: number }> = {
@@ -77,7 +88,7 @@ export class LevelBuilder {
 
     // ─── VISIBLE GROUND ───
     // Create a visible, textured ground strip at the bottom of the level
-    const groundHeight = 48;
+    const groundHeight = GROUND_HEIGHT;
     
     // Ground body (for main ground surface)
     const groundGraphics = scene.add.graphics();
@@ -105,12 +116,21 @@ export class LevelBuilder {
 
     // ─── VISIBLE PLATFORMS ───
     if (levelCfg.hasPlatforms) {
+      const playerBodyHeight = 96;
+      const platformReach = getDoubleJumpReach();
+      const minHeadClearance = playerBodyHeight + 8;
+      const minJumpGap = 78;
+      const maxJumpGap = Math.max(minJumpGap, Math.min(platformReach - 10, 116));
+      const groundTop = h - groundHeight;
+
       for (let i = 0; i < tiles; i++) {
         if (i > levelCfg.platformStartTile && i % levelCfg.platformInterval === 0) {
           const px = i * tileSize + 32;
-          const py = h - 250 - rng.next() * 95;
           const platWidth = 120 + rng.next() * 60;
           const platHeight = 32;
+          const jumpGap = minJumpGap + rng.next() * (maxJumpGap - minJumpGap);
+          const platformTop = Math.min(groundTop - jumpGap, groundTop - minHeadClearance);
+          const py = platformTop + platHeight / 2;
           
           // Draw visible platform
           const plat = scene.add.graphics();
@@ -135,6 +155,8 @@ export class LevelBuilder {
           // Physics body for platform (invisible rectangle collider)
           const platBody = scene.add.rectangle(px, py, platWidth, platHeight, 0x000000, 0);
           platBody.setData('isOneWay', true);
+          platBody.setData('jumpGap', jumpGap);
+          platBody.setData('platformTop', platformTop);
           scene.matter.add.gameObject(platBody, { isStatic: true, friction: 0, frictionStatic: 0, frictionAir: 0 });
 
           // 40% chance to spawn a dynamic physics crate or barrel on top of the platform!
