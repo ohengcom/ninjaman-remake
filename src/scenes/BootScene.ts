@@ -43,7 +43,6 @@ export class BootScene extends Phaser.Scene {
     }
 
     // Load normal maps for character spritesheets and atlas to enable 2D dynamic lights
-    this.load.image('knight_n', asset('assets/sprites/knight_n.png'));
     this.load.image('enemy_guard_sheet_n', asset('assets/sprites/enemy_guard_n.png'));
     this.load.image('enemy_axe_sheet_n', asset('assets/sprites/enemy_axe_n.png'));
     this.load.image('enemy_ninja_sheet_n', asset('assets/sprites/enemy_ninja_n.png'));

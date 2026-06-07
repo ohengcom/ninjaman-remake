@@ -1,11 +1,11 @@
 # Ninjaman 工程状态与维护计划
 
-日期：2026-05-29
-版本：3.6.0
+日期：2026-06-07
+版本：3.8.0
 
 ## 当前状态
 
-本项目使用 Phaser 4、TypeScript、Vite、Vitest 和 Playwright。当前重点维护方向是：输入一致性、敌我速度配置、场景生命周期、测试可靠性、脚本文档一致性。
+本项目使用 Phaser 4、TypeScript、Vite、Vitest、Playwright 和 Matter.js。当前重点维护方向是：资源管线可维护性、平台可达性、场景生命周期稳定性、缓存一致性、测试可靠性和目录清洁度。
 
 本轮修复对照了公开文档：
 
@@ -29,8 +29,13 @@
 - Playwright 转场测试改用 `baseURL`，删除默认运行的 debug test，增加实际断言。
 - e2e 构建使用 Vite `--mode test`，只在 dev/test 模式暴露 `window.game` 测试钩子。
 - HUD sound toggle 移除 inline `onclick`，改为 add/remove event listener。
-- README、HUD footer、主菜单版本号、package 版本同步到真实操作和 `3.6.0`。
+- README、主菜单版本号、package 版本、package-lock 版本和 asset cache 版本同步到 `3.8.0`。
 - 资源/音频脚本移除本机绝对路径和未转义 shell 字符串拼接。
+- 玩家动画注册改为 `src/animations/characterAnimationManifest.ts` 数据驱动，避免帧范围散落硬编码。
+- 玩家 spritesheet 改为 `scripts/generate_player_hero.js` 通过 Playwright/Chromium 渲染 SVG 生成。
+- 敌人/Boss spritesheet 使用 `scripts/generate_realistic_enemies.js` 的 SVG 渲染管线。
+- 平台高度按当前双跳能力约束生成，e2e 校验平台存在、可达和资源版本请求。
+- 删除旧 SWF、调试截图、未加载 packed atlases、旧 knight/player placeholder 资源和废弃导入/处理脚本。
 
 ## 约定
 
@@ -45,6 +50,15 @@
 - Enemy and Boss movement lives in `src/config/enemies.ts`.
 - Multipliers should be named config values, not inline magic numbers in entity logic.
 
+### Asset Pipeline
+
+- Runtime asset loading lives in `src/assets/manifest.ts`.
+- `ASSET_VERSION` must match the app release version whenever cached public assets change.
+- Player animation ranges live in `src/animations/characterAnimationManifest.ts`.
+- Regenerate the player sheet with `npm run build:player-art`.
+- Regenerate backgrounds, player, enemies, and boss with `npm run build:art`.
+- Keep generated assets checked in only when the current manifest or generation scripts use them.
+
 ## 验证清单
 
 每次改动后至少运行：
@@ -53,7 +67,6 @@
 npm run typecheck
 npm test
 npm run build
-npm audit --audit-level=moderate
 npm run test:visual
 ```
 
@@ -61,4 +74,4 @@ npm run test:visual
 
 - 如果明确支持手机浏览器，需要增加虚拟摇杆和触屏按钮；否则 README 应继续明确当前是 keyboard/gamepad 操作。
 - 可以继续减少 Phaser 内部 API 的 `as any` 使用，但涉及 Phaser 4 新 API 类型缺口时应先补本地类型声明。
-- 如果确认未使用 `player_hero` 或 normal map 资产，应删除对应 manifest 项以降低加载体积。
+- 当前 SVG 生成美术仍是 placeholder；如果后续接入 Aseprite atlas 或 Spine，应保留 animation manifest / animator 层作为切换点。

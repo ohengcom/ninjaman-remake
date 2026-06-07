@@ -1,4 +1,4 @@
-export const ASSET_VERSION = '3.7.0';
+export const ASSET_VERSION = '3.8.0';
 export const asset = (url: string) => `${url}?v=${ASSET_VERSION}`;
 
 export const manifest = {
@@ -25,9 +25,7 @@ export const manifest = {
     // Boss — 1020x1024 image, 6 poses in 3x2 grid.
     { key: 'boss_oni_sheet', url: asset('assets/sprites/boss_oni.png'), frameConfig: { frameWidth: 340, frameHeight: 512 } },
   ],
-  atlases: [
-    { key: 'knight', image: asset('assets/sprites/knight.png'), atlas: asset('assets/sprites/knight.json') },
-  ],
+  atlases: [] as readonly { key: string; image: string; atlas: string }[],
   audio: [
     { key: 'bgm_sector1', url: asset('assets/audio/bgm_level1.mp3') },
     { key: 'bgm_sector2', url: asset('assets/audio/bgm_level2.mp3') },

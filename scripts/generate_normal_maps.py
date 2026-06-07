@@ -9,13 +9,12 @@ os.makedirs(sprites_dir, exist_ok=True)
 
 # Find all sprite sheet textures to generate normal maps for
 SPRITES = [
-    "player_hero.png",
+    "player_hero_hd.png",
     "enemy_guard.png",
     "enemy_axe.png",
     "enemy_ninja.png",
     "enemy_sniper.png",
-    "boss_oni.png",
-    "knight.png"
+    "boss_oni.png"
 ]
 
 def generate_normal_map(name, strength=3.0, blur_radius=2):
