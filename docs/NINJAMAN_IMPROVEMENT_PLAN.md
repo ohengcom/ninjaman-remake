@@ -1,7 +1,7 @@
 # Ninjaman 工程状态与维护计划
 
-日期：2026-06-07
-版本：3.8.1
+日期：2026-06-08
+版本：3.9.0
 
 ## 当前状态
 
@@ -29,7 +29,8 @@
 - Playwright 转场测试改用 `baseURL`，删除默认运行的 debug test，增加实际断言。
 - e2e 构建使用 Vite `--mode test`，只在 dev/test 模式暴露 `window.game` 测试钩子。
 - HUD sound toggle 移除 inline `onclick`，改为 add/remove event listener。
-- README、主菜单版本号、package 版本、package-lock 版本和 asset cache 版本同步到 `3.8.1`。
+- README、主菜单版本号、package 版本、package-lock 版本和 asset cache 版本同步到 `3.9.0`。
+- 新增 Godot 4.6.3 重构原型：Foxy 免费可商用视觉基线、非 Vite 旧素材、夜间森林关卡、Godot Web export preset、本地 `npm run build:godot:web` 和可切换 `vercel.godot.json`。
 - 资源/音频脚本移除本机绝对路径和未转义 shell 字符串拼接。
 - 玩家动画注册改为 `src/animations/characterAnimationManifest.ts` 数据驱动，避免帧范围散落硬编码。
 - 玩家 spritesheet 改为 `scripts/generate_player_hero.js` 通过 Playwright/Chromium 渲染 SVG 生成。
@@ -68,6 +69,7 @@ npm run typecheck
 npm test
 npm run build
 npm run test:visual
+npm run build:godot:web
 ```
 
 ## 后续建议

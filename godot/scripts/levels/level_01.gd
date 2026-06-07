@@ -61,19 +61,69 @@ func _process(_delta: float) -> void:
 
 func _build_backdrop() -> void:
 	var sky := ColorRect.new()
-	sky.color = Color(0.04, 0.07, 0.12)
+	sky.color = Color(0.025, 0.035, 0.065)
 	sky.size = Vector2(5000, 720)
 	sky.position = Vector2(0, 0)
 	sky.z_index = -100
 	add_child(sky)
 
-	for i in range(12):
+	var moon := Polygon2D.new()
+	moon.polygon = _circle_polygon(Vector2(1040, 132), 76, 32)
+	moon.color = Color(0.72, 0.86, 1.0, 0.42)
+	moon.z_index = -98
+	add_child(moon)
+
+	for i in range(54):
+		var star := ColorRect.new()
+		var x := float((i * 317) % 4920 + 24)
+		var y := float(34 + (i * 71) % 210)
+		var size := float(2 + (i % 3))
+		star.color = Color(0.70, 0.86, 1.0, 0.26 + float(i % 4) * 0.08)
+		star.position = Vector2(x, y)
+		star.size = Vector2(size, size)
+		star.z_index = -99
+		add_child(star)
+
+	for i in range(9):
+		var fog := ColorRect.new()
+		fog.color = Color(0.28, 0.45, 0.55, 0.055)
+		fog.position = Vector2(float(i * 620 - 180), float(390 + (i % 3) * 34))
+		fog.size = Vector2(540, 26)
+		fog.z_index = -75
+		add_child(fog)
+
+	for i in range(11):
 		var mountain := Polygon2D.new()
 		var x := float(i * 420 - 180)
-		mountain.polygon = PackedVector2Array([Vector2(x, 650), Vector2(x + 260, 260 + (i % 3) * 40), Vector2(x + 560, 650)])
-		mountain.color = Color(0.08, 0.13, 0.18, 0.85)
+		mountain.polygon = PackedVector2Array([Vector2(x, 650), Vector2(x + 260, 250 + (i % 3) * 38), Vector2(x + 560, 650)])
+		mountain.color = Color(0.055, 0.09, 0.14, 0.92)
 		mountain.z_index = -90
 		add_child(mountain)
+
+	for i in range(26):
+		var trunk := ColorRect.new()
+		var x := float(i * 190 + 40)
+		var h := float(80 + (i % 5) * 24)
+		trunk.color = Color(0.08, 0.055, 0.04, 0.85)
+		trunk.position = Vector2(x, 610 - h)
+		trunk.size = Vector2(14, h)
+		trunk.z_index = -60
+		add_child(trunk)
+
+		var crown := Polygon2D.new()
+		crown.polygon = PackedVector2Array([Vector2(x - 54, 618 - h), Vector2(x + 7, 506 - h), Vector2(x + 70, 618 - h)])
+		crown.color = Color(0.05, 0.18, 0.13, 0.82)
+		crown.z_index = -61
+		add_child(crown)
+
+	for i in range(44):
+		var blade := Polygon2D.new()
+		var x := float(i * 113 + 18)
+		var h := float(18 + (i % 5) * 4)
+		blade.polygon = PackedVector2Array([Vector2(x, 684), Vector2(x + 8, 684 - h), Vector2(x + 18, 684)])
+		blade.color = Color(0.10, 0.30, 0.16, 0.64)
+		blade.z_index = -20
+		add_child(blade)
 
 func _build_level_geometry() -> void:
 	for platform in LEVEL_LAYOUT["platforms"]:
@@ -96,10 +146,16 @@ func _add_platform(center: Vector2, size: Vector2, color: Color, semisolid: bool
 	body.add_child(shape)
 
 	var visual := ColorRect.new()
-	visual.color = color
+	visual.color = color.darkened(0.05)
 	visual.size = size
 	visual.position = -size / 2.0
 	body.add_child(visual)
+
+	var bevel := ColorRect.new()
+	bevel.color = Color(0.62, 0.46, 0.28, 0.22)
+	bevel.size = Vector2(size.x, 5)
+	bevel.position = Vector2(-size.x / 2.0, -size.y / 2.0 + 8.0)
+	body.add_child(bevel)
 
 	var cap := ColorRect.new()
 	cap.color = Color(0.32, 0.52, 0.28)
@@ -107,7 +163,28 @@ func _add_platform(center: Vector2, size: Vector2, color: Color, semisolid: bool
 	cap.position = Vector2(-size.x / 2.0, -size.y / 2.0)
 	body.add_child(cap)
 
+	var shadow := ColorRect.new()
+	shadow.color = Color(0.0, 0.0, 0.0, 0.18)
+	shadow.size = Vector2(size.x - 12.0, 7.0)
+	shadow.position = Vector2(-size.x / 2.0 + 6.0, size.y / 2.0 - 10.0)
+	body.add_child(shadow)
+
+	if size.x > 120.0:
+		for i in range(int(size.x / 96.0)):
+			var notch := ColorRect.new()
+			notch.color = Color(0.0, 0.0, 0.0, 0.10)
+			notch.size = Vector2(18, 3)
+			notch.position = Vector2(-size.x / 2.0 + 36.0 + i * 96.0, -size.y / 2.0 + 18.0 + float(i % 3) * 9.0)
+			body.add_child(notch)
+
 	platforms.add_child(body)
+
+func _circle_polygon(center: Vector2, radius: float, segments: int) -> PackedVector2Array:
+	var points := PackedVector2Array()
+	for i in range(segments):
+		var a := TAU * float(i) / float(segments)
+		points.append(center + Vector2(cos(a), sin(a)) * radius)
+	return points
 
 func _spawn_player() -> void:
 	player = PlayerScene.instantiate()

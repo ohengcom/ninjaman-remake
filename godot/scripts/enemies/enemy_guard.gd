@@ -13,8 +13,8 @@ var health := max_health
 var hurt_timer := 0.0
 var walk_speed := 90.0
 var score_value := 150
-var body_color := Color(0.18, 0.21, 0.24)
-var accent_color := Color(0.55, 0.14, 0.12)
+var sprite_tint := Color(0.76, 0.88, 1.0)
+var sprite_scale := Vector2(0.21, 0.21)
 
 func configure(type_name: String) -> void:
 	enemy_type = type_name
@@ -22,24 +22,27 @@ func configure(type_name: String) -> void:
 		max_health = 70
 		walk_speed = 64.0
 		score_value = 220
-		body_color = Color(0.30, 0.20, 0.13)
-		accent_color = Color(0.85, 0.35, 0.12)
+		sprite_tint = Color(1.0, 0.62, 0.42)
+		sprite_scale = Vector2(0.25, 0.25)
 	elif enemy_type == "ninja":
 		max_health = 34
 		walk_speed = 145.0
 		score_value = 260
-		body_color = Color(0.06, 0.08, 0.12)
-		accent_color = Color(0.18, 0.55, 0.70)
+		sprite_tint = Color(0.66, 0.95, 1.0)
+		sprite_scale = Vector2(0.19, 0.19)
 	else:
 		max_health = 45
 		walk_speed = 90.0
 		score_value = 150
-		body_color = Color(0.18, 0.21, 0.24)
-		accent_color = Color(0.55, 0.14, 0.12)
+		sprite_tint = Color(0.78, 0.88, 1.0)
+		sprite_scale = Vector2(0.21, 0.21)
 	health = max_health
 
 func _ready() -> void:
 	_build_sprite_frames()
+	sprite.position = Vector2(0, -86)
+	sprite.scale = sprite_scale
+	sprite.modulate = sprite_tint
 	add_to_group("enemies")
 
 func _physics_process(delta: float) -> void:
@@ -71,47 +74,16 @@ func take_damage(amount: int, from_x: float) -> void:
 
 func _build_sprite_frames() -> void:
 	var frames := SpriteFrames.new()
-	_add_anim(frames, "walk", body_color, accent_color, 4)
-	_add_anim(frames, "hurt", body_color.lightened(0.22), Color(1.0, 0.32, 0.22), 2)
+	_add_file_anim(frames, "walk", "res://assets/characters/foxy/animation/run/foxy-run_%02d.png", 0, 15, 13.0, true)
+	_add_file_anim(frames, "hurt", "res://assets/characters/foxy/animation/hurt/foxy-hurt_%02d.png", 0, 11, 16.0, false)
 	sprite.sprite_frames = frames
 	sprite.play("walk")
 
-func _add_anim(frames: SpriteFrames, name: StringName, body: Color, accent: Color, count: int) -> void:
+func _add_file_anim(frames: SpriteFrames, name: StringName, path_pattern: String, start: int, count: int, fps: float, loop: bool) -> void:
 	frames.add_animation(name)
-	frames.set_animation_speed(name, 8.0)
-	frames.set_animation_loop(name, name == &"walk")
+	frames.set_animation_speed(name, fps)
+	frames.set_animation_loop(name, loop)
 	for i in range(count):
-		frames.add_frame(name, _make_texture(i, count, body, accent))
-
-func _make_texture(index: int, count: int, body: Color, accent: Color) -> Texture2D:
-	var image := Image.create(112, 128, false, Image.FORMAT_RGBA8)
-	image.fill(Color.TRANSPARENT)
-	var bob := int(sin(TAU * float(index) / maxf(1.0, float(count))) * 3.0)
-	_rect(image, 40, 24 + bob, 32, 28, body.darkened(0.2))
-	_rect(image, 34, 53 + bob, 45, 44, body)
-	_rect(image, 29, 61 + bob, 14, 28, body.darkened(0.1))
-	_rect(image, 70, 60 + bob, 14, 30, body.darkened(0.05))
-	_rect(image, 38, 94 + bob, 14, 28, body.darkened(0.2))
-	_rect(image, 62, 94 + bob, 14, 28, body.darkened(0.2))
-	_rect(image, 34, 55 + bob, 45, 8, accent)
-	_rect(image, 48, 34 + bob, 20, 7, Color(0.76, 0.58, 0.42))
-	if enemy_type == "axe":
-		_line(image, 72, 68 + bob, 102, 32 + bob, Color(0.46, 0.30, 0.14), 5)
-		_rect(image, 98, 25 + bob, 18, 16, Color(0.75, 0.75, 0.68))
-	elif enemy_type == "ninja":
-		_line(image, 74, 66 + bob, 100, 54 + bob, Color(0.82, 0.9, 0.92), 2)
-		_line(image, 33, 67 + bob, 12, 48 + bob, Color(0.82, 0.9, 0.92), 2)
-	else:
-		_line(image, 72, 68 + bob, 96, 42 + bob, Color(0.72, 0.78, 0.82), 3)
-	return ImageTexture.create_from_image(image)
-
-func _rect(image: Image, x: int, y: int, w: int, h: int, color: Color) -> void:
-	for py in range(maxi(0, y), mini(image.get_height(), y + h)):
-		for px in range(maxi(0, x), mini(image.get_width(), x + w)):
-			image.set_pixel(px, py, color)
-
-func _line(image: Image, x1: int, y1: int, x2: int, y2: int, color: Color, width: int) -> void:
-	var steps := maxi(absi(x2 - x1), absi(y2 - y1))
-	for i in range(steps + 1):
-		var p := float(i) / maxf(1.0, float(steps))
-		_rect(image, int(lerpf(x1, x2, p)), int(lerpf(y1, y2, p)), width, width, color)
+		var texture := load(path_pattern % (start + i))
+		if texture:
+			frames.add_frame(name, texture)

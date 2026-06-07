@@ -61,7 +61,7 @@ export class MainMenuScene extends Phaser.Scene {
       ease: 'Sine.easeInOut',
     });
 
-    this.add.text(w / 2, h - 40, 'v3.8.1 - Prototype', {
+    this.add.text(w / 2, h - 40, 'v3.9.0 - Prototype', {
       fontFamily: 'Inter, sans-serif',
       fontSize: '14px',
       color: '#d9d0c0',

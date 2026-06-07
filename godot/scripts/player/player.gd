@@ -33,6 +33,7 @@ var is_dead := false
 func _ready() -> void:
 	_build_sprite_frames()
 	_build_attack_shape()
+	sprite.scale = Vector2(0.26, 0.26)
 	attack_area.body_entered.connect(_on_attack_body_entered)
 	animation_tree.active = false
 	animation_player.playback_active = true
@@ -142,52 +143,21 @@ func _build_attack_shape() -> void:
 
 func _build_sprite_frames() -> void:
 	var frames := SpriteFrames.new()
-	_add_anim(frames, "idle", 8, Color(0.12, 0.14, 0.18), Color(0.75, 0.12, 0.18))
-	_add_anim(frames, "run", 8, Color(0.10, 0.12, 0.16), Color(0.85, 0.15, 0.22), true)
-	_add_anim(frames, "jump", 4, Color(0.12, 0.14, 0.19), Color(0.9, 0.18, 0.26))
-	_add_anim(frames, "fall", 4, Color(0.11, 0.13, 0.17), Color(0.65, 0.1, 0.16))
-	_add_anim(frames, "attack", 6, Color(0.13, 0.15, 0.2), Color(0.95, 0.2, 0.28), false, true)
-	_add_anim(frames, "wave", 5, Color(0.11, 0.14, 0.2), Color(0.2, 0.85, 1.0), false, true)
-	_add_anim(frames, "hurt", 2, Color(0.18, 0.08, 0.09), Color(1.0, 0.25, 0.25))
+	_add_file_anim(frames, "idle", "res://assets/characters/foxy/animation/idle/foxy-idle_%02d.png", 0, 15, 9.0, true)
+	_add_file_anim(frames, "run", "res://assets/characters/foxy/animation/run/foxy-run_%02d.png", 0, 15, 16.0, true)
+	_add_file_anim(frames, "jump", "res://assets/characters/foxy/animation/jump/foxy-jump_%02d.png", 0, 10, 13.0, false)
+	_add_file_anim(frames, "fall", "res://assets/characters/foxy/animation/jump/foxy-jump_%02d.png", 10, 12, 12.0, true)
+	_add_file_anim(frames, "attack", "res://assets/characters/foxy/animation/blaster shoot/foxy-blaster shoot_%d.png", 0, 9, 18.0, false)
+	_add_file_anim(frames, "wave", "res://assets/characters/foxy/animation/blaster shoot/foxy-blaster shoot_%d.png", 0, 9, 18.0, false)
+	_add_file_anim(frames, "hurt", "res://assets/characters/foxy/animation/hurt/foxy-hurt_%02d.png", 0, 11, 16.0, false)
 	sprite.sprite_frames = frames
 	sprite.play("idle")
 
-func _add_anim(frames: SpriteFrames, name: StringName, count: int, body: Color, accent: Color, stride := false, blade := false) -> void:
+func _add_file_anim(frames: SpriteFrames, name: StringName, path_pattern: String, start: int, count: int, fps: float, loop: bool) -> void:
 	frames.add_animation(name)
-	frames.set_animation_speed(name, 10.0 if name == "run" else 8.0)
-	frames.set_animation_loop(name, name in [&"idle", &"run", &"fall"])
+	frames.set_animation_speed(name, fps)
+	frames.set_animation_loop(name, loop)
 	for i in range(count):
-		frames.add_frame(name, _make_character_texture(i, count, body, accent, stride, blade))
-
-func _make_character_texture(index: int, count: int, body: Color, accent: Color, stride: bool, blade: bool) -> Texture2D:
-	var image := Image.create(112, 128, false, Image.FORMAT_RGBA8)
-	image.fill(Color.TRANSPARENT)
-	var t := TAU * float(index) / maxf(1.0, float(count))
-	var bob := int(sin(t) * 3.0)
-	var leg := int(sin(t) * 10.0) if stride else 0
-	_rect(image, 43, 20 + bob, 26, 24, body.darkened(0.25))
-	_rect(image, 36, 45 + bob, 40, 48, body)
-	_rect(image, 31, 50 + bob, 14, 33, body.darkened(0.15))
-	_rect(image, 70, 49 + bob, 14, 35, body.lightened(0.08))
-	_rect(image, 37, 87 + bob, 14, 34 + leg, body.darkened(0.25))
-	_rect(image, 62, 87 + bob, 14, 34 - leg, body.darkened(0.1))
-	_rect(image, 30, 36 + bob, 52, 9, accent)
-	_rect(image, 35, 92 + bob, 45, 9, accent.darkened(0.2))
-	_rect(image, 47, 28 + bob, 21, 6, Color(0.88, 0.72, 0.55))
-	_rect(image, 61, 28 + bob, 10, 5, Color(0.9, 1.0, 0.96))
-	if blade:
-		_line(image, 73, 64 + bob, 108, 26 + bob - index * 2, Color(0.9, 1.0, 1.0), 3)
-	else:
-		_line(image, 73, 65 + bob, 95, 38 + bob, Color(0.65, 0.72, 0.76), 2)
-	return ImageTexture.create_from_image(image)
-
-func _rect(image: Image, x: int, y: int, w: int, h: int, color: Color) -> void:
-	for py in range(maxi(0, y), mini(image.get_height(), y + h)):
-		for px in range(maxi(0, x), mini(image.get_width(), x + w)):
-			image.set_pixel(px, py, color)
-
-func _line(image: Image, x1: int, y1: int, x2: int, y2: int, color: Color, width: int) -> void:
-	var steps := maxi(absi(x2 - x1), absi(y2 - y1))
-	for i in range(steps + 1):
-		var p := float(i) / maxf(1.0, float(steps))
-		_rect(image, int(lerpf(x1, x2, p)), int(lerpf(y1, y2, p)), width, width, color)
+		var texture := load(path_pattern % (start + i))
+		if texture:
+			frames.add_frame(name, texture)

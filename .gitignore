@@ -13,3 +13,4 @@ __pycache__/
 scratch/
 godot/.godot/
 godot/exported/
+godot/build/

@@ -2,7 +2,7 @@
 
 A Phaser 4, TypeScript, and Vite action-platformer prototype with Matter.js physics, responsive scaling, keyboard controls, gamepad support, and an SVG-rendered sprite pipeline for current placeholder production art.
 
-Current version: `3.8.1`
+Current version: `3.9.0`
 
 ## Features
 
@@ -94,3 +94,4 @@ npm run test:visual
 - Generated runtime assets under `public/assets` are kept only when they are loaded by the current manifest or scripts.
 - Temporary Playwright output, scratch debugging files, `dist`, and `node_modules` are ignored.
 - Legacy SWF imports, old packed atlases, and unused placeholder character sheets were removed in `3.8.0`.
+- Godot 4.6.3 migration prototype lives under `godot/` with a free-commercial Foxy visual baseline, Web export preset, and optional `vercel.godot.json` deployment config.

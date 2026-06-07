@@ -18,6 +18,9 @@ var rush_timer := 0.0
 
 func _ready() -> void:
 	_build_sprite_frames()
+	sprite.position = Vector2(0, -118)
+	sprite.scale = Vector2(0.39, 0.39)
+	sprite.modulate = Color(1.0, 0.42, 0.32)
 	add_to_group("enemies")
 	add_to_group("boss")
 
@@ -67,42 +70,17 @@ func take_damage(amount: int, from_x: float) -> void:
 
 func _build_sprite_frames() -> void:
 	var frames := SpriteFrames.new()
-	_add_anim(frames, "walk", Color(0.28, 0.08, 0.08), Color(0.95, 0.28, 0.15), 4)
-	_add_anim(frames, "rush", Color(0.42, 0.08, 0.1), Color(1.0, 0.55, 0.18), 4)
-	_add_anim(frames, "hurt", Color(0.55, 0.12, 0.14), Color(1.0, 0.8, 0.32), 2)
+	_add_file_anim(frames, "walk", "res://assets/characters/foxy/animation/run/foxy-run_%02d.png", 0, 15, 10.0, true)
+	_add_file_anim(frames, "rush", "res://assets/characters/foxy/animation/run/foxy-run_%02d.png", 0, 15, 20.0, true)
+	_add_file_anim(frames, "hurt", "res://assets/characters/foxy/animation/hurt/foxy-hurt_%02d.png", 0, 11, 14.0, false)
 	sprite.sprite_frames = frames
 	sprite.play("walk")
 
-func _add_anim(frames: SpriteFrames, name: StringName, body: Color, accent: Color, count: int) -> void:
+func _add_file_anim(frames: SpriteFrames, name: StringName, path_pattern: String, start: int, count: int, fps: float, loop: bool) -> void:
 	frames.add_animation(name)
-	frames.set_animation_speed(name, 7.0)
-	frames.set_animation_loop(name, name != &"hurt")
+	frames.set_animation_speed(name, fps)
+	frames.set_animation_loop(name, loop)
 	for i in range(count):
-		frames.add_frame(name, _make_texture(i, count, body, accent))
-
-func _make_texture(index: int, count: int, body: Color, accent: Color) -> Texture2D:
-	var image := Image.create(150, 168, false, Image.FORMAT_RGBA8)
-	image.fill(Color.TRANSPARENT)
-	var bob := int(sin(TAU * float(index) / maxf(1.0, float(count))) * 3.0)
-	_rect(image, 52, 18 + bob, 46, 42, body.darkened(0.18))
-	_rect(image, 38, 58 + bob, 74, 66, body)
-	_rect(image, 26, 70 + bob, 22, 48, body.darkened(0.1))
-	_rect(image, 102, 70 + bob, 22, 48, body.darkened(0.05))
-	_rect(image, 48, 120 + bob, 22, 42, body.darkened(0.24))
-	_rect(image, 84, 120 + bob, 22, 42, body.darkened(0.2))
-	_rect(image, 36, 58 + bob, 78, 12, accent)
-	_rect(image, 45, 18 + bob, 16, 28, Color(0.86, 0.78, 0.55))
-	_rect(image, 93, 18 + bob, 16, 28, Color(0.86, 0.78, 0.55))
-	_line(image, 108, 84 + bob, 142, 42 + bob, Color(0.9, 0.92, 0.84), 5)
-	return ImageTexture.create_from_image(image)
-
-func _rect(image: Image, x: int, y: int, w: int, h: int, color: Color) -> void:
-	for py in range(maxi(0, y), mini(image.get_height(), y + h)):
-		for px in range(maxi(0, x), mini(image.get_width(), x + w)):
-			image.set_pixel(px, py, color)
-
-func _line(image: Image, x1: int, y1: int, x2: int, y2: int, color: Color, width: int) -> void:
-	var steps := maxi(absi(x2 - x1), absi(y2 - y1))
-	for i in range(steps + 1):
-		var p := float(i) / maxf(1.0, float(steps))
-		_rect(image, int(lerpf(x1, x2, p)), int(lerpf(y1, y2, p)), width, width, color)
+		var texture := load(path_pattern % (start + i))
+		if texture:
+			frames.add_frame(name, texture)

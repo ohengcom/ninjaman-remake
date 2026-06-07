@@ -1,4 +1,4 @@
-export const ASSET_VERSION = '3.8.1';
+export const ASSET_VERSION = '3.9.0';
 export const asset = (url: string) => `${url}?v=${ASSET_VERSION}`;
 
 export const manifest = {

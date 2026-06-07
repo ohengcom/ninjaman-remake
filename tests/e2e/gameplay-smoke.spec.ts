@@ -72,7 +72,7 @@ test.describe('Gameplay Smoke', () => {
     expect(levelOnePhysics.nearestPlatformGap).toBeLessThanOrEqual(220);
     expect(levelOnePhysics.platformAboveStandingHead).toBe(true);
     expect(levelOnePhysics.hasPlayerGuardAnimation).toBe(true);
-    expect(playerSheetRequests.some((url) => url.includes('v=3.8.1'))).toBe(true);
+    expect(playerSheetRequests.some((url) => url.includes('v=3.9.0'))).toBe(true);
 
     // Hold D to walk right, press J to attack, repeat to hit crates/barrels/enemies
     console.log('--- STARTING PLAYGROUND SIMULATION ---');

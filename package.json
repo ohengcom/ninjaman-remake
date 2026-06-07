@@ -1,6 +1,6 @@
 {
   "name": "ninjaman-remake",
-  "version": "3.8.1",
+  "version": "3.9.0",
   "description": "Ninja Man Remake - A modern high-definition action-platformer built with Phaser 4, TypeScript, and Vite.",
   "type": "module",
   "scripts": {
@@ -11,6 +11,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:visual": "playwright test",
+    "build:godot:web": "node scripts/export_godot_web.js",
     "build:art": "node scripts/generate_hd_art.js && node scripts/generate_realistic_enemies.js",
     "build:player-art": "node scripts/generate_player_hero.js",
     "build:audio": "node scripts/build_audiosprite.js"
