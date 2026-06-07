@@ -407,19 +407,9 @@ function drawEnemyFrame(target, type, frameIndex) {
   target.composite(frame, col * ENEMY_FRAME_W, row * ENEMY_FRAME_H);
 }
 
-async function makeEnemySheets() {
-  for (const type of ['guard', 'axe', 'ninja', 'sniper', 'boss']) {
-    const sheet = new Jimp({ width: ENEMY_FRAME_W * 3, height: ENEMY_FRAME_H * 2, color: rgba(0, 0, 0, 0) });
-    for (let i = 0; i < 6; i++) drawEnemyFrame(sheet, type, i);
-    const file = type === 'boss' ? 'boss_oni' : `enemy_${type}`;
-    await sheet.write(`public/assets/sprites/${file}.png`);
-  }
-}
-
 await makeForest();
 await makeBeach();
 await makeCastle();
 await makeHeroSheet();
-await makeEnemySheets();
 
-console.log('Generated HD backgrounds, player, enemy, and boss spritesheets.');
+console.log('Generated HD backgrounds and player spritesheet. Use generate_realistic_enemies.js for enemy and boss sheets.');
