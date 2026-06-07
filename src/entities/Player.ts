@@ -5,11 +5,11 @@ import { PLAYER_MOVEMENT, PLAYER_ATTACKS, PLAYER_DEFENSE } from '../config/comba
 import { GAME_EVENTS } from '../events.js';
 
 const PLAYER_RENDER = {
-  displaySize: 165,
+  displaySize: 184,
   frameSize: 256,
   yFeet: 232,
-  bodyWidth: 34,
-  bodyHeight: 96,
+  bodyWidth: 40,
+  bodyHeight: 106,
   bodyOffsetX: 30,
   bodyOffsetY: 23,
 } as const;

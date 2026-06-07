@@ -1,6 +1,6 @@
 {
   "name": "ninjaman-remake",
-  "version": "3.8.0",
+  "version": "3.8.1",
   "description": "Ninja Man Remake - A modern high-definition action-platformer built with Phaser 4, TypeScript, and Vite.",
   "type": "module",
   "scripts": {

@@ -1,4 +1,4 @@
-export const ASSET_VERSION = '3.8.0';
+export const ASSET_VERSION = '3.8.1';
 export const asset = (url: string) => `${url}?v=${ASSET_VERSION}`;
 
 export const manifest = {
@@ -11,7 +11,7 @@ export const manifest = {
     { key: 'vfx_particles', url: asset('assets/sprites/vfx_particles.png') },
   ],
   svgs: [
-    { key: 'player_wave', url: asset('assets/sprites/player_wave.svg'), svgConfig: { width: 60, height: 60 } },
+    { key: 'player_wave', url: asset('assets/sprites/player_wave.svg'), svgConfig: { width: 120, height: 64 } },
     { key: 'projectile', url: asset('assets/sprites/projectile.svg'), svgConfig: { width: 40, height: 20 } },
   ],
   spritesheets: [

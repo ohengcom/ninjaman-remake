@@ -55,24 +55,24 @@ test.describe('Gameplay Smoke', () => {
         .filter((body: any) => body.isStatic && body.gameObject?.getData?.('isOneWay'));
       const platformGaps = oneWayPlatforms.map((body: any) => groundTop - body.bounds.min.y);
       const nearestPlatformGap = Math.min(...platformGaps);
-      const platformWithHeadroom = oneWayPlatforms.some((body: any) => body.bounds.max.y > playerTop + 8);
+      const platformAboveStandingHead = oneWayPlatforms.some((body: any) => body.bounds.max.y < playerTop - 20);
       return {
         playerGroundDelta: Math.abs(playerBottom - groundTop),
         enemyGroundDelta: Math.abs(enemyBottom - groundTop),
         platformCount: oneWayPlatforms.length,
         nearestPlatformGap,
-        platformWithHeadroom,
+        platformAboveStandingHead,
         hasPlayerGuardAnimation: gameScene.anims.exists('player_guard'),
       };
     });
     expect(levelOnePhysics.playerGroundDelta).toBeLessThanOrEqual(2);
     expect(levelOnePhysics.enemyGroundDelta).toBeLessThanOrEqual(2);
     expect(levelOnePhysics.platformCount).toBeGreaterThan(0);
-    expect(levelOnePhysics.nearestPlatformGap).toBeGreaterThanOrEqual(78);
-    expect(levelOnePhysics.nearestPlatformGap).toBeLessThanOrEqual(116);
-    expect(levelOnePhysics.platformWithHeadroom).toBe(true);
+    expect(levelOnePhysics.nearestPlatformGap).toBeGreaterThanOrEqual(170);
+    expect(levelOnePhysics.nearestPlatformGap).toBeLessThanOrEqual(220);
+    expect(levelOnePhysics.platformAboveStandingHead).toBe(true);
     expect(levelOnePhysics.hasPlayerGuardAnimation).toBe(true);
-    expect(playerSheetRequests.some((url) => url.includes('v=3.8.0'))).toBe(true);
+    expect(playerSheetRequests.some((url) => url.includes('v=3.8.1'))).toBe(true);
 
     // Hold D to walk right, press J to attack, repeat to hit crates/barrels/enemies
     console.log('--- STARTING PLAYGROUND SIMULATION ---');

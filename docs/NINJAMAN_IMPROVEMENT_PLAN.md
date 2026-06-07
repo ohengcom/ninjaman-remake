@@ -1,7 +1,7 @@
 # Ninjaman 工程状态与维护计划
 
 日期：2026-06-07
-版本：3.8.0
+版本：3.8.1
 
 ## 当前状态
 
@@ -29,7 +29,7 @@
 - Playwright 转场测试改用 `baseURL`，删除默认运行的 debug test，增加实际断言。
 - e2e 构建使用 Vite `--mode test`，只在 dev/test 模式暴露 `window.game` 测试钩子。
 - HUD sound toggle 移除 inline `onclick`，改为 add/remove event listener。
-- README、主菜单版本号、package 版本、package-lock 版本和 asset cache 版本同步到 `3.8.0`。
+- README、主菜单版本号、package 版本、package-lock 版本和 asset cache 版本同步到 `3.8.1`。
 - 资源/音频脚本移除本机绝对路径和未转义 shell 字符串拼接。
 - 玩家动画注册改为 `src/animations/characterAnimationManifest.ts` 数据驱动，避免帧范围散落硬编码。
 - 玩家 spritesheet 改为 `scripts/generate_player_hero.js` 通过 Playwright/Chromium 渲染 SVG 生成。

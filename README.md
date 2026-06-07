@@ -2,7 +2,7 @@
 
 A Phaser 4, TypeScript, and Vite action-platformer prototype with Matter.js physics, responsive scaling, keyboard controls, gamepad support, and an SVG-rendered sprite pipeline for current placeholder production art.
 
-Current version: `3.8.0`
+Current version: `3.8.1`
 
 ## Features
 

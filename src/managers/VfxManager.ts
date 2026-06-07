@@ -26,7 +26,7 @@ export class VfxManager {
 
   public createAmbientMotes(mapWidth: number, mapHeight: number) {
     // Firefly/petal layer (slow, dreamy)
-    this.scene.add.particles(this.scene.cameras.main.width / 2, mapHeight / 2, 'player_wave', {
+    this.scene.add.particles(this.scene.cameras.main.width / 2, mapHeight / 2, 'vfx_particles', {
       x: { min: 0, max: mapWidth },
       y: { min: 0, max: mapHeight },
       scale: { start: 0.06, end: 0 },
@@ -41,7 +41,7 @@ export class VfxManager {
     }).setScrollFactor(0.3).setDepth(-5);
 
     // Front sparkle layer
-    this.scene.add.particles(this.scene.cameras.main.width / 2, mapHeight / 2, 'player_wave', {
+    this.scene.add.particles(this.scene.cameras.main.width / 2, mapHeight / 2, 'vfx_particles', {
       x: { min: 0, max: mapWidth },
       y: { min: 0, max: mapHeight },
       scale: { start: 0.08, end: 0 },
@@ -58,7 +58,7 @@ export class VfxManager {
 
   public createHitParticles() {
     // Impact burst particles (red/orange for hits)
-    this.hitParticles = this.scene.add.particles(0, 0, 'player_wave', {
+    this.hitParticles = this.scene.add.particles(0, 0, 'vfx_particles', {
       speed: { min: 150, max: 500 },
       angle: { min: 0, max: 360 },
       scale: { start: 0.2, end: 0 },
@@ -70,7 +70,7 @@ export class VfxManager {
     });
 
     // Upward spark fountain (gold/white for special hits)
-    this.sparkParticles = this.scene.add.particles(0, 0, 'player_wave', {
+    this.sparkParticles = this.scene.add.particles(0, 0, 'vfx_particles', {
       speed: { min: 250, max: 600 },
       angle: { min: -130, max: -50 },
       scale: { start: 0.12, end: 0 },
@@ -82,7 +82,7 @@ export class VfxManager {
     });
 
     // Ground dust cloud
-    this.dustParticles = this.scene.add.particles(0, 0, 'player_wave', {
+    this.dustParticles = this.scene.add.particles(0, 0, 'vfx_particles', {
       speed: { min: 30, max: 100 },
       angle: { min: -30, max: 210 },
       scale: { start: 0.25, end: 0 },
@@ -95,7 +95,7 @@ export class VfxManager {
     });
 
     // Slash trail (for melee attacks)
-    this.slashTrail = this.scene.add.particles(0, 0, 'player_wave', {
+    this.slashTrail = this.scene.add.particles(0, 0, 'vfx_particles', {
       speed: { min: 20, max: 80 },
       angle: { min: 0, max: 360 },
       scale: { start: 0.15, end: 0 },
@@ -346,7 +346,7 @@ export class VfxManager {
 
   /** 跟隨玩家的攻擊拖尾粒子 */
   public createAttackTrail(player: Phaser.Physics.Matter.Sprite): Phaser.GameObjects.Particles.ParticleEmitter {
-    return this.scene.add.particles(0, 0, 'player_wave', {
+    return this.scene.add.particles(0, 0, 'vfx_particles', {
       follow: player,
       followOffset: { x: 0, y: 0 },
       speed: { min: 20, max: 80 },
@@ -364,7 +364,7 @@ export class VfxManager {
   public bossPhaseParticleBurst(x: number, y: number, phase: number) {
     const colors = phase === 3 ? [0xff4444, 0xff8844] : [0xffd43b, 0xffaa00];
 
-    this.scene.add.particles(x, y, 'player_wave', {
+    this.scene.add.particles(x, y, 'vfx_particles', {
       speed: { min: 200, max: 600 },
       angle: { min: 0, max: 360 },
       scale: { start: 0.3, end: 0 },
@@ -378,4 +378,3 @@ export class VfxManager {
     }).emitParticleAt(x, y, 40);
   }
 }
-

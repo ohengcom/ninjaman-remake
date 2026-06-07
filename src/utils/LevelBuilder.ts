@@ -116,11 +116,11 @@ export class LevelBuilder {
 
     // ─── VISIBLE PLATFORMS ───
     if (levelCfg.hasPlatforms) {
-      const playerBodyHeight = 96;
+      const playerBodyHeight = 106;
       const platformReach = getDoubleJumpReach();
-      const minHeadClearance = playerBodyHeight + 8;
-      const minJumpGap = 78;
-      const maxJumpGap = Math.max(minJumpGap, Math.min(platformReach - 10, 116));
+      const minHeadClearance = playerBodyHeight + 36;
+      const minJumpGap = 170;
+      const maxJumpGap = Math.max(minJumpGap, Math.min(platformReach + 96, 220));
       const groundTop = h - groundHeight;
 
       for (let i = 0; i < tiles; i++) {

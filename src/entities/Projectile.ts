@@ -25,9 +25,9 @@ export class Projectile extends Phaser.Physics.Matter.Sprite {
         
         // Adjust hitbox for player wave vs sniper bullet
         if (textureKey === 'player_wave') {
-            this.setRectangle(30, 40);
+            this.setRectangle(76, 34);
             this.setOrigin(0.5, 0.5);
-            this.setDisplaySize(60, 60);
+            this.setDisplaySize(120, 56);
         } else {
             this.setRectangle(20, 10);
             this.setOrigin(0.5, 0.5);
