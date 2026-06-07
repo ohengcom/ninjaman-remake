@@ -21,7 +21,7 @@ const ENEMY_RENDER_CONFIGS = {
   sniper: { displayWidth: 134, displayHeight: 202, bodyWidth: 40, bodyHeight: 112, yFeet: 466 },
 } as const;
 
-const ENEMY_GROUND_CLEARANCE = 2;
+const ENEMY_GROUND_CLEARANCE = 0;
 
 export class Enemy extends Phaser.Physics.Matter.Sprite {
   public stateMachine: StateMachine<Enemy>;

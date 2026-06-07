@@ -7,6 +7,7 @@ import { GAME_EVENTS } from '../events.js';
 const PLAYER_RENDER = {
   displaySize: 165,
   frameSize: 256,
+  yFeet: 232,
   bodyWidth: 34,
   bodyHeight: 96,
   bodyOffsetX: 30,
@@ -315,8 +316,12 @@ export class Player extends Phaser.Physics.Matter.Sprite {
       frictionStatic: 0,
       frictionAir: 0.01,
     });
-    this.setOrigin(0.5, 0.875); // Feet are drawn near the bottom of each HD frame.
+    this.setOrigin(0.5, this.getOriginYForFeet());
     this.setFixedRotation();
+  }
+
+  private getOriginYForFeet(): number {
+    return PLAYER_RENDER.yFeet / PLAYER_RENDER.frameSize - PLAYER_RENDER.bodyHeight / (2 * PLAYER_RENDER.displaySize);
   }
 
   public getBodyHalfHeight(): number {
@@ -325,7 +330,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
 
   public setFlipX(value: boolean) {
     super.setFlipX(value);
-    this.setOrigin(0.5, 0.875);
+    this.setOrigin(0.5, this.getOriginYForFeet());
     return this;
   }
 
