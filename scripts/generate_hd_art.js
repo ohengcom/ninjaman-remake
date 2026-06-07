@@ -156,74 +156,149 @@ async function makeCastle() {
   await img.write('public/assets/backgrounds/bg_castle.png');
 }
 
-function drawBlade(img, cx, cy, dir, lift, alpha = 255) {
-  const c1 = rgba(230, 251, 255, alpha);
-  const c2 = rgba(74, 218, 255, Math.floor(alpha * 0.7));
-  line(img, cx + dir * 4, cy - 26 + lift, cx + dir * 86, cy - 92 + lift, 9, c2);
-  line(img, cx + dir * 14, cy - 28 + lift, cx + dir * 92, cy - 96 + lift, 3, c1);
+function drawSteelBlade(img, hiltX, hiltY, tipX, tipY, width, alpha = 255) {
+  const dx = tipX - hiltX;
+  const dy = tipY - hiltY;
+  const len = Math.max(1, Math.hypot(dx, dy));
+  const nx = -dy / len;
+  const ny = dx / len;
+  poly(img, [
+    [hiltX + nx * width, hiltY + ny * width],
+    [tipX, tipY],
+    [hiltX - nx * width, hiltY - ny * width],
+    [hiltX - nx * width * 0.35, hiltY - ny * width * 0.35],
+  ], rgba(176, 188, 195, alpha));
+  line(img, hiltX, hiltY, tipX, tipY, Math.max(1, width * 0.22), rgba(244, 249, 250, alpha));
+  line(img, hiltX - nx * width * 1.6, hiltY - ny * width * 1.6, hiltX + nx * width * 1.6, hiltY + ny * width * 1.6, width * 0.45, rgba(92, 70, 46, alpha));
 }
 
-function drawHero(img, frameX, frameY, pose) {
-  const ox = frameX * FRAME_W;
-  const oy = frameY * FRAME_H;
-  const cx = ox + 128 + (pose.shiftX || 0);
-  const foot = oy + 224 + (pose.footY || 0);
-  const dir = 1;
-  const suit = rgba(18, 23, 37, 255);
-  const suit2 = rgba(37, 47, 74, 255);
-  const skin = rgba(238, 195, 153, 255);
-  const red = rgba(219, 45, 83, 255);
-  const cyan = rgba(70, 226, 255, 240);
-  const shadow = rgba(0, 0, 0, 52);
-  ellipse(img, cx, foot + 6, 58, 10, shadow);
-  if (pose.slash) {
-    ellipse(img, cx + 45, foot - 92 + pose.slashY, 74, 22, rgba(75, 225, 255, 55));
-    drawBlade(img, cx, foot - 60, dir, pose.slashY, 210);
-  }
+function drawClothFold(img, x1, y1, x2, y2, alpha = 100) {
+  line(img, x1, y1, x2, y2, 1.2, rgba(255, 255, 255, alpha));
+  line(img, x1 + 3, y1 + 4, x2 + 3, y2 + 4, 1.4, rgba(0, 0, 0, Math.floor(alpha * 0.7)));
+}
+
+function drawRealisticHeroFrame(target, pose, frameIndex) {
+  const S = 4;
+  const img = new Jimp({ width: FRAME_W * S, height: FRAME_H * S, color: rgba(0, 0, 0, 0) });
+  const x = (v) => v * S;
+  const y = (v) => v * S;
+  const cx = x(128 + (pose.shiftX || 0));
+  const foot = y(232 + (pose.footY || 0));
+  const lean = x(pose.lean || 0);
+  const bob = y(pose.bob || 0);
+  const torsoX = cx + lean;
+  const shoulderY = foot - y(130) + bob;
+  const hipY = foot - y(60) + bob;
+  const headY = shoulderY - y(34);
+  const cloth = rgba(18, 21, 26, 255);
+  const clothLight = rgba(45, 49, 56, 255);
+  const clothDeep = rgba(6, 8, 12, 255);
+  const leather = rgba(55, 42, 31, 255);
+  const leatherLight = rgba(97, 75, 52, 255);
+  const metal = rgba(112, 122, 127, 255);
+  const skin = rgba(201, 155, 116, 255);
+  const sash = rgba(116, 24, 31, 255);
+  const sashLight = rgba(183, 54, 62, 235);
+  ellipse(img, cx, foot + y(3), x(46), y(9), rgba(0, 0, 0, 70));
+
   if (pose.trail) {
     for (let i = 1; i <= 3; i++) {
-      ellipse(img, cx - i * 18, foot - 94, 24, 49, rgba(33, 74, 106, 45));
-      line(img, cx - i * 18, foot - 60, cx - i * 42, foot - 104, 10, rgba(219, 45, 83, 45));
+      ellipse(img, torsoX - x(13 * i), shoulderY + y(44), x(20), y(58), rgba(28, 32, 40, 42));
+      line(img, torsoX - x(24 * i), shoulderY - y(10), torsoX - x(52 + i * 14), shoulderY - y(24), x(6), rgba(108, 24, 35, 45));
     }
   }
-  line(img, cx - 12, foot - 76, cx - 24 + pose.armLX, foot - 33 + pose.armLY, 17, suit2);
-  line(img, cx + 18, foot - 76, cx + 42 + pose.armRX, foot - 47 + pose.armRY, 16, suit2);
-  line(img, cx - 12, foot - 25, cx - 32 + pose.legLX, foot - 1 + pose.legLY, 20, suit);
-  line(img, cx + 14, foot - 25, cx + 32 + pose.legRX, foot - 1 + pose.legRY, 20, suit);
-  ellipse(img, cx, foot - 66, 31, 50, suit);
-  rect(img, cx - 22, foot - 91, 44, 15, red);
-  circle(img, cx, foot - 129, 32, suit);
-  rect(img, cx - 28, foot - 134, 56, 18, rgba(7, 10, 18, 255));
-  rect(img, cx + 6, foot - 126, 19, 7, cyan);
-  circle(img, cx + 28, foot - 135, 5, skin);
-  line(img, cx - 22, foot - 138, cx - 82 - pose.scarf, foot - 155 + pose.scarfY, 16, red);
-  line(img, cx - 13, foot - 132, cx - 68 - pose.scarf * 0.6, foot - 115 + pose.scarfY, 13, rgba(255, 78, 118, 230));
-  rect(img, cx - 18, foot - 40, 38, 9, cyan);
-  if (pose.blade) drawBlade(img, cx, foot - 50, dir, pose.bladeLift || 0, 255);
+
+  if (pose.slash) {
+    ellipse(img, torsoX + x(50), shoulderY + y(pose.slashY || 0), x(72), y(20), rgba(218, 231, 235, 42));
+    ellipse(img, torsoX + x(54), shoulderY + y((pose.slashY || 0) - 3), x(55), y(9), rgba(255, 255, 255, 58));
+  }
+
+  const leftKnee = [torsoX - x(18) + x(pose.legLX || 0), hipY + y(48) + y(pose.legLY || 0)];
+  const leftFoot = [torsoX - x(28) + x(pose.legLX2 || pose.legLX || 0), foot - y(6) + y(pose.legLY2 || 0)];
+  const rightKnee = [torsoX + x(20) + x(pose.legRX || 0), hipY + y(47) + y(pose.legRY || 0)];
+  const rightFoot = [torsoX + x(30) + x(pose.legRX2 || pose.legRX || 0), foot - y(5) + y(pose.legRY2 || 0)];
+  line(img, torsoX - x(12), hipY, leftKnee[0], leftKnee[1], x(15), clothDeep);
+  line(img, leftKnee[0], leftKnee[1], leftFoot[0], leftFoot[1], x(13), cloth);
+  line(img, torsoX + x(13), hipY, rightKnee[0], rightKnee[1], x(15), cloth);
+  line(img, rightKnee[0], rightKnee[1], rightFoot[0], rightFoot[1], x(13), clothDeep);
+  ellipse(img, leftFoot[0] + x(5), leftFoot[1] + y(2), x(18), y(6), leather);
+  ellipse(img, rightFoot[0] + x(5), rightFoot[1] + y(2), x(18), y(6), leather);
+  line(img, leftKnee[0] - x(4), leftKnee[1] - y(14), leftFoot[0] - x(2), leftFoot[1] - y(16), x(1.2), rgba(105, 112, 118, 120));
+  line(img, rightKnee[0] + x(3), rightKnee[1] - y(16), rightFoot[0] + x(4), rightFoot[1] - y(15), x(1.2), rgba(105, 112, 118, 120));
+
+  poly(img, [
+    [torsoX - x(29), shoulderY + y(2)],
+    [torsoX + x(28), shoulderY - y(4)],
+    [torsoX + x(22), hipY + y(12)],
+    [torsoX - x(22), hipY + y(14)],
+  ], cloth);
+  poly(img, [[torsoX - x(24), shoulderY + y(5)], [torsoX + x(8), shoulderY + y(2)], [torsoX - x(4), hipY + y(14)], [torsoX - x(29), hipY + y(4)]], clothLight);
+  poly(img, [[torsoX + x(8), shoulderY + y(2)], [torsoX + x(29), shoulderY - y(3)], [torsoX + x(24), hipY + y(10)], [torsoX - x(2), hipY + y(14)]], clothDeep);
+  rect(img, torsoX - x(24), hipY - y(7), x(52), y(12), leather);
+  rect(img, torsoX - x(2), hipY - y(8), x(12), y(14), metal);
+  poly(img, [[torsoX - x(32), hipY], [torsoX - x(7), hipY + y(8)], [torsoX - x(17), foot - y(18)], [torsoX - x(48), foot - y(35)]], rgba(10, 12, 17, 230));
+  poly(img, [[torsoX + x(24), hipY], [torsoX + x(44), hipY + y(8)], [torsoX + x(33), foot - y(30)], [torsoX + x(8), foot - y(22)]], rgba(8, 10, 14, 220));
+
+  const leftHand = [torsoX - x(44) + x(pose.armLX || 0), shoulderY + y(62) + y(pose.armLY || 0)];
+  const rightHand = [torsoX + x(43) + x(pose.armRX || 0), shoulderY + y(53) + y(pose.armRY || 0)];
+  line(img, torsoX - x(24), shoulderY + y(9), leftHand[0], leftHand[1], x(12), clothDeep);
+  line(img, torsoX + x(25), shoulderY + y(7), rightHand[0], rightHand[1], x(12), cloth);
+  circle(img, leftHand[0], leftHand[1], x(5), skin);
+  circle(img, rightHand[0], rightHand[1], x(5), skin);
+  line(img, torsoX - x(25), shoulderY + y(19), leftHand[0] - x(2), leftHand[1] - y(4), x(1.2), rgba(130, 136, 141, 120));
+  line(img, torsoX + x(22), shoulderY + y(18), rightHand[0] + x(2), rightHand[1] - y(3), x(1.2), rgba(150, 156, 160, 125));
+
+  if (pose.blade) {
+    drawSteelBlade(img, rightHand[0] - x(1), rightHand[1] - y(2), rightHand[0] + x(74), rightHand[1] - y(66 + (pose.bladeLift || 0)), x(4), 245);
+  }
   if (pose.guard) {
-    ellipse(img, cx + 38, foot - 75, 20, 48, rgba(94, 220, 255, 80));
-    line(img, cx + 30, foot - 112, cx + 45, foot - 35, 5, cyan);
+    drawSteelBlade(img, rightHand[0], rightHand[1], rightHand[0] + x(12), rightHand[1] - y(88), x(4), 245);
+    ellipse(img, torsoX + x(36), shoulderY + y(36), x(18), y(46), rgba(190, 202, 207, 42));
   }
   if (pose.wave) {
-    for (let i = 0; i < 4; i++) ellipse(img, cx + 72 + i * 25, foot - 78, 24 + i * 9, 12 + i * 4, rgba(78, 229, 255, 125 - i * 24));
+    for (let i = 0; i < 5; i++) ellipse(img, rightHand[0] + x(30 + i * 20), rightHand[1] - y(8), x(18 + i * 7), y(8 + i * 3), rgba(214, 231, 235, 92 - i * 13));
   }
+
+  line(img, torsoX - x(20), shoulderY - y(2), torsoX - x(70 + (pose.scarf || 0)), shoulderY - y(22) + y(pose.scarfY || 0), x(9), sash);
+  line(img, torsoX - x(14), shoulderY + y(5), torsoX - x(58 + (pose.scarf || 0) * 0.7), shoulderY + y(14) + y(pose.scarfY || 0), x(7), sashLight);
+  poly(img, [[torsoX - x(18), shoulderY + y(3)], [torsoX + x(20), shoulderY], [torsoX + x(17), shoulderY + y(17)], [torsoX - x(20), shoulderY + y(19)]], sash);
+
+  ellipse(img, torsoX + x(1), headY, x(22), y(30), clothDeep);
+  ellipse(img, torsoX + x(3), headY - y(1), x(18), y(25), cloth);
+  rect(img, torsoX - x(17), headY - y(5), x(38), y(10), rgba(9, 10, 12, 255));
+  rect(img, torsoX - x(7), headY - y(4), x(15), y(5), rgba(202, 158, 118, 245));
+  rect(img, torsoX + x(7), headY - y(4), x(8), y(4), rgba(196, 211, 215, 235));
+  poly(img, [[torsoX - x(20), headY - y(25)], [torsoX + x(9), headY - y(35)], [torsoX + x(24), headY - y(16)]], clothDeep);
+  rect(img, torsoX - x(13), shoulderY - y(20), x(27), y(14), cloth);
+  circle(img, torsoX + x(19), headY + y(3), x(3), skin);
+
+  drawClothFold(img, torsoX - x(9), shoulderY + y(14), torsoX - x(15), hipY - y(8), 95);
+  drawClothFold(img, torsoX + x(8), shoulderY + y(12), torsoX + x(15), hipY - y(10), 75);
+  drawClothFold(img, torsoX - x(5), hipY + y(12), torsoX - x(21), foot - y(35), 65);
+  drawClothFold(img, torsoX + x(11), hipY + y(12), torsoX + x(28), foot - y(38), 55);
+  line(img, torsoX - x(30), shoulderY - y(5), torsoX - x(14), shoulderY - y(11), x(1.5), rgba(198, 205, 208, 120));
+  line(img, torsoX + x(2), hipY - y(6), torsoX + x(27), hipY - y(5), x(1.2), leatherLight);
+
+  img.blur(1);
+  img.resize({ w: FRAME_W, h: FRAME_H });
+  target.composite(img, (frameIndex % SHEET_COLS) * FRAME_W, Math.floor(frameIndex / SHEET_COLS) * FRAME_H);
 }
 
 async function makeHeroSheet() {
   const img = new Jimp({ width: FRAME_W * SHEET_COLS, height: FRAME_H * SHEET_ROWS, color: rgba(0, 0, 0, 0) });
   const poses = [
-    ...Array.from({ length: 8 }, (_, i) => ({ armLX: -8, armLY: 4, armRX: i % 2 ? -4 : 0, armRY: i % 2 ? 2 : -2, legLX: -2, legLY: 0, legRX: 2, legRY: 0, scarf: 10 + i * 2, scarfY: Math.sin(i) * 7 })),
-    ...Array.from({ length: 8 }, (_, i) => ({ shiftX: i % 2 ? 5 : -4, footY: i % 2 ? -5 : 0, armLX: -18, armLY: i % 2 ? -8 : 8, armRX: 10, armRY: -8, legLX: i % 2 ? 19 : -18, legLY: 0, legRX: i % 2 ? -19 : 18, legRY: -3, scarf: 35 + i * 3, scarfY: -10, blade: true, bladeLift: i % 2 ? -4 : 5, trail: true })),
-    ...Array.from({ length: 6 }, (_, i) => ({ footY: -10 - i * 2, armLX: -16, armLY: -10, armRX: 10, armRY: -18, legLX: -10 + i * 2, legLY: -4, legRX: 16 - i, legRY: -10, scarf: 38, scarfY: -12, blade: true, bladeLift: -20 + i * 4 })),
-    ...Array.from({ length: 6 }, (_, i) => ({ footY: 2 + i, armLX: -10, armLY: 8, armRX: 8, armRY: 14, legLX: -12, legLY: 8, legRX: 14, legRY: 5, scarf: 46, scarfY: 16, blade: i < 2 })),
-    ...Array.from({ length: 8 }, (_, i) => ({ shiftX: i * 3, armLX: -10, armLY: 2, armRX: 24 + i * 2, armRY: -6 - i, legLX: -6, legLY: 0, legRX: 10, legRY: -3, scarf: 36 + i * 3, scarfY: -8, slash: i > 1, slashY: -28 + i * 7, blade: true, bladeLift: -8 + i * 2 })),
-    ...Array.from({ length: 8 }, (_, i) => ({ shiftX: i * 2, armLX: -20, armLY: -14, armRX: 36, armRY: -34 + i * 2, legLX: -12, legLY: -4, legRX: 16, legRY: -5, scarf: 48, scarfY: -18, slash: true, slashY: -42 + i * 7, blade: true, bladeLift: -24 + i * 4 })),
-    ...Array.from({ length: 8 }, (_, i) => ({ shiftX: i * 4, armLX: -24, armLY: 8, armRX: 50, armRY: 0, legLX: -14, legLY: 4, legRX: 28, legRY: 1, scarf: 60, scarfY: -22, slash: true, slashY: -10 + i * 3, blade: true, bladeLift: 10, trail: true })),
-    ...Array.from({ length: 6 }, (_, i) => ({ armLX: -8, armLY: -4, armRX: 14, armRY: -6, legLX: -3, legLY: 0, legRX: 2, legRY: 0, scarf: 18, scarfY: 0, guard: i < 3, wave: i > 1, blade: true })),
-    { armLX: -12, armLY: -8, armRX: 12, armRY: -10, legLX: -8, legLY: -4, legRX: 8, legRY: -8, scarf: 48, scarfY: -20, blade: true, bladeLift: -36 },
-    { armLX: -10, armLY: 10, armRX: 20, armRY: 18, legLX: -10, legLY: 10, legRX: 18, legRY: 8, scarf: 52, scarfY: 22, slash: true, slashY: 28 },
+    ...Array.from({ length: 8 }, (_, i) => ({ bob: Math.sin(i / 8 * Math.PI * 2) * 2, armLX: -4, armLY: 2, armRX: i % 2 ? -3 : 2, armRY: i % 2 ? 1 : -2, legLX: -2, legRX: 2, scarf: 8 + i, scarfY: Math.sin(i) * 4, blade: true })),
+    ...Array.from({ length: 8 }, (_, i) => ({ shiftX: i % 2 ? 4 : -3, footY: i % 2 ? -4 : 0, lean: 4, armLX: i % 2 ? -24 : -10, armLY: i % 2 ? -8 : 8, armRX: i % 2 ? 16 : 7, armRY: -8, legLX: i % 2 ? 16 : -13, legLY: 0, legRX: i % 2 ? -18 : 16, legRY: -3, scarf: 30 + i * 2, scarfY: -8, blade: true, bladeLift: i % 2 ? -4 : 5, trail: true })),
+    ...Array.from({ length: 6 }, (_, i) => ({ footY: -10 - i * 2, lean: 2, armLX: -18, armLY: -14, armRX: 8, armRY: -22, legLX: -8 + i * 2, legLY: -4, legRX: 15 - i, legRY: -9, scarf: 34, scarfY: -12, blade: true, bladeLift: -24 + i * 4 })),
+    ...Array.from({ length: 6 }, (_, i) => ({ footY: 1 + i, lean: -2, armLX: -10, armLY: 9, armRX: 8, armRY: 15, legLX: -10, legLY: 8, legRX: 12, legRY: 5, scarf: 42, scarfY: 14, blade: i < 2 })),
+    ...Array.from({ length: 8 }, (_, i) => ({ shiftX: i * 2, lean: i > 3 ? 8 : 2, armLX: -12, armLY: 2, armRX: 24 + i * 2, armRY: -8 - i, legLX: -5, legRY: -3, scarf: 32 + i * 2, scarfY: -8, slash: i > 1, slashY: -28 + i * 7, blade: true, bladeLift: -8 + i * 2 })),
+    ...Array.from({ length: 8 }, (_, i) => ({ shiftX: i * 2, lean: 7, armLX: -22, armLY: -13, armRX: 34, armRY: -34 + i * 2, legLX: -11, legLY: -4, legRX: 15, legRY: -5, scarf: 44, scarfY: -17, slash: true, slashY: -42 + i * 7, blade: true, bladeLift: -24 + i * 4 })),
+    ...Array.from({ length: 8 }, (_, i) => ({ shiftX: i * 4, lean: 11, armLX: -25, armLY: 7, armRX: 50, armRY: 0, legLX: -12, legLY: 4, legRX: 28, legRY: 1, scarf: 56, scarfY: -21, slash: true, slashY: -10 + i * 3, blade: true, bladeLift: 10, trail: true })),
+    ...Array.from({ length: 6 }, (_, i) => ({ armLX: -8, armLY: -4, armRX: 12, armRY: -8, legLX: -3, legRX: 2, scarf: 16, scarfY: 0, guard: i < 3, wave: i > 1, blade: true })),
+    { armLX: -12, armLY: -9, armRX: 10, armRY: -12, legLX: -8, legLY: -4, legRX: 8, legRY: -8, scarf: 44, scarfY: -20, blade: true, bladeLift: -36 },
+    { armLX: -10, armLY: 10, armRX: 18, armRY: 18, legLX: -10, legLY: 10, legRX: 18, legRY: 8, scarf: 48, scarfY: 22, slash: true, slashY: 28 },
   ];
-  poses.forEach((pose, index) => drawHero(img, index % SHEET_COLS, Math.floor(index / SHEET_COLS), pose));
+  poses.forEach((pose, index) => drawRealisticHeroFrame(img, pose, index));
   await img.write('public/assets/sprites/player_hero_hd.png');
 }
 
