@@ -87,19 +87,14 @@ export class LevelBuilder {
       // Main ground body
       groundGraphics.fillStyle(theme.groundColor, 1);
       groundGraphics.fillRect(x, h - groundHeight, tileSize, groundHeight);
-      
-      // Ground top surface (grass/stone/sand strip)
+
+      // Ground top surface reads as terrain thickness, not a floating line.
       groundGraphics.fillStyle(theme.groundTopColor, 1);
-      groundGraphics.fillRect(x, h - groundHeight, tileSize, 6);
-      
-      // Surface detail highlights
-      groundGraphics.fillStyle(theme.accentColor, 0.3);
-      groundGraphics.fillRect(x, h - groundHeight + 6, tileSize, 2);
-      
-      // Subtle dirt texture lines
-      if (rng.next() > 0.5) {
-        groundGraphics.fillStyle(0x000000, 0.1);
-        groundGraphics.fillRect(x + rng.next() * (tileSize - 10), h - groundHeight + 12, 8 + rng.next() * 12, 2);
+      groundGraphics.fillRoundedRect(x, h - groundHeight, tileSize, 10, { tl: 3, tr: 3, bl: 0, br: 0 });
+
+      if (rng.next() > 0.55) {
+        groundGraphics.fillStyle(theme.accentColor, 0.18);
+        groundGraphics.fillEllipse(x + rng.next() * tileSize, h - 22 - rng.next() * 12, 12 + rng.next() * 18, 4 + rng.next() * 4);
       }
     }
     
@@ -115,27 +110,27 @@ export class LevelBuilder {
           const px = i * tileSize + 32;
           const py = h - 160 - rng.next() * 80;
           const platWidth = 120 + rng.next() * 60;
-          const platHeight = 24;
+          const platHeight = 32;
           
           // Draw visible platform
           const plat = scene.add.graphics();
           
-          // Platform body
+          // Platform body with visible thickness so it reads as a real jumpable ledge.
           plat.fillStyle(theme.platformColor, 1);
-          plat.fillRoundedRect(px - platWidth / 2, py - platHeight / 2, platWidth, platHeight, 4);
-          
-          // Platform top highlight
+          plat.fillRoundedRect(px - platWidth / 2, py - platHeight / 2, platWidth, platHeight, 7);
+
+          plat.fillStyle(0x000000, 0.16);
+          plat.fillRoundedRect(px - platWidth / 2 + 6, py + platHeight / 2 - 10, platWidth - 12, 8, 4);
+
+          // Platform top cap
           plat.fillStyle(theme.groundTopColor, 1);
-          plat.fillRoundedRect(px - platWidth / 2, py - platHeight / 2, platWidth, 5, { tl: 4, tr: 4, bl: 0, br: 0 });
-          
-          // Bottom shadow
-          plat.fillStyle(0x000000, 0.2);
-          plat.fillRect(px - platWidth / 2 + 4, py + platHeight / 2 - 4, platWidth - 8, 4);
-          
-          // Platform edge decorations
-          plat.fillStyle(theme.accentColor, 0.5);
-          plat.fillRect(px - platWidth / 2, py - platHeight / 2, 3, platHeight);
-          plat.fillRect(px + platWidth / 2 - 3, py - platHeight / 2, 3, platHeight);
+          plat.fillRoundedRect(px - platWidth / 2, py - platHeight / 2, platWidth, 9, { tl: 7, tr: 7, bl: 0, br: 0 });
+
+          plat.fillStyle(theme.accentColor, 0.28);
+          for (let d = 0; d < 3; d++) {
+            const dx = px - platWidth / 2 + 18 + rng.next() * (platWidth - 36);
+            plat.fillEllipse(dx, py - 1 + rng.next() * 8, 20 + rng.next() * 24, 4);
+          }
 
           // Physics body for platform (invisible rectangle collider)
           const platBody = scene.add.rectangle(px, py, platWidth, platHeight, 0x000000, 0);

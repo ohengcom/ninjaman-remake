@@ -15,10 +15,10 @@ const ENEMY_TEXTURES: Record<EnemyType, string> = {
 };
 
 const ENEMY_RENDER_CONFIGS = {
-  guard:  { displayWidth: 130, displayHeight: 190, bodyWidth: 42, bodyHeight: 110, yFeet: 493 },
-  axe:    { displayWidth: 140, displayHeight: 200, bodyWidth: 46, bodyHeight: 120, yFeet: 459 },
-  ninja:  { displayWidth: 130, displayHeight: 190, bodyWidth: 40, bodyHeight: 108, yFeet: 441 },
-  sniper: { displayWidth: 130, displayHeight: 190, bodyWidth: 40, bodyHeight: 108, yFeet: 501 },
+  guard:  { displayWidth: 136, displayHeight: 205, bodyWidth: 42, bodyHeight: 116, yFeet: 466 },
+  axe:    { displayWidth: 148, displayHeight: 218, bodyWidth: 48, bodyHeight: 124, yFeet: 466 },
+  ninja:  { displayWidth: 132, displayHeight: 198, bodyWidth: 40, bodyHeight: 112, yFeet: 466 },
+  sniper: { displayWidth: 134, displayHeight: 202, bodyWidth: 40, bodyHeight: 112, yFeet: 466 },
 } as const;
 
 const ENEMY_GROUND_CLEARANCE = 2;

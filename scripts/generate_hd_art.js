@@ -4,6 +4,8 @@ const WIDTH = 1920;
 const HEIGHT = 1080;
 const FRAME_W = 256;
 const FRAME_H = 256;
+const ENEMY_FRAME_W = 340;
+const ENEMY_FRAME_H = 512;
 const SHEET_COLS = 8;
 const SHEET_ROWS = 8;
 
@@ -302,9 +304,122 @@ async function makeHeroSheet() {
   await img.write('public/assets/sprites/player_hero_hd.png');
 }
 
+function drawEnemyFrame(target, type, frameIndex) {
+  const S = 3;
+  const frame = new Jimp({ width: ENEMY_FRAME_W * S, height: ENEMY_FRAME_H * S, color: rgba(0, 0, 0, 0) });
+  const x = (v) => v * S;
+  const y = (v) => v * S;
+  const col = frameIndex % 3;
+  const row = Math.floor(frameIndex / 3);
+  const action = ['idle', 'walkA', 'walkB', 'attack', 'hurt', 'die'][frameIndex];
+  const cx = x(170 + (action === 'walkA' ? -8 : action === 'walkB' ? 8 : action === 'attack' ? 12 : 0));
+  const foot = y(action === 'die' ? 418 : 466);
+  const palette = {
+    guard: { cloth: [44, 48, 54], light: [86, 90, 96], accent: [128, 34, 34], metal: [128, 136, 140], skin: [190, 144, 105] },
+    axe: { cloth: [58, 44, 36], light: [112, 82, 52], accent: [116, 58, 22], metal: [154, 148, 134], skin: [178, 118, 82] },
+    ninja: { cloth: [15, 17, 22], light: [48, 52, 60], accent: [52, 82, 94], metal: [122, 132, 136], skin: [185, 137, 100] },
+    sniper: { cloth: [35, 46, 39], light: [76, 92, 68], accent: [86, 64, 42], metal: [100, 105, 98], skin: [190, 145, 104] },
+    boss: { cloth: [48, 27, 31], light: [112, 50, 42], accent: [188, 50, 38], metal: [126, 112, 98], skin: [118, 74, 58] },
+  }[type];
+  const scale = type === 'boss' ? 1.28 : type === 'axe' ? 1.08 : 1;
+  const bodyH = y(210 * scale);
+  const shoulderY = foot - bodyH;
+  const hipY = foot - y(78 * scale);
+  const headY = shoulderY - y(42 * scale);
+  const cloth = rgba(...palette.cloth, 255);
+  const light = rgba(...palette.light, 255);
+  const accent = rgba(...palette.accent, 255);
+  const metal = rgba(...palette.metal, 255);
+  const skin = rgba(...palette.skin, 255);
+  ellipse(frame, cx, foot + y(8), x(58 * scale), y(13), rgba(0, 0, 0, 65));
+
+  if (action === 'die') {
+    const y0 = foot - y(48);
+    ellipse(frame, cx, y0, x(86 * scale), y(28 * scale), cloth);
+    ellipse(frame, cx + x(48), y0 - y(8), x(22 * scale), y(19 * scale), cloth);
+    line(frame, cx - x(70), y0 + y(8), cx + x(74), y0 + y(6), x(10), light);
+    drawSteelBlade(frame, cx + x(12), y0 - y(4), cx + x(106), y0 - y(13), x(4), 210);
+    frame.blur(1).resize({ w: ENEMY_FRAME_W, h: ENEMY_FRAME_H });
+    target.composite(frame, col * ENEMY_FRAME_W, row * ENEMY_FRAME_H);
+    return;
+  }
+
+  const limp = action === 'hurt' ? 16 : 0;
+  const stride = action === 'walkA' ? -18 : action === 'walkB' ? 18 : 0;
+  line(frame, cx - x(18), hipY, cx - x(34) + x(stride), foot - y(20), x(20 * scale), cloth);
+  line(frame, cx + x(18), hipY, cx + x(36) - x(stride), foot - y(18), x(20 * scale), rgba(...palette.cloth, 235));
+  ellipse(frame, cx - x(28) + x(stride), foot - y(10), x(24), y(8), rgba(42, 32, 24, 255));
+  ellipse(frame, cx + x(36) - x(stride), foot - y(8), x(24), y(8), rgba(42, 32, 24, 255));
+
+  poly(frame, [[cx - x(42 * scale), shoulderY], [cx + x(42 * scale), shoulderY - y(6)], [cx + x(34 * scale), hipY + y(16)], [cx - x(34 * scale), hipY + y(14)]], cloth);
+  poly(frame, [[cx - x(40 * scale), shoulderY + y(8)], [cx + x(6), shoulderY + y(2)], [cx - x(2), hipY + y(18)], [cx - x(39), hipY + y(9)]], light);
+  poly(frame, [[cx + x(8), shoulderY + y(2)], [cx + x(43 * scale), shoulderY - y(5)], [cx + x(35), hipY + y(12)], [cx - x(2), hipY + y(18)]], rgba(...palette.cloth, 245));
+  rect(frame, cx - x(44), hipY - y(12), x(88), y(18), rgba(55, 40, 28, 255));
+  rect(frame, cx - x(8), hipY - y(14), x(18), y(20), metal);
+
+  if (type === 'guard' || type === 'boss') {
+    poly(frame, [[cx - x(37), shoulderY - y(6)], [cx - x(2), shoulderY - y(18)], [cx + x(36), shoulderY - y(7)], [cx + x(25), shoulderY + y(18)], [cx - x(24), shoulderY + y(20)]], metal);
+  }
+  if (type === 'axe') {
+    circle(frame, cx + x(31), shoulderY + y(4), x(16), metal);
+    circle(frame, cx - x(31), shoulderY + y(4), x(16), metal);
+  }
+
+  const leftHand = [cx - x(58) + (action === 'attack' ? x(-8) : 0), shoulderY + y(76 + limp)];
+  const rightHand = [cx + x(62) + (action === 'attack' ? x(32) : 0), shoulderY + y(type === 'sniper' ? 48 : 70 - limp)];
+  line(frame, cx - x(35), shoulderY + y(14), leftHand[0], leftHand[1], x(16 * scale), cloth);
+  line(frame, cx + x(35), shoulderY + y(12), rightHand[0], rightHand[1], x(16 * scale), cloth);
+  circle(frame, leftHand[0], leftHand[1], x(7), skin);
+  circle(frame, rightHand[0], rightHand[1], x(7), skin);
+
+  if (type === 'guard') {
+    drawSteelBlade(frame, rightHand[0], rightHand[1], rightHand[0] + x(action === 'attack' ? 112 : 70), rightHand[1] - y(action === 'attack' ? 30 : 82), x(5), 240);
+    ellipse(frame, leftHand[0] - x(12), leftHand[1] - y(16), x(24), y(38), metal);
+  } else if (type === 'axe') {
+    line(frame, rightHand[0] - x(8), rightHand[1] + y(10), rightHand[0] + x(52), rightHand[1] - y(86), x(8), rgba(84, 58, 36, 255));
+    poly(frame, [[rightHand[0] + x(38), rightHand[1] - y(92)], [rightHand[0] + x(80), rightHand[1] - y(78)], [rightHand[0] + x(55), rightHand[1] - y(48)]], metal);
+  } else if (type === 'ninja') {
+    drawSteelBlade(frame, rightHand[0], rightHand[1], rightHand[0] + x(80), rightHand[1] - y(action === 'attack' ? 18 : 64), x(4), 235);
+    line(frame, leftHand[0], leftHand[1], leftHand[0] - x(46), leftHand[1] - y(38), x(3), metal);
+  } else if (type === 'sniper') {
+    line(frame, leftHand[0] - x(8), leftHand[1] - y(52), leftHand[0] + x(16), leftHand[1] + y(58), x(6), rgba(89, 55, 30, 255));
+    line(frame, leftHand[0] - x(8), leftHand[1] - y(52), leftHand[0] + x(16), leftHand[1] + y(58), x(1), metal);
+    line(frame, leftHand[0], leftHand[1], rightHand[0] + x(34), rightHand[1], x(3), rgba(194, 188, 150, 255));
+  } else if (type === 'boss') {
+    drawSteelBlade(frame, rightHand[0], rightHand[1], rightHand[0] + x(action === 'attack' ? 150 : 96), rightHand[1] - y(action === 'attack' ? 20 : 92), x(9), 245);
+    poly(frame, [[cx - x(54), shoulderY - y(8)], [cx - x(88), shoulderY + y(40)], [cx - x(62), hipY + y(34)], [cx - x(36), shoulderY + y(22)]], rgba(36, 16, 18, 235));
+  }
+
+  ellipse(frame, cx, headY, x(30 * scale), y(38 * scale), cloth);
+  ellipse(frame, cx + x(2), headY - y(2), x(24 * scale), y(31 * scale), rgba(...palette.cloth, 245));
+  rect(frame, cx - x(23), headY - y(7), x(50), y(14), rgba(8, 9, 10, 255));
+  rect(frame, cx - x(9), headY - y(5), x(18), y(5), skin);
+  rect(frame, cx + x(10), headY - y(5), x(10), y(4), rgba(220, 220, 210, 210));
+  if (type === 'boss') {
+    poly(frame, [[cx - x(22), headY - y(30)], [cx - x(42), headY - y(68)], [cx - x(4), headY - y(38)]], accent);
+    poly(frame, [[cx + x(18), headY - y(30)], [cx + x(42), headY - y(68)], [cx + x(2), headY - y(38)]], accent);
+  }
+
+  line(frame, cx - x(22), shoulderY + y(28), cx - x(30), hipY - y(8), x(2), rgba(255, 255, 255, 70));
+  line(frame, cx + x(12), shoulderY + y(24), cx + x(28), hipY - y(10), x(2), rgba(0, 0, 0, 90));
+  rect(frame, cx - x(42), hipY + y(4), x(84), y(10), accent);
+  frame.blur(1).resize({ w: ENEMY_FRAME_W, h: ENEMY_FRAME_H });
+  target.composite(frame, col * ENEMY_FRAME_W, row * ENEMY_FRAME_H);
+}
+
+async function makeEnemySheets() {
+  for (const type of ['guard', 'axe', 'ninja', 'sniper', 'boss']) {
+    const sheet = new Jimp({ width: ENEMY_FRAME_W * 3, height: ENEMY_FRAME_H * 2, color: rgba(0, 0, 0, 0) });
+    for (let i = 0; i < 6; i++) drawEnemyFrame(sheet, type, i);
+    const file = type === 'boss' ? 'boss_oni' : `enemy_${type}`;
+    await sheet.write(`public/assets/sprites/${file}.png`);
+  }
+}
+
 await makeForest();
 await makeBeach();
 await makeCastle();
 await makeHeroSheet();
+await makeEnemySheets();
 
-console.log('Generated HD backgrounds and player_hero_hd spritesheet.');
+console.log('Generated HD backgrounds, player, enemy, and boss spritesheets.');

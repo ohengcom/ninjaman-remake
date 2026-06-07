@@ -13,20 +13,19 @@ export class Boss extends Phaser.Physics.Matter.Sprite {
   private bossTimers: Phaser.Time.TimerEvent[] = [];
 
   public get baseScaleX(): number {
-    return 200 / 340;
+    return 250 / 340;
   }
 
   public get baseScaleY(): number {
-    return 240 / 512;
+    return 320 / 512;
   }
 
   private applyBossVisuals() {
     this.setScale(this.baseScaleX, this.baseScaleY);
     
-    // Compute the perfect originY based on our pixel-perfect physics-visual formula (yFeet = 499, scaledHeight = 200 * baseScaleY)
-    const displayHeight = 240;
-    const scaledHeight = 200 * this.baseScaleY;
-    const originY = 499 / 512 - scaledHeight / (2 * displayHeight);
+    const displayHeight = 320;
+    const scaledHeight = 210 * this.baseScaleY;
+    const originY = 466 / 512 - scaledHeight / (2 * displayHeight);
     this.setOrigin(0.5, originY);
     
     // Boss phases color feedback
@@ -44,8 +43,8 @@ export class Boss extends Phaser.Physics.Matter.Sprite {
 
   private applyBossPhysics() {
     // Scale body dimensions by the visual scale to convert from texture space to game space
-    const scaledWidth = 60 * this.baseScaleX;
-    const scaledHeight = 200 * this.baseScaleY;
+    const scaledWidth = 76 * this.baseScaleX;
+    const scaledHeight = 210 * this.baseScaleY;
     this.setRectangle(scaledWidth, scaledHeight);
     this.setFixedRotation();
     this.setIgnoreGravity(false); // Enable gravity so the Boss stands/falls naturally
