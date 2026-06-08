@@ -18,9 +18,10 @@ var rush_timer := 0.0
 
 func _ready() -> void:
 	_build_sprite_frames()
-	sprite.position = Vector2(0, -118)
-	sprite.scale = Vector2(0.39, 0.39)
-	sprite.modulate = Color(1.0, 0.42, 0.32)
+	sprite.position = Vector2(0, -94)
+	sprite.scale = Vector2(1.05, 1.05)
+	sprite.modulate = Color(1.0, 0.46, 0.34)
+	_update_facing()
 	add_to_group("enemies")
 	add_to_group("boss")
 
@@ -34,7 +35,7 @@ func _physics_process(delta: float) -> void:
 	var player := get_tree().get_first_node_in_group("player") as Node2D
 	if is_instance_valid(player):
 		direction = 1 if player.global_position.x > global_position.x else -1
-		sprite.flip_h = direction > 0
+		_update_facing()
 		var distance := global_position.distance_to(player.global_position)
 		if distance < 520.0 and rush_timer <= 0.0 and health < max_health * 0.65:
 			rush_timer = 0.55
@@ -70,17 +71,21 @@ func take_damage(amount: int, from_x: float) -> void:
 
 func _build_sprite_frames() -> void:
 	var frames := SpriteFrames.new()
-	_add_file_anim(frames, "walk", "res://assets/characters/foxy/animation/run/foxy-run_%02d.png", 0, 15, 10.0, true)
-	_add_file_anim(frames, "rush", "res://assets/characters/foxy/animation/run/foxy-run_%02d.png", 0, 15, 20.0, true)
-	_add_file_anim(frames, "hurt", "res://assets/characters/foxy/animation/hurt/foxy-hurt_%02d.png", 0, 11, 14.0, false)
+	var base := "res://assets/characters/kenney_platformer/Zombie/Poses/zombie_"
+	_add_pose_anim(frames, "walk", [base + "walk1.png", base + "walk2.png"], 5.5, true)
+	_add_pose_anim(frames, "rush", [base + "kick.png", base + "walk2.png"], 12.0, true)
+	_add_pose_anim(frames, "hurt", [base + "hurt.png", base + "idle.png"], 8.0, false)
 	sprite.sprite_frames = frames
 	sprite.play("walk")
 
-func _add_file_anim(frames: SpriteFrames, name: StringName, path_pattern: String, start: int, count: int, fps: float, loop: bool) -> void:
+func _add_pose_anim(frames: SpriteFrames, name: StringName, paths: Array[String], fps: float, loop: bool) -> void:
 	frames.add_animation(name)
 	frames.set_animation_speed(name, fps)
 	frames.set_animation_loop(name, loop)
-	for i in range(count):
-		var texture := load(path_pattern % (start + i))
+	for path in paths:
+		var texture := load(path)
 		if texture:
 			frames.add_frame(name, texture)
+
+func _update_facing() -> void:
+	sprite.flip_h = direction < 0

@@ -29,9 +29,9 @@
 
 - 不再复用 Phaser/Vite 版的程序生成角色和背景。
 - 当前 Godot 主角临时使用 OpenGameArt 的 `Foxy 2D Character Asset` demo 帧作为更好的动画基线；主角不再强制限定为 ninja，优先生动、好看、授权清晰的免费可商用资源。
-- 当前 guard/axe/ninja/Boss 使用同一 Foxy 资源的缩放、调色、速度变体，先替代脚本生成的方块敌人，建立完整非方块视觉基线。
+- 当前 guard/axe/ninja/Boss 使用 Kenney Platformer Characters 的 Zombie/Soldier 资源，避免与玩家共用同一个 Foxy silhouette。
 - Foxy 资源许可证是 OGA-BY 3.0，需要保留署名；署名记录在 `godot/assets/CREDITS.md`。
-- Kenney Platformer Characters 已确认是 CC0，可作为后续敌人/替代主角/cutout 骨骼资源来源。
+- Kenney Platformer Characters 已确认是 CC0，用作当前敌人/Boss 视觉基线，也可作为后续替代主角/cutout 骨骼资源来源。
 - 背景和平台暂时用 Godot 原生矢量/几何绘制，包括夜空、星点、月亮、远山、雾、树林、草和平台细节，不沿用 Vite 背景。
 
 ## 运行方式
@@ -84,7 +84,7 @@
 
 ## 下一步迁移计划
 
-1. 为敌人和 Boss 选择独立的免费可商用角色包，替换当前 Foxy 调色/缩放变体。
+1. 为敌人和 Boss 继续寻找更完整的免费可商用动作动画包，替换当前 Kenney 两帧 pose 动画。
 2. 用 `TileSet`/`TileMap` 重做关卡，而不是脚本生成平台。
 3. 用 `AnimationPlayer` 做攻击判定窗口、受击停顿和脚步事件。
 4. 用 `AnimationTree` 管 idle/run/jump/fall/attack/wave/hurt 状态切换。
