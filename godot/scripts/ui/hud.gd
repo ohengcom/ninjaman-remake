@@ -6,6 +6,8 @@ var score_label: Label
 var sector_label: Label
 var message_label: Label
 var pause_label: Label
+var control_label: Label
+var damage_flash: ColorRect
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -24,6 +26,13 @@ func update_health(current: int, max_health: int) -> void:
 func update_score(score: int) -> void:
 	if is_instance_valid(score_label):
 		score_label.text = "SCORE %06d" % score
+
+func flash_damage() -> void:
+	if not is_instance_valid(damage_flash):
+		return
+	damage_flash.modulate.a = 0.34
+	var tween := create_tween()
+	tween.tween_property(damage_flash, "modulate:a", 0.0, 0.22)
 
 func show_message(text: String, duration := 1.5) -> void:
 	if not is_instance_valid(message_label):
@@ -84,3 +93,19 @@ func _build_ui() -> void:
 	pause_label.add_theme_color_override("font_color", Color(1.0, 0.32, 0.42))
 	pause_label.visible = false
 	root.add_child(pause_label)
+
+	control_label = Label.new()
+	control_label.text = "A/D MOVE  SPACE JUMP  SHIFT DASH  J MELEE  L WAVE  ESC PAUSE"
+	control_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	control_label.position = Vector2(240, 672)
+	control_label.size = Vector2(800, 32)
+	control_label.add_theme_font_size_override("font_size", 16)
+	control_label.add_theme_color_override("font_color", Color(0.7, 0.88, 1.0, 0.74))
+	root.add_child(control_label)
+
+	damage_flash = ColorRect.new()
+	damage_flash.color = Color(1.0, 0.05, 0.02)
+	damage_flash.set_anchors_preset(Control.PRESET_FULL_RECT)
+	damage_flash.modulate.a = 0.0
+	damage_flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(damage_flash)

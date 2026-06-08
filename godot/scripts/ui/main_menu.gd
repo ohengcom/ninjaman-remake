@@ -31,7 +31,7 @@ func _build_menu() -> void:
 	root.add_child(title)
 
 	var subtitle := Label.new()
-	subtitle.text = "GODOT 4 REBUILD PROTOTYPE"
+	subtitle.text = "GODOT 4 REBUILD - FOREST COMBAT PROTOTYPE"
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	subtitle.position = Vector2(340, 280)
 	subtitle.size = Vector2(600, 40)
@@ -49,10 +49,19 @@ func _build_menu() -> void:
 	root.add_child(prompt)
 
 	var controls := Label.new()
-	controls.text = "A/D MOVE   SPACE JUMP   SHIFT DASH   J ATTACK   L WAVE   ESC PAUSE"
+	controls.text = "A/D MOVE   SPACE JUMP/DOUBLE JUMP   SHIFT DASH   J MELEE   L WAVE   ESC PAUSE"
 	controls.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	controls.position = Vector2(240, 540)
 	controls.size = Vector2(800, 40)
 	controls.add_theme_font_size_override("font_size", 18)
 	controls.add_theme_color_override("font_color", Color(0.75, 0.78, 0.82))
 	root.add_child(controls)
+
+	var web_note := Label.new()
+	web_note.text = "Web build tip: click the game once if controls do not respond. Best tested on desktop Chrome/Edge."
+	web_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	web_note.position = Vector2(220, 590)
+	web_note.size = Vector2(840, 36)
+	web_note.add_theme_font_size_override("font_size", 15)
+	web_note.add_theme_color_override("font_color", Color(0.54, 0.68, 0.76))
+	root.add_child(web_note)
