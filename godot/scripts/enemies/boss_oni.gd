@@ -9,6 +9,7 @@ const RUSH_SPEED := 280.0
 const JUMP_SLAM_VELOCITY := -560.0
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
+@onready var body_shape: CollisionShape2D = $CollisionShape2D
 
 enum State { STALK, WINDUP, SWIPE, RUSH, SLAM, HURT }
 
@@ -27,9 +28,10 @@ var phase := 1
 
 func _ready() -> void:
 	_build_sprite_frames()
-	sprite.position = Vector2(0, -96)
-	sprite.scale = Vector2(0.34, 0.34)
-	sprite.modulate = Color(1.0, 0.56, 0.44)
+	_build_body_shape()
+	sprite.position = Vector2(0, -72)
+	sprite.scale = Vector2(4.6, 4.6)
+	sprite.modulate = Color(1.0, 0.82, 0.58)
 	_update_facing()
 	add_to_group("enemies")
 	add_to_group("boss")
@@ -125,26 +127,33 @@ func take_damage(amount: int, from_x: float) -> void:
 
 func _build_sprite_frames() -> void:
 	var frames := SpriteFrames.new()
-	var base := "res://assets/characters/bevouliin_monsters/pink/"
-	_add_pose_anim(frames, "walk", [base + "idle/frame_1.png", base + "idle/frame_2.png"], 4.0, true)
-	_add_pose_anim(frames, "rush", [base + "idle/frame_2.png", base + "hit/frame_1.png"], 10.0, true)
-	_add_pose_anim(frames, "attack", [base + "idle/frame_2.png", base + "hit/frame_1.png"], 12.0, true)
-	_add_pose_anim(frames, "slam", [base + "hit/frame_1.png", base + "idle/frame_2.png"], 9.0, true)
-	_add_pose_anim(frames, "hurt", [base + "hit/frame_1.png", base + "hit/frame_2.png"], 8.0, false)
+	var base := "res://assets/characters/dungeon_sprites/dragon_/"
+	_add_dir_anim(frames, "walk", base + "walkRun_/", "lWalkRun", 4, 7.0, true)
+	_add_dir_anim(frames, "rush", base + "walkRun_/", "lWalkRun", 4, 14.0, true)
+	_add_dir_anim(frames, "attack", base + "attack_/", "lAttack", 4, 12.0, true)
+	_add_dir_anim(frames, "slam", base + "jump_/", "lJump", 4, 10.0, true)
+	_add_dir_anim(frames, "hurt", base + "hurt_/", "lHurt", 4, 9.0, false)
+	_add_dir_anim(frames, "death", base + "death_/", "lDeath", 4, 8.0, false)
 	sprite.sprite_frames = frames
 	sprite.play("walk")
 
-func _add_pose_anim(frames: SpriteFrames, name: StringName, paths: Array[String], fps: float, loop: bool) -> void:
+func _add_dir_anim(frames: SpriteFrames, name: StringName, directory: String, prefix: String, count: int, fps: float, loop: bool) -> void:
 	frames.add_animation(name)
 	frames.set_animation_speed(name, fps)
 	frames.set_animation_loop(name, loop)
-	for path in paths:
-		var texture := load(path)
+	for i in range(count):
+		var texture := load("%s%s_%d.png" % [directory, prefix, i])
 		if texture:
 			frames.add_frame(name, texture)
 
 func _update_facing() -> void:
 	sprite.flip_h = direction > 0
+
+func _build_body_shape() -> void:
+	var rect := RectangleShape2D.new()
+	rect.size = Vector2(82, 112)
+	body_shape.shape = rect
+	body_shape.position = Vector2(0, -56)
 
 func _try_hit_player(player: Node2D) -> void:
 	if attack_has_hit or not is_instance_valid(player) or not player.has_method("take_damage"):

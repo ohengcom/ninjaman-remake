@@ -26,6 +26,7 @@ const HURT_INVULNERABLE_TIME := 0.82
 @onready var attack_shape: CollisionShape2D = $AttackArea/AttackShape
 @onready var animation_tree: AnimationTree = $AnimationTree
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
+@onready var body_shape: CollisionShape2D = $CollisionShape2D
 
 var facing := 1
 var jumps_used := 0
@@ -47,7 +48,9 @@ var hit_targets: Array[Node] = []
 func _ready() -> void:
 	_build_sprite_frames()
 	_build_attack_shape()
-	sprite.scale = Vector2(0.26, 0.26)
+	_build_body_shape()
+	sprite.position = Vector2(0, -44)
+	sprite.scale = Vector2(3.0, 3.0)
 	attack_area.body_entered.connect(_on_attack_body_entered)
 	animation_tree.active = false
 	animation_player.playback_active = true
@@ -201,28 +204,36 @@ func _spawn_afterimage() -> void:
 
 func _build_attack_shape() -> void:
 	var rect := RectangleShape2D.new()
-	rect.size = Vector2(92, 64)
+	rect.size = Vector2(86, 54)
 	attack_shape.shape = rect
-	attack_shape.position = Vector2(62, -58)
+	attack_shape.position = Vector2(54, -42)
 	attack_shape.disabled = true
+
+func _build_body_shape() -> void:
+	var rect := RectangleShape2D.new()
+	rect.size = Vector2(34, 66)
+	body_shape.shape = rect
+	body_shape.position = Vector2(0, -33)
 
 func _build_sprite_frames() -> void:
 	var frames := SpriteFrames.new()
-	_add_file_anim(frames, "idle", "res://assets/characters/foxy/animation/idle/foxy-idle_%02d.png", 0, 15, 9.0, true)
-	_add_file_anim(frames, "run", "res://assets/characters/foxy/animation/run/foxy-run_%02d.png", 0, 15, 16.0, true)
-	_add_file_anim(frames, "jump", "res://assets/characters/foxy/animation/jump/foxy-jump_%02d.png", 0, 10, 13.0, false)
-	_add_file_anim(frames, "fall", "res://assets/characters/foxy/animation/jump/foxy-jump_%02d.png", 10, 12, 12.0, true)
-	_add_file_anim(frames, "attack", "res://assets/characters/foxy/animation/blaster shoot/foxy-blaster shoot_%d.png", 0, 9, 18.0, false)
-	_add_file_anim(frames, "wave", "res://assets/characters/foxy/animation/blaster shoot/foxy-blaster shoot_%d.png", 0, 9, 18.0, false)
-	_add_file_anim(frames, "hurt", "res://assets/characters/foxy/animation/hurt/foxy-hurt_%02d.png", 0, 11, 16.0, false)
+	var base := "res://assets/characters/dungeon_sprites/mHero_/"
+	_add_dir_anim(frames, "idle", base + "idle_/", "rIdle", 4, 8.0, true)
+	_add_dir_anim(frames, "run", base + "walkRun_/", "rWalkRun", 4, 13.0, true)
+	_add_dir_anim(frames, "jump", base + "jump_/", "rJump", 4, 10.0, false)
+	_add_dir_anim(frames, "fall", base + "jump_/", "rJump", 4, 8.0, true)
+	_add_dir_anim(frames, "attack", base + "turn_/", "rTurn", 4, 16.0, false)
+	_add_dir_anim(frames, "wave", base + "turn_/", "rTurn", 4, 16.0, false)
+	_add_dir_anim(frames, "hurt", base + "hurt_/", "rHurt", 4, 12.0, false)
+	_add_dir_anim(frames, "death", base + "death_/", "rDeath", 4, 9.0, false)
 	sprite.sprite_frames = frames
 	sprite.play("idle")
 
-func _add_file_anim(frames: SpriteFrames, name: StringName, path_pattern: String, start: int, count: int, fps: float, loop: bool) -> void:
+func _add_dir_anim(frames: SpriteFrames, name: StringName, directory: String, prefix: String, count: int, fps: float, loop: bool) -> void:
 	frames.add_animation(name)
 	frames.set_animation_speed(name, fps)
 	frames.set_animation_loop(name, loop)
 	for i in range(count):
-		var texture := load(path_pattern % (start + i))
+		var texture := load("%s%s_%d.png" % [directory, prefix, i])
 		if texture:
 			frames.add_frame(name, texture)

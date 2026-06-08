@@ -5,6 +5,7 @@ signal defeated(points: int, point: Vector2)
 
 const GRAVITY := 1800.0
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
+@onready var body_shape: CollisionShape2D = $CollisionShape2D
 
 enum State { PATROL, CHASE, WINDUP, ATTACK, HURT }
 
@@ -23,8 +24,8 @@ var detect_range := 360.0
 var attack_damage := 12
 var score_value := 150
 var sprite_tint := Color.WHITE
-var sprite_scale := Vector2(0.15, 0.15)
-var monster_key := "green"
+var sprite_scale := Vector2(3.0, 3.0)
+var character_key := "goblin_"
 var state := State.PATROL
 var home_x := 0.0
 var patrol_radius := 260.0
@@ -39,9 +40,9 @@ func configure(type_name: String) -> void:
 		attack_range = 88.0
 		attack_damage = 18
 		score_value = 220
-		sprite_tint = Color(1.0, 0.8, 0.66)
-		sprite_scale = Vector2(0.18, 0.18)
-		monster_key = "pink"
+		sprite_tint = Color(1.0, 0.88, 0.74)
+		sprite_scale = Vector2(3.35, 3.35)
+		character_key = "orc_"
 	elif enemy_type == "ninja":
 		max_health = 34
 		walk_speed = 145.0
@@ -50,8 +51,8 @@ func configure(type_name: String) -> void:
 		attack_damage = 10
 		score_value = 260
 		sprite_tint = Color(0.72, 0.92, 1.0)
-		sprite_scale = Vector2(0.13, 0.13)
-		monster_key = "green"
+		sprite_scale = Vector2(3.0, 3.0)
+		character_key = "skeleton_"
 	else:
 		max_health = 45
 		walk_speed = 90.0
@@ -60,13 +61,14 @@ func configure(type_name: String) -> void:
 		attack_damage = 12
 		score_value = 150
 		sprite_tint = Color(0.9, 1.0, 0.82)
-		sprite_scale = Vector2(0.15, 0.15)
-		monster_key = "green"
+		sprite_scale = Vector2(3.0, 3.0)
+		character_key = "goblin_"
 	health = max_health
 
 func _ready() -> void:
 	_build_sprite_frames()
-	sprite.position = Vector2(0, -58)
+	_build_body_shape()
+	sprite.position = Vector2(0, -42)
 	sprite.scale = sprite_scale
 	sprite.modulate = sprite_tint
 	home_x = global_position.x
@@ -144,24 +146,31 @@ func take_damage(amount: int, from_x: float) -> void:
 
 func _build_sprite_frames() -> void:
 	var frames := SpriteFrames.new()
-	var base := "res://assets/characters/bevouliin_monsters/%s/" % monster_key
-	_add_pose_anim(frames, "walk", [base + "idle/frame_1.png", base + "idle/frame_2.png"], 5.0, true)
-	_add_pose_anim(frames, "attack", [base + "idle/frame_2.png", base + "hit/frame_1.png"], 11.0, true)
-	_add_pose_anim(frames, "hurt", [base + "hit/frame_1.png", base + "hit/frame_2.png"], 9.0, false)
+	var base := "res://assets/characters/dungeon_sprites/%s/" % character_key
+	_add_dir_anim(frames, "walk", base + "walkRun_/", "lWalkRun", 4, 9.0, true)
+	_add_dir_anim(frames, "attack", base + "turn_/", "lTurn", 4, 13.0, true)
+	_add_dir_anim(frames, "hurt", base + "hurt_/", "lHurt", 4, 10.0, false)
+	_add_dir_anim(frames, "death", base + "death_/", "lDeath", 4, 9.0, false)
 	sprite.sprite_frames = frames
 	sprite.play("walk")
 
-func _add_pose_anim(frames: SpriteFrames, name: StringName, paths: Array[String], fps: float, loop: bool) -> void:
+func _add_dir_anim(frames: SpriteFrames, name: StringName, directory: String, prefix: String, count: int, fps: float, loop: bool) -> void:
 	frames.add_animation(name)
 	frames.set_animation_speed(name, fps)
 	frames.set_animation_loop(name, loop)
-	for path in paths:
-		var texture := load(path)
+	for i in range(count):
+		var texture := load("%s%s_%d.png" % [directory, prefix, i])
 		if texture:
 			frames.add_frame(name, texture)
 
 func _update_facing() -> void:
 	sprite.flip_h = direction > 0
+
+func _build_body_shape() -> void:
+	var rect := RectangleShape2D.new()
+	rect.size = Vector2(34, 62) if enemy_type != "axe" else Vector2(42, 70)
+	body_shape.shape = rect
+	body_shape.position = Vector2(0, -31) if enemy_type != "axe" else Vector2(0, -35)
 
 func _set_direction_to(x: float) -> void:
 	direction = 1 if x > global_position.x else -1

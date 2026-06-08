@@ -28,10 +28,10 @@
 ## 当前视觉资源方向
 
 - 不再复用 Phaser/Vite 版的程序生成角色和背景。
-- 当前 Godot 主角临时使用 OpenGameArt 的 `Foxy 2D Character Asset` demo 帧作为更好的动画基线；主角不再强制限定为 ninja，优先生动、好看、授权清晰的免费可商用资源。
-- 当前 guard/axe/ninja/Boss 使用 Bevouliin CC0 侧视怪物 sprites，避免与玩家共用同一个 Foxy silhouette，也避免 Kenney 人偶与玩家比例/风格不匹配的问题。
-- Foxy 资源许可证是 OGA-BY 3.0，需要保留署名；署名记录在 `godot/assets/CREDITS.md`。
-- Bevouliin 怪物资源已确认是 CC0，用作当前敌人/Boss 视觉基线。
+- 当前 Godot 主角、guard、axe、ninja、Boss 已统一切到 Kevin's Mom's House / analogstudios_ 的 `dungeonSprites_` 24x24 pixel fantasy set。
+- `dungeonSprites_` 是 CC0/name-your-own-price，可免费商用，署名非必需；授权记录在 `godot/assets/CREDITS.md`。
+- 玩家使用 `mHero_`，guard 使用 `goblin_`，axe 使用 `orc_`，ninja 使用 `skeleton_`，Boss 使用 `dragon_`。
+- 该套资源提供 idle/walkRun/jump/turn/hurt/death 等完整动作帧；Boss dragon 额外提供 attack 帧。普通敌人攻击阶段暂用 turn/hurt 组合表现，因为该包多数普通角色没有独立 attack 动画。
 - 背景和平台暂时用 Godot 原生矢量/几何绘制，包括夜空、星点、月亮、远山、雾、树林、草和平台细节，不沿用 Vite 背景。
 
 ## 运行方式
@@ -75,7 +75,7 @@
 ## 当前玩法循环
 
 - 玩家从左侧出生，沿数据驱动平台和地面推进。
-- 敌人包含 guard、axe、ninja 和 boss 四类原型。
+- 敌人包含 guard、axe、ninja 和 boss 四类原型，并使用同一套 CC0 fantasy pixel art 角色资源。
 - 击败敌人增加分数并生成命中特效。
 - 玩家受伤会更新 HUD 血条。
 - 玩家死亡后自动重开当前场景。
@@ -84,8 +84,8 @@
 
 ## 下一步迁移计划
 
-1. 为敌人和 Boss 继续寻找更完整的免费可商用动作动画包，替换当前 Bevouliin idle/hit 两帧怪物动画。
-2. 用 `TileSet`/`TileMap` 重做关卡，而不是脚本生成平台。
+1. 用 `TileSet`/`TileMap` 重做关卡，而不是脚本生成平台。
+2. 为普通敌人补独立 melee attack overlay 或绘制/组合武器帧，让攻击动画不再依赖 turn/hurt 替代。
 3. 用 `AnimationPlayer` 做攻击判定窗口、受击停顿和脚步事件。
 4. 用 `AnimationTree` 管 idle/run/jump/fall/attack/wave/hurt 状态切换。
 5. 如果继续免费路线，用 `Skeleton2D`/`Bone2D` 做 cutout 角色，而不是 Spine。
