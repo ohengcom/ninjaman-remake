@@ -88,4 +88,4 @@ func _add_pose_anim(frames: SpriteFrames, name: StringName, paths: Array[String]
 			frames.add_frame(name, texture)
 
 func _update_facing() -> void:
-	sprite.flip_h = direction < 0
+	sprite.flip_h = direction > 0
