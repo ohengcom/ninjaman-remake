@@ -10,11 +10,13 @@
 
 This asset is used as a temporary high-quality player visual baseline for the Godot rebuild. It should remain credited in any distributed build that includes it.
 
-## Kenney Platformer Characters
+## Bevouliin Land Monster Sprites
 
-- Author: Kenney Vleugels (Kenney.nl)
-- Source: https://kenney.nl/assets/platformer-characters
+- Author: bevouliin.com
+- Sources:
+  - https://opengameart.org/content/bevouliin-green-horn-monster-sprite-sheets
+  - https://opengameart.org/content/bevouliin-pink-monster-sprites
 - License: Creative Commons Zero, CC0
-- Use: Distinct Godot prototype enemy and boss character poses.
+- Use: Godot prototype enemy and boss monster sprites.
 
-This asset is used to avoid player/enemy silhouette reuse. Credit is appreciated by the author but not required by the license.
+These assets provide side-view monster silhouettes that better match a platform action enemy role and avoid player/enemy silhouette reuse. Credit is not required by the license.

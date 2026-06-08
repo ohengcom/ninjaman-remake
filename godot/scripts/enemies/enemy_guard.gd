@@ -14,8 +14,8 @@ var hurt_timer := 0.0
 var walk_speed := 90.0
 var score_value := 150
 var sprite_tint := Color.WHITE
-var sprite_scale := Vector2(1.0, 1.0)
-var character_key := "zombie"
+var sprite_scale := Vector2(0.15, 0.15)
+var monster_key := "green"
 
 func configure(type_name: String) -> void:
 	enemy_type = type_name
@@ -23,28 +23,28 @@ func configure(type_name: String) -> void:
 		max_health = 70
 		walk_speed = 64.0
 		score_value = 220
-		sprite_tint = Color(1.0, 0.72, 0.58)
-		sprite_scale = Vector2(0.72, 0.72)
-		character_key = "soldier"
+		sprite_tint = Color(1.0, 0.8, 0.66)
+		sprite_scale = Vector2(0.18, 0.18)
+		monster_key = "pink"
 	elif enemy_type == "ninja":
 		max_health = 34
 		walk_speed = 145.0
 		score_value = 260
-		sprite_tint = Color(0.55, 0.85, 1.0)
-		sprite_scale = Vector2(0.58, 0.58)
-		character_key = "soldier"
+		sprite_tint = Color(0.72, 0.92, 1.0)
+		sprite_scale = Vector2(0.13, 0.13)
+		monster_key = "green"
 	else:
 		max_health = 45
 		walk_speed = 90.0
 		score_value = 150
-		sprite_tint = Color(0.86, 1.0, 0.74)
-		sprite_scale = Vector2(0.64, 0.64)
-		character_key = "zombie"
+		sprite_tint = Color(0.9, 1.0, 0.82)
+		sprite_scale = Vector2(0.15, 0.15)
+		monster_key = "green"
 	health = max_health
 
 func _ready() -> void:
 	_build_sprite_frames()
-	sprite.position = Vector2(0, -68)
+	sprite.position = Vector2(0, -58)
 	sprite.scale = sprite_scale
 	sprite.modulate = sprite_tint
 	_update_facing()
@@ -79,14 +79,11 @@ func take_damage(amount: int, from_x: float) -> void:
 
 func _build_sprite_frames() -> void:
 	var frames := SpriteFrames.new()
-	var base := "res://assets/characters/kenney_platformer/%s/Poses/%s_" % [_character_folder(), character_key]
-	_add_pose_anim(frames, "walk", [base + "walk1.png", base + "walk2.png"], 7.5, true)
-	_add_pose_anim(frames, "hurt", [base + "hurt.png", base + "idle.png"], 10.0, false)
+	var base := "res://assets/characters/bevouliin_monsters/%s/" % monster_key
+	_add_pose_anim(frames, "walk", [base + "idle/frame_1.png", base + "idle/frame_2.png"], 5.0, true)
+	_add_pose_anim(frames, "hurt", [base + "hit/frame_1.png", base + "hit/frame_2.png"], 9.0, false)
 	sprite.sprite_frames = frames
 	sprite.play("walk")
-
-func _character_folder() -> String:
-	return "Soldier" if character_key == "soldier" else "Zombie"
 
 func _add_pose_anim(frames: SpriteFrames, name: StringName, paths: Array[String], fps: float, loop: bool) -> void:
 	frames.add_animation(name)

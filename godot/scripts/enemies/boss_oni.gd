@@ -18,9 +18,9 @@ var rush_timer := 0.0
 
 func _ready() -> void:
 	_build_sprite_frames()
-	sprite.position = Vector2(0, -94)
-	sprite.scale = Vector2(1.05, 1.05)
-	sprite.modulate = Color(1.0, 0.46, 0.34)
+	sprite.position = Vector2(0, -96)
+	sprite.scale = Vector2(0.34, 0.34)
+	sprite.modulate = Color(1.0, 0.56, 0.44)
 	_update_facing()
 	add_to_group("enemies")
 	add_to_group("boss")
@@ -71,10 +71,10 @@ func take_damage(amount: int, from_x: float) -> void:
 
 func _build_sprite_frames() -> void:
 	var frames := SpriteFrames.new()
-	var base := "res://assets/characters/kenney_platformer/Zombie/Poses/zombie_"
-	_add_pose_anim(frames, "walk", [base + "walk1.png", base + "walk2.png"], 5.5, true)
-	_add_pose_anim(frames, "rush", [base + "kick.png", base + "walk2.png"], 12.0, true)
-	_add_pose_anim(frames, "hurt", [base + "hurt.png", base + "idle.png"], 8.0, false)
+	var base := "res://assets/characters/bevouliin_monsters/pink/"
+	_add_pose_anim(frames, "walk", [base + "idle/frame_1.png", base + "idle/frame_2.png"], 4.0, true)
+	_add_pose_anim(frames, "rush", [base + "idle/frame_2.png", base + "hit/frame_1.png"], 10.0, true)
+	_add_pose_anim(frames, "hurt", [base + "hit/frame_1.png", base + "hit/frame_2.png"], 8.0, false)
 	sprite.sprite_frames = frames
 	sprite.play("walk")
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cqvgyu5232wxa"
-path="res://.godot/imported/soldier_walk1.png-3fbd3d3671607ac12187b993c275bb2d.ctex"
+uid="uid://brvk728wgm4lr"
+path="res://.godot/imported/frame_2.png-72331e8ab43e0546cfc0acb5968891c9.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/characters/kenney_platformer/Soldier/Poses/soldier_walk1.png"
-dest_files=["res://.godot/imported/soldier_walk1.png-3fbd3d3671607ac12187b993c275bb2d.ctex"]
+source_file="res://assets/characters/bevouliin_monsters/green/idle/frame_2.png"
+dest_files=["res://.godot/imported/frame_2.png-72331e8ab43e0546cfc0acb5968891c9.ctex"]
 
 [params]
 

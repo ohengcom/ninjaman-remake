@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://brdxs4l1i4qi7"
-path="res://.godot/imported/soldier_hurt.png-014f393fd9d89a33258849db5a0ed8d9.ctex"
+uid="uid://cl60kvdjnpxtb"
+path="res://.godot/imported/frame_1.png-96874df912f69eb7a7511b39dd4b1a82.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/characters/kenney_platformer/Soldier/Poses/soldier_hurt.png"
-dest_files=["res://.godot/imported/soldier_hurt.png-014f393fd9d89a33258849db5a0ed8d9.ctex"]
+source_file="res://assets/characters/bevouliin_monsters/green/idle/frame_1.png"
+dest_files=["res://.godot/imported/frame_1.png-96874df912f69eb7a7511b39dd4b1a82.ctex"]
 
 [params]
 

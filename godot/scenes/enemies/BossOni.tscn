@@ -10,8 +10,8 @@ collision_mask = 3
 script = ExtResource("1_boss")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-position = Vector2(0, -94)
-scale = Vector2(1.05, 1.05)
+position = Vector2(0, -96)
+scale = Vector2(0.34, 0.34)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 

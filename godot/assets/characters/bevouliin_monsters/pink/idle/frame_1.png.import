@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://xw7tjh0mb10k"
-path="res://.godot/imported/zombie_kick.png-b1927e079673c70eef8deba5fccddc15.ctex"
+uid="uid://cd1j8ccu6aiss"
+path="res://.godot/imported/frame_1.png-6330da59b3c5eefe53cd70cb83aa6374.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/characters/kenney_platformer/Zombie/Poses/zombie_kick.png"
-dest_files=["res://.godot/imported/zombie_kick.png-b1927e079673c70eef8deba5fccddc15.ctex"]
+source_file="res://assets/characters/bevouliin_monsters/pink/idle/frame_1.png"
+dest_files=["res://.godot/imported/frame_1.png-6330da59b3c5eefe53cd70cb83aa6374.ctex"]
 
 [params]
 

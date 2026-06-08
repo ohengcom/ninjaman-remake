@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cuxs5j0jgq62x"
-path="res://.godot/imported/zombie_walk1.png-0e74f36259261a44f7da3a9911902075.ctex"
+uid="uid://crs033xpspuj8"
+path="res://.godot/imported/frame_1.png-556bec9e7453039c1512c1cd3e68f49f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/characters/kenney_platformer/Zombie/Poses/zombie_walk1.png"
-dest_files=["res://.godot/imported/zombie_walk1.png-0e74f36259261a44f7da3a9911902075.ctex"]
+source_file="res://assets/characters/bevouliin_monsters/pink/hit/frame_1.png"
+dest_files=["res://.godot/imported/frame_1.png-556bec9e7453039c1512c1cd3e68f49f.ctex"]
 
 [params]
 
