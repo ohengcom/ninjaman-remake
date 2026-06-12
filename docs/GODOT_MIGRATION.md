@@ -61,6 +61,7 @@
 - 当前根目录 `vercel.json` 仍保持 Phaser/Vite 发布，避免在 Vercel 环境缺少 Godot CLI 或 export templates 时破坏线上版本。
 - 若要切换 Vercel 发布 Godot 版，可把 `vercel.godot.json` 的内容复制/替换为根目录 `vercel.json`，或在单独项目中使用同等配置。
 - Godot Web 导出需要安装 Godot Web export templates；若本地导出失败，先在 Godot Editor 的 Export Template Manager 中安装匹配版本模板。
+- 当前 Godot Web 测试站部署在 `https://ninjaman-remake-psi.vercel.app`，通过 `npx vercel deploy godot/build/web --prod` 发布本地导出产物；主站 `https://ninjaman-remake.vercel.app` 仍为 Phaser/Vite 版。
 
 ## 控制
 
