@@ -2,7 +2,9 @@
 
 A Phaser 4, TypeScript, and Vite action-platformer prototype with Matter.js physics, responsive scaling, keyboard controls, gamepad support, and an SVG-rendered sprite pipeline for current placeholder production art.
 
-Current version: `3.9.0`
+Current version: `3.10.0`
+
+**Godot 4.6.3 Prototype**: A parallel 2D pixel-art demo with CC0 assets, complete audio, tilemap terrain, and 8-10 screen level. See `godot/` directory and deployment at https://ninjaman-remake-psi.vercel.app
 
 ## Features
 
@@ -94,4 +96,30 @@ npm run test:visual
 - Generated runtime assets under `public/assets` are kept only when they are loaded by the current manifest or scripts.
 - Temporary Playwright output, scratch debugging files, `dist`, and `node_modules` are ignored.
 - Legacy SWF imports, old packed atlases, and unused placeholder character sheets were removed in `3.8.0`.
-- Godot 4.6.3 migration prototype lives under `godot/` with a unified CC0 `dungeonSprites_` character set (player, enemies, and boss), Web export preset, and optional `vercel.godot.json` deployment config. Asset credits live in `godot/assets/CREDITS.md`.
+- **Godot 4.6.3 Prototype (v3.10.0)**: A complete pixel-art demo under `godot/` with:
+  - CC0 fourSeasonsPlatformer_ tileset (terrain, objects, backgrounds)
+  - CC0 dungeonSprites_ characters (player, enemies, boss)
+  - CC0 audio (Juhani Junkala music + SFX)
+  - CC0 Kenney pixel fonts
+  - 8-10 screen forest level with parallax, coins, hearts, fire hazards, checkpoints
+  - Full AudioManager system with music crossfade and SFX pooling
+  - Boss encounter with dynamic music switching
+  - Sword overlay attack animations
+  - Web export preset and Vercel deployment config
+  - All credits in `godot/assets/CREDITS.md`
+
+## Godot Prototype Features
+
+- **Tilemap Terrain**: TileMapLayer with grass/stone/leaf blocks from fourSeasonsPlatformer_ tileset
+- **Parallax Backgrounds**: 3-layer scrolling (sky, hills, trees) using Parallax2D nodes
+- **Extended Level**: 10 screens (11,520 px) with vertical platforming and branching paths
+- **Collectibles & Hazards**: Coins (13), hearts (3), fire hazards (4) with glow effects
+- **Checkpoint System**: 3 checkpoints with health preservation on respawn
+- **Complete Audio**: Title/level/boss/victory music + 20 gameplay SFX
+- **Visual Polish**: Pixel fonts, death animations, sword swing overlay, camera shake
+- **Controls**: A/D move, Space jump, Shift dash, J melee, L wave, Esc pause
+
+Build the Godot web export:
+```bash
+npm run build:godot:web
+```
