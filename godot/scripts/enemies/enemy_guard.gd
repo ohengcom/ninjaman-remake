@@ -101,6 +101,7 @@ func _physics_process(delta: float) -> void:
 			state = State.ATTACK
 			attack_timer = 0.18
 			attack_has_hit = false
+			AudioManager.play_sword_sfx()
 	elif state == State.ATTACK:
 		velocity.x = move_toward(velocity.x, chase_speed * 1.6 * direction, chase_speed * 16.0 * delta)
 		_try_hit_player(player)
@@ -127,8 +128,8 @@ func _physics_process(delta: float) -> void:
 		_update_facing()
 	move_and_slide()
 	if health <= 0:
-		defeated.emit(score_value, global_position + Vector2(0, -48))
-		queue_free()
+		_play_death_animation()
+		return
 	elif hurt_timer > 0.0:
 		sprite.play("hurt")
 	elif state == State.WINDUP or state == State.ATTACK:
@@ -143,6 +144,10 @@ func take_damage(amount: int, from_x: float) -> void:
 	velocity.x = 220.0 * sign(global_position.x - from_x)
 	velocity.y = -150.0
 	hit_landed.emit(global_position + Vector2(0, -48))
+	if health <= 0:
+		AudioManager.play_sfx("kill", -2.0)
+	else:
+		AudioManager.play_sfx("hit", -3.0, randf_range(0.94, 1.05))
 
 func _build_sprite_frames() -> void:
 	var frames := SpriteFrames.new()
@@ -162,7 +167,6 @@ func _add_dir_anim(frames: SpriteFrames, name: StringName, directory: String, pr
 		var texture := load("%s%s_%d.png" % [directory, prefix, i])
 		if texture:
 			frames.add_frame(name, texture)
-
 func _update_facing() -> void:
 	sprite.flip_h = direction > 0
 
@@ -183,3 +187,12 @@ func _try_hit_player(player: Node2D) -> void:
 		attack_has_hit = true
 		player.take_damage(attack_damage, global_position.x)
 		hit_landed.emit(player.global_position + Vector2(0, -52))
+
+func _play_death_animation() -> void:
+	set_physics_process(false)
+	collision_layer = 0
+	collision_mask = 0
+	sprite.play("death")
+	defeated.emit(score_value, global_position + Vector2(0, -48))
+	await sprite.animation_finished
+	queue_free()

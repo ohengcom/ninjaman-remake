@@ -3,17 +3,21 @@ extends CanvasLayer
 var health_bar: ColorRect
 var health_back: ColorRect
 var score_label: Label
+var coin_label: Label
 var sector_label: Label
 var message_label: Label
 var pause_label: Label
 var control_label: Label
 var damage_flash: ColorRect
+var pixel_font: Font
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	pixel_font = load("res://assets/fonts/kenney_pixel.ttf")
 	_build_ui()
 	update_health(100, 100)
 	update_score(0)
+	update_coins(0)
 	show_message("NINJA MAN: GODOT PROTOTYPE", 2.0)
 
 func update_health(current: int, max_health: int) -> void:
@@ -26,6 +30,10 @@ func update_health(current: int, max_health: int) -> void:
 func update_score(score: int) -> void:
 	if is_instance_valid(score_label):
 		score_label.text = "SCORE %06d" % score
+
+func update_coins(coins: int) -> void:
+	if is_instance_valid(coin_label):
+		coin_label.text = "COINS %d" % coins
 
 func flash_damage() -> void:
 	if not is_instance_valid(damage_flash):
@@ -68,18 +76,28 @@ func _build_ui() -> void:
 	sector_label = Label.new()
 	sector_label.text = "ACT 1: FOREST TESTBED"
 	sector_label.position = Vector2(28, 60)
+	sector_label.add_theme_font_override("font", pixel_font)
 	sector_label.add_theme_font_size_override("font_size", 18)
 	root.add_child(sector_label)
 
 	score_label = Label.new()
 	score_label.position = Vector2(1030, 28)
+	score_label.add_theme_font_override("font", pixel_font)
 	score_label.add_theme_font_size_override("font_size", 22)
 	root.add_child(score_label)
+
+	coin_label = Label.new()
+	coin_label.position = Vector2(1030, 58)
+	coin_label.add_theme_font_override("font", pixel_font)
+	coin_label.add_theme_font_size_override("font_size", 20)
+	coin_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.3))
+	root.add_child(coin_label)
 
 	message_label = Label.new()
 	message_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	message_label.position = Vector2(360, 94)
 	message_label.size = Vector2(560, 40)
+	message_label.add_theme_font_override("font", pixel_font)
 	message_label.add_theme_font_size_override("font_size", 24)
 	message_label.modulate = Color(0.75, 0.95, 1.0, 0.0)
 	root.add_child(message_label)
@@ -89,6 +107,7 @@ func _build_ui() -> void:
 	pause_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	pause_label.position = Vector2(480, 310)
 	pause_label.size = Vector2(320, 80)
+	pause_label.add_theme_font_override("font", pixel_font)
 	pause_label.add_theme_font_size_override("font_size", 54)
 	pause_label.add_theme_color_override("font_color", Color(1.0, 0.32, 0.42))
 	pause_label.visible = false
@@ -99,6 +118,7 @@ func _build_ui() -> void:
 	control_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	control_label.position = Vector2(240, 672)
 	control_label.size = Vector2(800, 32)
+	control_label.add_theme_font_override("font", pixel_font)
 	control_label.add_theme_font_size_override("font_size", 16)
 	control_label.add_theme_color_override("font_color", Color(0.7, 0.88, 1.0, 0.74))
 	root.add_child(control_label)

@@ -28,6 +28,7 @@ const HURT_INVULNERABLE_TIME := 0.82
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 @onready var body_shape: CollisionShape2D = $CollisionShape2D
 
+var sword_overlay: Sprite2D
 var facing := 1
 var jumps_used := 0
 var dash_timer := 0.0
@@ -49,6 +50,7 @@ func _ready() -> void:
 	_build_sprite_frames()
 	_build_attack_shape()
 	_build_body_shape()
+	_build_sword_overlay()
 	sprite.position = Vector2(0, -44)
 	sprite.scale = Vector2(3.0, 3.0)
 	attack_area.body_entered.connect(_on_attack_body_entered)
@@ -105,10 +107,12 @@ func _handle_jump() -> void:
 		jumps_used = 1
 		jump_buffer_timer = 0.0
 		coyote_timer = 0.0
+		AudioManager.play_sfx("jump", -6.0)
 	elif jumps_used < 2:
 		velocity.y = DOUBLE_JUMP_VELOCITY
 		jumps_used += 1
 		jump_buffer_timer = 0.0
+		AudioManager.play_sfx("jump", -8.0, 1.15)
 
 func _handle_dash() -> void:
 	if Input.is_action_just_pressed("dash") and dash_timer <= 0.0 and dash_cooldown <= 0.0:
@@ -117,16 +121,20 @@ func _handle_dash() -> void:
 		invulnerable_timer = maxf(invulnerable_timer, DASH_TIME + 0.04)
 		afterimage_timer = 0.0
 		velocity.x = DASH_SPEED * facing
+		AudioManager.play_sfx("dash", -4.0)
 
 func _handle_attacks() -> void:
 	if Input.is_action_just_pressed("attack") and attack_timer <= 0.0:
 		attack_timer = ATTACK_TIME
 		hit_targets.clear()
 		sprite.play("attack")
+		AudioManager.play_sword_sfx()
+		_swing_sword()
 	if Input.is_action_just_pressed("wave") and wave_cooldown <= 0.0:
 		wave_cooldown = WAVE_COOLDOWN
 		sprite.play("wave")
 		wave_cast.emit(global_position, facing)
+		AudioManager.play_sfx("wave", -4.0)
 
 func _apply_movement(delta: float) -> void:
 	if not is_on_floor():
@@ -170,7 +178,17 @@ func take_damage(amount: int, from_x: float) -> void:
 	sprite.play("hurt")
 	if health <= 0:
 		is_dead = true
+		AudioManager.play_sfx("death", -2.0)
+		sprite.play("death")
 		died.emit()
+	else:
+		AudioManager.play_sfx("hurt", -3.0)
+
+func heal(amount: int) -> void:
+	if is_dead:
+		return
+	health = mini(max_health, health + amount)
+	health_changed.emit(health, max_health)
 
 func _on_attack_body_entered(body: Node) -> void:
 	if attack_shape.disabled or hit_targets.has(body) or not body.has_method("take_damage"):
@@ -178,13 +196,13 @@ func _on_attack_body_entered(body: Node) -> void:
 	hit_targets.append(body)
 	body.take_damage(18, global_position.x)
 	hit_landed.emit(body.global_position + Vector2(0, -48))
-	Engine.time_scale = 0.12
-	await get_tree().create_timer(0.035, true, false, true).timeout
-	Engine.time_scale = 1.0
+	AudioManager.play_sfx("hit", -3.0, randf_range(0.95, 1.06))
+	AudioManager.hit_stop(0.05, 0.12)
 
 func _handle_landing_feedback() -> void:
 	if is_on_floor() and not landed_last_frame and velocity.y >= 0.0:
 		hit_landed.emit(global_position + Vector2(0, -10))
+		AudioManager.play_sfx("land", -10.0, randf_range(0.95, 1.05))
 	landed_last_frame = is_on_floor()
 
 func _spawn_afterimage() -> void:
@@ -237,3 +255,23 @@ func _add_dir_anim(frames: SpriteFrames, name: StringName, directory: String, pr
 		var texture := load("%s%s_%d.png" % [directory, prefix, i])
 		if texture:
 			frames.add_frame(name, texture)
+
+func _build_sword_overlay() -> void:
+	sword_overlay = Sprite2D.new()
+	sword_overlay.texture = load("res://assets/characters/dungeon_sprites/weapons_/rSword.png")
+	sword_overlay.position = Vector2(42, -42)
+	sword_overlay.scale = Vector2(3.0, 3.0)
+	sword_overlay.z_index = 1
+	sword_overlay.visible = false
+	add_child(sword_overlay)
+
+func _swing_sword() -> void:
+	if not sword_overlay:
+		return
+	sword_overlay.visible = true
+	sword_overlay.position = Vector2(42 * facing, -42)
+	sword_overlay.rotation = -0.8 * facing
+	sword_overlay.flip_h = facing < 0
+	var tween := create_tween()
+	tween.tween_property(sword_overlay, "rotation", 0.6 * facing, 0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_callback(func(): sword_overlay.visible = false)

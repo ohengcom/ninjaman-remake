@@ -25,6 +25,7 @@ var slam_timer := 0.0
 var state := State.STALK
 var attack_has_hit := false
 var phase := 1
+var music_triggered := false
 
 func _ready() -> void:
 	_build_sprite_frames()
@@ -46,12 +47,18 @@ func _physics_process(delta: float) -> void:
 	swipe_timer = maxf(0.0, swipe_timer - delta)
 	slam_timer = maxf(0.0, slam_timer - delta)
 	phase = 3 if health < max_health * 0.32 else 2 if health < max_health * 0.65 else 1
+	if phase >= 2 and hurt_timer > 0.0:
+		AudioManager.play_sfx("boss_roar", -3.0)
 
 	var player := get_tree().get_first_node_in_group("player") as Node2D
 	if is_instance_valid(player):
+		var distance := global_position.distance_to(player.global_position)
+		if not music_triggered and distance < 800.0:
+			music_triggered = true
+			AudioManager.play_music("boss")
+			AudioManager.play_sfx("boss_roar", 0.0)
 		direction = 1 if player.global_position.x > global_position.x else -1
 		_update_facing()
-		var distance := global_position.distance_to(player.global_position)
 		if state == State.STALK and attack_cooldown <= 0.0:
 			if distance < 112.0:
 				state = State.WINDUP
@@ -78,6 +85,7 @@ func _physics_process(delta: float) -> void:
 			state = State.SWIPE
 			swipe_timer = 0.24
 			attack_has_hit = false
+			AudioManager.play_sword_sfx()
 	elif state == State.SWIPE:
 		velocity.x = move_toward(velocity.x, RUSH_SPEED * 0.75 * direction, RUSH_SPEED * 8.0 * delta)
 		if swipe_timer <= 0.0:
@@ -104,8 +112,8 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 	if health <= 0:
-		defeated.emit(2500, global_position + Vector2(0, -80))
-		queue_free()
+		_play_death_animation()
+		return
 	elif hurt_timer > 0.0:
 		sprite.play("hurt")
 	elif state == State.WINDUP or state == State.SWIPE:
@@ -124,6 +132,10 @@ func take_damage(amount: int, from_x: float) -> void:
 	velocity.x = 140.0 * sign(global_position.x - from_x)
 	velocity.y = -90.0
 	hit_landed.emit(global_position + Vector2(0, -80))
+	if health <= 0:
+		AudioManager.play_sfx("kill", 0.0)
+	else:
+		AudioManager.play_sfx("hit", -2.0, randf_range(0.92, 1.03))
 
 func _build_sprite_frames() -> void:
 	var frames := SpriteFrames.new()
@@ -165,3 +177,13 @@ func _try_hit_player(player: Node2D) -> void:
 		var damage := 18 if state == State.SWIPE else 24 if state == State.RUSH else 28
 		player.take_damage(damage, global_position.x)
 		hit_landed.emit(player.global_position + Vector2(0, -52))
+
+func _play_death_animation() -> void:
+	set_physics_process(false)
+	collision_layer = 0
+	collision_mask = 0
+	sprite.play("death")
+	defeated.emit(2500, global_position + Vector2(0, -80))
+	AudioManager.play_music("victory")
+	await sprite.animation_finished
+	queue_free()
