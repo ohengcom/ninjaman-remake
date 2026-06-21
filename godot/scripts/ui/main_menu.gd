@@ -4,6 +4,7 @@ signal start_requested
 
 var prompt: Label
 var pixel_font: Font
+var started := false
 
 func _ready() -> void:
 	pixel_font = load("res://assets/fonts/kenney_pixel.ttf")
@@ -12,8 +13,26 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed("jump") or Input.is_action_just_pressed("attack"):
-		AudioManager.play_sfx("menu_select")
-		start_requested.emit()
+		_start()
+
+func _unhandled_input(event: InputEvent) -> void:
+	# Web fallback: respond to raw key/click/touch even if action mapping or
+	# canvas focus is flaky on first interaction.
+	if event is InputEventKey and event.pressed and not event.echo:
+		var k: int = event.keycode
+		if k == KEY_SPACE or k == KEY_J or k == KEY_ENTER or k == KEY_KP_ENTER:
+			_start()
+	elif event is InputEventMouseButton and event.pressed:
+		_start()
+	elif event is InputEventScreenTouch and event.pressed:
+		_start()
+
+func _start() -> void:
+	if started:
+		return
+	started = true
+	AudioManager.play_sfx("menu_select")
+	start_requested.emit()
 
 func _build_menu() -> void:
 	var root := Control.new()
@@ -46,7 +65,7 @@ func _build_menu() -> void:
 	root.add_child(subtitle)
 
 	prompt = Label.new()
-	prompt.text = "PRESS SPACE OR J TO START"
+	prompt.text = "PRESS SPACE / J / ENTER OR CLICK TO START"
 	prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	prompt.position = Vector2(340, 430)
 	prompt.size = Vector2(600, 40)
@@ -66,7 +85,7 @@ func _build_menu() -> void:
 	root.add_child(controls)
 
 	var web_note := Label.new()
-	web_note.text = "Web build tip: click the game once if controls do not respond. Best tested on desktop Chrome/Edge."
+	web_note.text = "Web build tip: click the game first if keyboard does not respond. Desktop Chrome/Edge recommended."
 	web_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	web_note.position = Vector2(220, 590)
 	web_note.size = Vector2(840, 36)
