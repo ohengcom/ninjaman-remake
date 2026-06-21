@@ -5,21 +5,24 @@ signal hit_landed(point: Vector2)
 signal health_changed(current: int, max_health: int)
 signal died
 
-const GRAVITY := 1800.0
-const RUN_SPEED := 390.0
-const AIR_SPEED := 330.0
-const JUMP_VELOCITY := -660.0
-const DOUBLE_JUMP_VELOCITY := -610.0
-const DASH_SPEED := 900.0
-const DASH_TIME := 0.14
-const DASH_COOLDOWN := 0.45
-const ATTACK_TIME := 0.28
-const ATTACK_ACTIVE_START := 0.10
-const ATTACK_ACTIVE_END := 0.20
-const WAVE_COOLDOWN := 0.42
-const COYOTE_TIME := 0.10
-const JUMP_BUFFER_TIME := 0.11
-const HURT_INVULNERABLE_TIME := 0.82
+var GRAVITY := Balance.GRAVITY
+var RUN_SPEED := Balance.PLAYER.run_speed
+var AIR_SPEED := Balance.PLAYER.air_speed
+var JUMP_VELOCITY := Balance.PLAYER.jump_velocity
+var DOUBLE_JUMP_VELOCITY := Balance.PLAYER.double_jump_velocity
+var DASH_SPEED := Balance.PLAYER.dash_speed
+var DASH_TIME := Balance.PLAYER.dash_time
+var DASH_COOLDOWN := Balance.PLAYER.dash_cooldown
+var ATTACK_TIME := Balance.PLAYER.attack_time
+var ATTACK_ACTIVE_START := Balance.PLAYER.attack_active_start
+var ATTACK_ACTIVE_END := Balance.PLAYER.attack_active_end
+var WAVE_COOLDOWN := Balance.PLAYER.wave_cooldown
+var COYOTE_TIME := Balance.PLAYER.coyote_time
+var JUMP_BUFFER_TIME := Balance.PLAYER.jump_buffer_time
+var HURT_INVULNERABLE_TIME := Balance.PLAYER.hurt_invulnerable_time
+var HURT_LOCK_TIME := Balance.PLAYER.hurt_lock_time
+var ATTACK_DAMAGE := Balance.PLAYER.attack_damage
+var MAX_JUMPS := Balance.PLAYER.max_jumps
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var attack_area: Area2D = $AttackArea
@@ -41,10 +44,12 @@ var invulnerable_timer := 0.0
 var hurt_lock_timer := 0.0
 var afterimage_timer := 0.0
 var landed_last_frame := false
-var max_health := 100
+var max_health := Balance.PLAYER.max_health
 var health := max_health
 var is_dead := false
 var hit_targets: Array[Node] = []
+
+var sm: StateMachine
 
 func _ready() -> void:
 	_build_sprite_frames()
@@ -57,6 +62,21 @@ func _ready() -> void:
 	animation_tree.active = false
 	animation_player.playback_active = true
 	add_to_group("player")
+	_setup_state_machine()
+	sm.set_state("ground")
+
+func _setup_state_machine() -> void:
+	# Player uses a hybrid model: the state machine selects the active movement
+	# mode + animation, while concurrent timers (dash/attack/hurt/wave) drive
+	# sub-state behavior. This mirrors the Phaser Player hybrid approach and
+	# preserves the original feel where dash > hurt > attack > normal movement.
+	sm = StateMachine.new(self)
+	sm.add_state("ground", Callable(), _on_ground_update)
+	sm.add_state("air", Callable(), _on_air_update)
+	sm.add_state("attack", Callable(), _on_attack_update)
+	sm.add_state("hurt", Callable(), _on_hurt_update)
+	sm.add_state("dash", Callable(), _on_dash_update)
+	sm.add_state("dead", _on_dead_enter, _on_dead_update)
 
 func _physics_process(delta: float) -> void:
 	if is_dead:
@@ -68,10 +88,30 @@ func _physics_process(delta: float) -> void:
 	_handle_jump()
 	_handle_dash()
 	_handle_attacks()
-	_apply_movement(delta)
+	_resolve_state()
+	sm.update(delta)
 	move_and_slide()
 	_handle_landing_feedback()
 	_update_animation()
+
+## Picks the active movement-mode state by priority, mirroring the original
+## _apply_movement() precedence: dash > hurt > attack > air/ground.
+func _resolve_state() -> void:
+	if dash_timer > 0.0:
+		if not sm.is_in("dash"):
+			sm.set_state("dash")
+	elif hurt_lock_timer > 0.0:
+		if not sm.is_in("hurt"):
+			sm.set_state("hurt")
+	elif attack_timer > 0.06:
+		if not sm.is_in("attack"):
+			sm.set_state("attack")
+	elif not is_on_floor():
+		if not sm.is_in("air"):
+			sm.set_state("air")
+	else:
+		if not sm.is_in("ground"):
+			sm.set_state("ground")
 
 func _apply_timers(delta: float) -> void:
 	dash_timer = maxf(0.0, dash_timer - delta)
@@ -108,7 +148,7 @@ func _handle_jump() -> void:
 		jump_buffer_timer = 0.0
 		coyote_timer = 0.0
 		AudioManager.play_sfx("jump", -6.0)
-	elif jumps_used < 2:
+	elif jumps_used < MAX_JUMPS:
 		velocity.y = DOUBLE_JUMP_VELOCITY
 		jumps_used += 1
 		jump_buffer_timer = 0.0
@@ -136,23 +176,45 @@ func _handle_attacks() -> void:
 		wave_cast.emit(global_position, facing)
 		AudioManager.play_sfx("wave", -4.0)
 
-func _apply_movement(delta: float) -> void:
+func _on_ground_update(_ctx, delta: float) -> void:
 	if not is_on_floor():
 		velocity.y += GRAVITY * delta
-	if dash_timer > 0.0:
-		if afterimage_timer <= 0.0:
-			_spawn_afterimage()
-			afterimage_timer = 0.045
-		return
-	if hurt_lock_timer > 0.0:
-		velocity.x = move_toward(velocity.x, 0.0, RUN_SPEED * 6.0 * delta)
-		return
-	if attack_timer > 0.06:
-		velocity.x = move_toward(velocity.x, 0.0, RUN_SPEED * 8.0 * delta)
 		return
 	var input_x := Input.get_axis("move_left", "move_right")
-	var speed := RUN_SPEED if is_on_floor() else AIR_SPEED
-	velocity.x = move_toward(velocity.x, input_x * speed, speed * 10.0 * delta)
+	velocity.x = move_toward(velocity.x, input_x * RUN_SPEED, RUN_SPEED * 10.0 * delta)
+
+func _on_air_update(_ctx, delta: float) -> void:
+	velocity.y += GRAVITY * delta
+	var input_x := Input.get_axis("move_left", "move_right")
+	velocity.x = move_toward(velocity.x, input_x * AIR_SPEED, AIR_SPEED * 10.0 * delta)
+
+func _on_attack_update(_ctx, delta: float) -> void:
+	if not is_on_floor():
+		velocity.y += GRAVITY * delta
+	velocity.x = move_toward(velocity.x, 0.0, RUN_SPEED * 8.0 * delta)
+
+func _on_hurt_update(_ctx, delta: float) -> void:
+	if not is_on_floor():
+		velocity.y += GRAVITY * delta
+	velocity.x = move_toward(velocity.x, 0.0, RUN_SPEED * 6.0 * delta)
+
+func _on_dash_update(_ctx, delta: float) -> void:
+	if not is_on_floor():
+		velocity.y += GRAVITY * delta
+	if afterimage_timer <= 0.0:
+		_spawn_afterimage()
+		afterimage_timer = 0.045
+
+func _on_dead_enter(_ctx) -> void:
+	set_physics_process(false)
+
+func _on_dead_update(_ctx, delta: float) -> void:
+	velocity.y += GRAVITY * delta
+
+func _apply_movement(_delta: float) -> void:
+	# Deprecated: movement is now driven by state callbacks (_on_*_update).
+	# Kept as no-op to avoid breaking any external callers.
+	pass
 
 func _update_animation() -> void:
 	if attack_timer > 0.0:
@@ -172,7 +234,7 @@ func take_damage(amount: int, from_x: float) -> void:
 	health -= amount
 	health_changed.emit(health, max_health)
 	invulnerable_timer = HURT_INVULNERABLE_TIME
-	hurt_lock_timer = 0.24
+	hurt_lock_timer = HURT_LOCK_TIME
 	velocity.x = 360.0 * sign(global_position.x - from_x)
 	velocity.y = -210.0
 	sprite.play("hurt")
@@ -194,7 +256,7 @@ func _on_attack_body_entered(body: Node) -> void:
 	if attack_shape.disabled or hit_targets.has(body) or not body.has_method("take_damage"):
 		return
 	hit_targets.append(body)
-	body.take_damage(18, global_position.x)
+	body.take_damage(ATTACK_DAMAGE, global_position.x)
 	hit_landed.emit(body.global_position + Vector2(0, -48))
 	AudioManager.play_sfx("hit", -3.0, randf_range(0.95, 1.06))
 	AudioManager.hit_stop(0.05, 0.12)

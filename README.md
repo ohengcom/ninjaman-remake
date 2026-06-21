@@ -2,9 +2,14 @@
 
 A Phaser 4, TypeScript, and Vite action-platformer prototype with Matter.js physics, responsive scaling, keyboard controls, gamepad support, and an SVG-rendered sprite pipeline for current placeholder production art.
 
-Current version: `3.10.0`
+Current version: `3.11.0`
 
-**Godot 4.6.3 Prototype**: A parallel 2D pixel-art demo with CC0 assets, complete audio, tilemap terrain, and 8-10 screen level. See `godot/` directory and deployment at https://ninjaman-remake-psi.vercel.app
+This repository ships **two parallel, independently deployed web builds** for side-by-side comparison:
+
+- **Phaser build** (`phaser/`): Phaser 4 + TypeScript + Vite. Deployed from the repo root → `ninjaman-remake.vercel.app`.
+- **Godot build** (`godot/`): Godot 4.6.3 + GDScript pixel-art demo with CC0 assets → `ninjaman-godot.vercel.app`.
+
+See `DEPLOYMENT.md` for the dual-deployment setup, `docs/GAME_DESIGN.md` for the canonical balance spec, and `docs/ELEMENT_MAPPING.md` for the Phaser⇄Godot element cross-reference.
 
 ## Features
 
@@ -37,10 +42,10 @@ npm run build:player-art
 npm run build:art
 ```
 
-- `build:player-art` regenerates `public/assets/sprites/player_hero_hd.png` from `scripts/generate_player_hero.js`.
+- `build:player-art` regenerates `phaser/public/assets/sprites/player_hero_hd.png` from `phaser/scripts/generate_player_hero.js`.
 - `build:art` regenerates backgrounds, the player sheet, enemy sheets, and boss sheet.
-- `src/assets/manifest.ts` is the single source for runtime asset loading and cache-busted URLs.
-- `src/animations/characterAnimationManifest.ts` is the single source for sprite animation ranges.
+- `phaser/src/assets/manifest.ts` is the single source for runtime asset loading and cache-busted URLs.
+- `phaser/src/animations/characterAnimationManifest.ts` is the single source for sprite animation ranges.
 
 ## Controls
 
@@ -119,7 +124,9 @@ npm run test:visual
 - **Visual Polish**: Pixel fonts, death animations, sword swing overlay, camera shake
 - **Controls**: A/D move, Space jump, Shift dash, J melee, L wave, Esc pause
 
-Build the Godot web export:
+Build the Godot web export locally (output: `godot/build/web/`):
 ```bash
 npm run build:godot:web
 ```
+
+> On Windows the Godot CLI may hang at 98%. In that case export from the Godot Editor (Project > Export > Web) or rely on the GitHub Action, which builds on Linux. See `DEPLOYMENT.md`.

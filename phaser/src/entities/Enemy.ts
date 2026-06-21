@@ -1,0 +1,415 @@
+import Phaser from 'phaser';
+import { StateMachine } from '../utils/StateMachine.js';
+import { ENEMY_STATS } from '../config/enemies.js';
+import { GAME_EVENTS } from '../events.js';
+
+export type EnemyType = 'guard' | 'axe' | 'ninja' | 'sniper';
+type TargetSprite = Phaser.Physics.Matter.Sprite & { health?: number };
+
+/** Maps each enemy type to its sprite sheet texture key */
+const ENEMY_TEXTURES: Record<EnemyType, string> = {
+  guard: 'enemy_guard_sheet',
+  axe: 'enemy_axe_sheet',
+  ninja: 'enemy_ninja_sheet',
+  sniper: 'enemy_sniper_sheet',
+};
+
+const ENEMY_RENDER_CONFIGS = {
+  guard:  { displayWidth: 136, displayHeight: 205, bodyWidth: 42, bodyHeight: 116, yFeet: 466 },
+  axe:    { displayWidth: 148, displayHeight: 218, bodyWidth: 48, bodyHeight: 124, yFeet: 466 },
+  ninja:  { displayWidth: 132, displayHeight: 198, bodyWidth: 40, bodyHeight: 112, yFeet: 466 },
+  sniper: { displayWidth: 134, displayHeight: 202, bodyWidth: 40, bodyHeight: 112, yFeet: 466 },
+} as const;
+
+const ENEMY_GROUND_CLEARANCE = 0;
+
+export class Enemy extends Phaser.Physics.Matter.Sprite {
+  public stateMachine: StateMachine<Enemy>;
+  public enemyType: EnemyType;
+  public health: number = 15;
+  public baseDamage: number = 10;
+  
+  private patrolDir: number = 1;
+  private patrolTimer: number = 0;
+  private target: TargetSprite | null = null;
+  private isInvulnerable = false;
+  
+  private moveSpeed: number = 50;
+  private chaseMultiplier: number = 1.5;
+  private attackReach: number = 60;
+  private attackWindup: number = 500;
+  private attackCooldown: number = 800;
+  private currentLaser: Phaser.GameObjects.Line | null = null;
+
+  public get baseScaleX(): number {
+    const cfg = ENEMY_RENDER_CONFIGS[this.enemyType];
+    return cfg.displayWidth / 340;
+  }
+
+  public get baseScaleY(): number {
+    const cfg = ENEMY_RENDER_CONFIGS[this.enemyType];
+    return cfg.displayHeight / 512;
+  }
+
+  private applyEnemyRender() {
+    this.setScale(this.baseScaleX, this.baseScaleY);
+    const cfg = ENEMY_RENDER_CONFIGS[this.enemyType];
+
+    this.setRectangle(cfg.bodyWidth, cfg.bodyHeight, {
+      friction: 0,
+      frictionStatic: 0,
+      frictionAir: 0.02,
+    });
+
+    // Compute the perfect originY based on our pixel-perfect physics-visual formula
+    const originY = cfg.yFeet / 512 - cfg.bodyHeight / (2 * cfg.displayHeight);
+    this.setOrigin(0.5, originY); // Must be called AFTER setRectangle to prevent Phaser from resetting it!
+
+    this.setFixedRotation();
+    this.setIgnoreGravity(false);
+  }
+
+  /** Get the animation key for this enemy type */
+  private animKey(action: 'idle' | 'walk' | 'attack' | 'hurt' | 'die'): string {
+    return `${this.enemyType}_${action}`;
+  }
+
+  destroy(fromScene?: boolean) {
+    if (this.currentLaser) {
+      this.currentLaser.destroy();
+      this.currentLaser = null;
+    }
+    this.scene?.tweens?.killTweensOf(this);
+    this.stateMachine?.destroy();
+    super.destroy(fromScene);
+  }
+
+  constructor(scene: Phaser.Scene, x: number, y: number, type: EnemyType = 'guard') {
+    super(scene.matter.world, x, y, ENEMY_TEXTURES[type]);
+    this.enemyType = type;
+    scene.add.existing(this);
+
+    this.configureType(type);
+    this.applyEnemyRender();
+
+    this.stateMachine = new StateMachine<Enemy>(this);
+    this.setupStates();
+    this.stateMachine.setState('patrol');
+  }
+
+  public spawn(x: number, y: number, type: EnemyType) {
+    this.scene.tweens.killTweensOf(this);
+    this.enemyType = type;
+    this.setTexture(ENEMY_TEXTURES[type]);
+    this.setPosition(x, y);
+    this.setActive(true);
+    this.setVisible(true);
+
+    this.configureType(type);
+    this.applyEnemyRender();
+    this.ensureBodyInWorld();
+
+    this.isInvulnerable = false;
+    this.patrolDir = 1;
+    this.clearTint();
+    this.setTintMode(Phaser.TintModes.MULTIPLY);
+    this.setAlpha(1);
+    this.stateMachine.setState('patrol');
+  }
+
+  public spawnOnGround(x: number, groundTop: number, type: EnemyType) {
+    this.spawn(x, groundTop - this.getBodyHalfHeight() - ENEMY_GROUND_CLEARANCE, type);
+  }
+
+  private getBodyHalfHeight(): number {
+    const cfg = ENEMY_RENDER_CONFIGS[this.enemyType];
+    return cfg.bodyHeight / 2;
+  }
+
+  private configureType(type: EnemyType) {
+    const stats = ENEMY_STATS[type];
+    this.health = stats.health;
+    this.baseDamage = stats.baseDamage;
+    this.moveSpeed = stats.moveSpeed;
+    this.chaseMultiplier = stats.chaseMultiplier;
+    this.attackReach = stats.attackReach;
+    this.attackWindup = stats.attackWindup;
+    this.attackCooldown = stats.attackCooldown;
+  }
+
+  public setTarget(target: TargetSprite) {
+    this.target = target;
+  }
+
+  private setupStates() {
+    this.stateMachine
+      .addState({
+        name: 'patrol',
+        onEnter: (e) => {
+          e.patrolTimer = e.scene.time.now + 2000;
+          e.play({ key: e.animKey('walk'), repeat: -1 }, true);
+        },
+        onUpdate: (e) => {
+          if (!e.active) return;
+          if (e.enemyType === 'sniper') {
+             // Snipers don't patrol, play idle
+             e.play({ key: e.animKey('idle'), repeat: 0 }, true);
+             if (e.target && e.target.active && Phaser.Math.Distance.Between(e.x, e.y, e.target.x, e.target.y) < e.attackReach) {
+               e.stateMachine.setState('chase');
+             }
+             return;
+          }
+
+          e.checkPatrolNavigation();
+
+          if (e.scene.time.now > e.patrolTimer) {
+            e.flipDirection();
+          }
+          
+          e.setVelocityX(e.moveSpeed * e.patrolDir);
+
+          if (e.target && e.target.active && Phaser.Math.Distance.Between(e.x, e.y, e.target.x, e.target.y) < 300) {
+            e.stateMachine.setState('chase');
+          }
+        }
+      })
+      .addState({
+        name: 'chase',
+        onEnter: (e) => {
+           e.play({ key: e.animKey('walk'), repeat: -1 }, true);
+        },
+        onUpdate: (e) => {
+          if (!e.active) return;
+          if (!e.target || !e.target.active || (e.target.health ?? 1) <= 0) {
+            e.stateMachine.setState('patrol');
+            return;
+          }
+
+          const dist = Math.abs(e.target.x - e.x);
+          const dir = Math.sign(e.target.x - e.x);
+          
+          e.setFlipX(dir < 0);
+
+          if (dist > e.attackReach + 100) {
+             e.stateMachine.setState('patrol');
+          } else if (dist <= e.attackReach) {
+             if (e.enemyType === 'sniper' || dist < e.attackReach) {
+                e.stateMachine.setState('attack');
+             }
+          } else if (e.enemyType !== 'sniper') {
+            e.setVelocityX((e.moveSpeed * e.chaseMultiplier) * dir);
+          }
+        }
+      })
+      .addState({
+        name: 'attack',
+        onEnter: (e) => {
+          e.setVelocityX(0);
+          // Play attack animation
+          e.play({ key: e.animKey('attack'), repeat: 0 }, true);
+
+          const backDir = e.flipX ? 1 : -1;
+          const originalX = e.x;
+          const originalY = e.y;
+
+          // ─── Archer/Sniper Bow Draw Tension Tween ───
+          if (e.enemyType === 'sniper') {
+             // Slowly scale Y up and pull back horizontally to simulate drawing the bowstring
+             e.scene.tweens.add({
+                targets: e,
+                scaleY: e.baseScaleY * 1.08,
+                x: originalX + (12 * backDir),
+                duration: e.attackWindup - 50,
+                ease: 'Quad.easeOut'
+             });
+          }
+
+          // ─── Axe Berserker Overhead Jump-Windup ───
+          if (e.enemyType === 'axe') {
+             // Leap slightly into the air to add momentum to the chop
+             e.scene.tweens.add({
+                targets: e,
+                y: originalY - 18,
+                duration: e.attackWindup,
+                yoyo: true,
+                ease: 'Quad.easeInOut'
+             });
+          }
+
+          e.stateMachine.addTimer(e.scene.time.delayedCall(e.attackWindup, () => {
+             e.setAlpha(1); // Ensure opacity resets
+
+             if (e.active && e.health > 0) {
+                  if (e.enemyType === 'sniper') {
+                       e.scene.events.emit(GAME_EVENTS.ENEMY_SHOOT, e, e.baseDamage);
+                      
+                      // Elastic recoil snap upon releasing the bowstring
+                      e.scene.tweens.add({
+                         targets: e,
+                         scaleY: e.baseScaleY,
+                         x: { from: e.x - (8 * backDir), to: originalX },
+                         duration: 250,
+                         ease: 'Elastic.easeOut'
+                      });
+                  } else if (e.enemyType === 'guard') {
+                      // Heavy Guard lunges forward during swing
+                      const forwardDir = e.flipX ? -1 : 1;
+                      e.scene.tweens.add({
+                         targets: e,
+                         x: e.x + (20 * forwardDir),
+                         duration: 150,
+                         yoyo: true,
+                         ease: 'Cubic.easeOut'
+                      });
+                      e.scene.events.emit(GAME_EVENTS.ENEMY_ATTACK, e, e.baseDamage, e.attackReach);
+                  } else if (e.enemyType === 'ninja') {
+                      // Nimble Shadow Ninja strikes with a lightning-fast dash
+                      const forwardDir = e.flipX ? -1 : 1;
+                      e.scene.tweens.add({
+                         targets: e,
+                         x: e.x + (35 * forwardDir),
+                         duration: 120,
+                         yoyo: true,
+                         ease: 'Quart.easeOut'
+                      });
+                      e.scene.events.emit(GAME_EVENTS.ENEMY_ATTACK, e, e.baseDamage, e.attackReach);
+                  } else if (e.enemyType === 'axe') {
+                      // Axe slam registers and shakes the camera on landing
+                      e.scene.cameras.main.shake(120, 0.015);
+                      e.scene.events.emit(GAME_EVENTS.ENEMY_ATTACK, e, e.baseDamage, e.attackReach);
+                  }
+
+                  e.stateMachine.addTimer(e.scene.time.delayedCall(e.attackCooldown, () => {
+                      if (e.active && e.health > 0) e.stateMachine.setState('chase');
+                  }));
+             }
+          }));
+        },
+        onExit: (e) => {
+            e.setAlpha(1);
+            e.scaleY = e.baseScaleY;
+        }
+      })
+      .addState({
+        name: 'hurt',
+        onEnter: (e) => {
+          e.play({ key: e.animKey('hurt'), repeat: 0 }, true);
+           e.setTint(0xff4444);
+          e.setTintMode(Phaser.TintModes.ADD);
+          e.isInvulnerable = true;
+
+          e.stateMachine.addTimer(e.scene.time.delayedCall(200, () => {
+            if (!e.active) return;
+             e.clearTint();
+            e.setTintMode(Phaser.TintModes.MULTIPLY);
+            e.isInvulnerable = false;
+            if (e.health > 0) {
+              e.stateMachine.setState('chase');
+            } else {
+              e.stateMachine.setState('dying');
+            }
+          }));
+        }
+      })
+      .addState({
+        name: 'dying',
+        onEnter: (e) => {
+          e.play({ key: e.animKey('die'), repeat: 0 }, true);
+          e.scene.tweens.killTweensOf(e);
+          e.setVelocityX(0);
+          e.setVelocityY(0);
+          // Fade out and disable after death animation
+          e.scene.tweens.add({
+            targets: e,
+            alpha: 0,
+            duration: 600,
+            delay: 200,
+            onComplete: () => {
+              e.removeBodyFromWorld();
+              e.setActive(false);
+              e.setVisible(false);
+              e.setAlpha(1); // Reset for reuse from pool
+            }
+          });
+        }
+      });
+  }
+
+  public takeDamage(amount: number, dirX: number) {
+    if (this.isInvulnerable || this.health <= 0 || !this.active) return;
+    this.health -= amount;
+    // Heavy enemies get knocked back less
+    const kb = ENEMY_STATS[this.enemyType].knockback;
+    this.setVelocityX(dirX * kb);
+    this.setVelocityY(-3.5);
+    this.stateMachine.setState('hurt');
+  }
+
+  private isCliffAhead(): boolean {
+    const halfHeight = this.getBodyHalfHeight();
+    const startX = this.x + this.patrolDir * 24;
+    const startY = this.y + halfHeight;
+    const start = { x: startX, y: startY };
+    const end = { x: startX, y: startY + 40 };
+
+    const bodies = (this.scene.matter.world.localWorld as any).bodies as MatterJS.BodyType[];
+    const collisions = this.scene.matter.query.ray(bodies, start, end);
+    const staticCollisions = collisions.filter(c => {
+      const b = (c as any).body;
+      return b && b.isStatic && b.gameObject !== this;
+    });
+
+    return staticCollisions.length === 0;
+  }
+
+  private isObstacleAhead(): boolean {
+    const startX = this.x;
+    const startY = this.y;
+    const start = { x: startX, y: startY };
+    const end = { x: startX + this.patrolDir * 30, y: startY };
+
+    const bodies = (this.scene.matter.world.localWorld as any).bodies as MatterJS.BodyType[];
+    const collisions = this.scene.matter.query.ray(bodies, start, end);
+    const staticCollisions = collisions.filter(c => {
+      const b = (c as any).body;
+      return b && b.isStatic && b.gameObject !== this;
+    });
+
+    return staticCollisions.length > 0;
+  }
+
+  public checkPatrolNavigation() {
+    if (this.enemyType === 'sniper') return;
+
+    if (this.isCliffAhead() || this.isObstacleAhead()) {
+      this.flipDirection();
+    }
+  }
+
+  public flipDirection() {
+    this.patrolDir *= -1;
+    this.setFlipX(this.patrolDir < 0);
+    this.patrolTimer = this.scene.time.now + 2000 + Math.random() * 2000;
+  }
+
+  private ensureBodyInWorld() {
+    const worldBodies = (this.scene.matter.world.localWorld as unknown as { bodies: MatterJS.BodyType[] }).bodies;
+    if (this.body && !worldBodies.includes(this.body as MatterJS.BodyType)) {
+      this.scene.matter.world.add(this.body as MatterJS.BodyType);
+    }
+  }
+
+  private removeBodyFromWorld() {
+    const worldBodies = (this.scene.matter.world.localWorld as unknown as { bodies: MatterJS.BodyType[] }).bodies;
+    if (this.body && worldBodies.includes(this.body as MatterJS.BodyType)) {
+      this.scene.matter.world.remove(this.body as MatterJS.BodyType);
+    }
+  }
+
+  preUpdate(time: number, delta: number) {
+    super.preUpdate(time, delta);
+    if (this.active) {
+      this.stateMachine.update(delta);
+    }
+  }
+}

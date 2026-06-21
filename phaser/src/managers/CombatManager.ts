@@ -1,0 +1,141 @@
+import Phaser from 'phaser';
+import { Player } from '../entities/Player.js';
+import { Enemy } from '../entities/Enemy.js';
+import { Boss } from '../entities/Boss.js';
+import { GameScene } from '../scenes/GameScene.js';
+import { SoundManager } from './SoundManager.js';
+import { PLAYER_ATTACKS, SCORE_CONFIG } from '../config/combat.js';
+import { BOSS_STATS } from '../config/enemies.js';
+import { GAME_EVENTS } from '../events.js';
+
+export class CombatManager {
+  private scene: GameScene;
+
+  constructor(scene: GameScene) {
+    this.scene = scene;
+  }
+
+  private getPlayerAttackRect(attacker: Player, type: string): Phaser.Geom.Rectangle {
+    const dir = attacker.flipX ? -1 : 1;
+    const comboBox = PLAYER_ATTACKS.hitboxes.combo[attacker.comboStep] ?? PLAYER_ATTACKS.hitboxes.combo[0];
+    const box = type === 'uppercut'
+      ? PLAYER_ATTACKS.hitboxes.uppercut
+      : type === 'dive'
+        ? PLAYER_ATTACKS.hitboxes.dive
+        : type === 'dive_land'
+          ? PLAYER_ATTACKS.hitboxes.dive_land
+          : comboBox;
+
+    const x = dir > 0 ? attacker.x + 10 : attacker.x - box.reach - 10;
+    const y = attacker.y + box.offsetY - box.height / 2;
+    return new Phaser.Geom.Rectangle(x, y, box.reach, box.height);
+  }
+
+  public resolvePlayerAttack(attacker: Player, type: string, enemies: Phaser.GameObjects.Group, boss: Boss | null) {
+    let baseDamage: number = PLAYER_ATTACKS.combo.baseDamage;
+
+    if (type === 'uppercut') { baseDamage = PLAYER_ATTACKS.uppercut.baseDamage; }
+    if (type === 'dive' || type === 'dive_land') { baseDamage = PLAYER_ATTACKS.dive.baseDamage; }
+    if (type === 'combo') { baseDamage = PLAYER_ATTACKS.combo.baseDamage + (attacker.comboStep * PLAYER_ATTACKS.combo.damagePerStep); }
+
+    const dir = attacker.flipX ? -1 : 1;
+    const attackRect = this.getPlayerAttackRect(attacker, type);
+
+    let hitAnything = false;
+    let lastHitX = attacker.x;
+
+    enemies.getChildren().forEach((obj) => {
+      const enemy = obj as Enemy;
+      // Object pooling: ignore inactive or dead enemies
+      if (!enemy.active || enemy.health <= 0) return;
+      const enemyRect = enemy.getBounds();
+
+      if (Phaser.Geom.Rectangle.Overlaps(attackRect, enemyRect)) {
+        hitAnything = true;
+        lastHitX = enemy.x;
+        enemy.takeDamage(baseDamage, dir);
+        this.scene.vfxManager.hitFlashFilter(enemy);
+        this.scene.emitHitParticle(enemy.x, enemy.y, 15);
+        if (enemy.health <= 0) {
+          this.scene.addScore(Math.floor(SCORE_CONFIG.enemyKill * this.scene.incrementCombo()));
+        }
+      }
+    });
+
+    if (boss && boss.active && boss.health > 0) {
+      const bossRect = boss.getBounds();
+      if (Phaser.Geom.Rectangle.Overlaps(attackRect, bossRect)) {
+        hitAnything = true;
+        lastHitX = boss.x;
+        boss.takeDamage(baseDamage * BOSS_STATS.damageMultiplier, dir);
+        this.scene.vfxManager.hitFlashFilter(boss);
+        this.scene.emitHitParticle(boss.x, boss.y, 25);
+        this.scene.incrementCombo();
+      }
+    }
+
+    this.scene.physicsProps.getChildren().forEach((obj) => {
+      const prop = obj as Phaser.GameObjects.Image;
+      if (!prop.active || !prop.getData('isDestructible')) return;
+      const propRect = prop.getBounds();
+
+      if (Phaser.Geom.Rectangle.Overlaps(attackRect, propRect)) {
+        hitAnything = true;
+        lastHitX = prop.x;
+        this.scene.damagePhysicsProp(prop, baseDamage, dir);
+      }
+    });
+
+    if (hitAnything) {
+      SoundManager.playHit(this.scene.getPan(lastHitX));
+      this.scene.hitstop(60);
+      this.scene.cameras.main.shake(150, 0.015);
+      if (this.scene.getComboCount() > 1) {
+        this.scene.showComboPopup(attacker.x + (50 * dir), attacker.y - 40);
+      }
+    } else if (type !== 'dive_land') {
+      SoundManager.playSwing(this.scene.getPan(attacker.x));
+    }
+  }
+
+  public resolveEnemyAttack(attacker: Enemy, damage: number, reach: number, player: Player) {
+    if (!attacker.active || attacker.health <= 0) return;
+    const dir = attacker.flipX ? -1 : 1;
+    const attackRect = new Phaser.Geom.Rectangle(dir > 0 ? attacker.x : attacker.x - reach, attacker.y - attacker.height / 2, reach, attacker.height);
+    const playerRect = player.getBounds();
+
+    if (Phaser.Geom.Rectangle.Overlaps(attackRect, playerRect)) {
+      this.scene.resetCombo();
+      player.takeDamage(damage, dir);
+      this.scene.events.emit(GAME_EVENTS.UPDATE_HEALTH, player.health, player.maxHealth);
+      if (!player.isBlocking) {
+        SoundManager.playDamage(this.scene.getPan(attacker.x));
+        this.scene.vfxManager.hitFlashFilter(player);
+        this.scene.emitHitParticle(player.x, player.y, 5);
+        this.scene.cameras.main.shake(200, 0.02);
+      } else {
+        // Assume taken care of by parry event, but if not a perfect block, it's a chip block
+      }
+    }
+  }
+
+  public resolveBossAttack(attacker: Boss, player: Player) {
+    if (!attacker.active || attacker.health <= 0) return;
+    const reach = BOSS_STATS.attackReach;
+    const dir = attacker.flipX ? -1 : 1;
+    const attackRect = new Phaser.Geom.Rectangle(dir > 0 ? attacker.x : attacker.x - reach, attacker.y - attacker.height / 2, reach, attacker.height);
+    const playerRect = player.getBounds();
+
+    if (Phaser.Geom.Rectangle.Overlaps(attackRect, playerRect)) {
+      this.scene.resetCombo();
+      player.takeDamage(BOSS_STATS.attackDamage, dir);
+      this.scene.events.emit(GAME_EVENTS.UPDATE_HEALTH, player.health, player.maxHealth);
+      if (!player.isBlocking) {
+        SoundManager.playDamage(this.scene.getPan(attacker.x));
+        this.scene.vfxManager.hitFlashFilter(player);
+        this.scene.emitHitParticle(player.x, player.y, 20);
+        this.scene.cameras.main.shake(300, 0.04);
+      }
+    }
+  }
+}

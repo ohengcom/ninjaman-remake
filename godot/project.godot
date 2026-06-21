@@ -18,11 +18,13 @@ config/name="Ninja Man Godot Prototype"
 run/main_scene="res://scenes/Main.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
+config/version="3.11.0"
 
 [autoload]
 
 GameState="*res://scripts/autoload/game_state.gd"
 AudioManager="*res://scripts/autoload/audio_manager.gd"
+Balance="*res://scripts/autoload/balance.gd"
 
 [display]
 
