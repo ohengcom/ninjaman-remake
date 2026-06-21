@@ -26,12 +26,12 @@ Two independent Vercel projects serve both builds for side-by-side comparison:
 |---|---|---|
 | Vercel project root | `.` | `godot` |
 | Config | `vercel.json` | `godot/vercel.json` |
-| Build | Vercel runs `npm run build` → `dist/` | GitHub Action exports → `godot/build/web/` |
-| Artifacts in git | No | No (41MB build output untracked) |
+| Build | Vercel runs `npm run build` → `dist/` | Pre-built `godot/build/web/` committed |
+| Artifacts in git | No | Yes (Godot web build committed for static hosting) |
 
-- **`build/web/` (41MB) removed from git tracking** — `.gitignore` now ignores `build/`.
+- **Root `build/` removed from git tracking** — `.gitignore` ignores the Phaser/root `build/`.
+- **`godot/build/web/` committed** for zero-CI static hosting on Vercel (no Godot CLI available in Vercel's build env). Editor sidecars (`*.import`) and `.vercel/` excluded.
 - **`vercel.godot.json` / `vercel.phaser.json` deleted** — replaced by per-track `vercel.json` (root + `godot/`).
-- **`.github/workflows/deploy-godot.yml`** — builds Godot web export on Ubuntu (works around the Windows CLI 98% hang) and deploys prebuilt output to Vercel.
 - **5 conflicting deployment docs merged** into a single `DEPLOYMENT.md`.
 
 ## Godot: centralized balance + state machines

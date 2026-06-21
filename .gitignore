@@ -15,3 +15,9 @@ scratch/
 godot/.godot/
 godot/exported/
 godot/build/
+# Godot web build output is committed for static Vercel hosting (no Godot CLI on Vercel).
+!godot/build/
+!godot/build/web/
+!godot/build/web/**
+# But not editor import sidecars (not needed for static serving).
+godot/build/web/*.import
